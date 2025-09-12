@@ -1,0 +1,212 @@
+<!-- dashboard.component.html -->
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1>Dashboard</h1>
+        </div>
+      <div class="header-actions">
+        <button class="btn btn-refresh" (click)="refreshStats()" [disabled]="loading">
+          <svg class="icon" [class.spinning]="loading" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+          <span>Actualizar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Cargando información...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <svg class="error-icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
+      <h3>Ocurrió un error</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="refreshStats()">
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="stats && !loading" class="dashboard-content">
+    
+    <!-- KPI Cards -->
+    <div class="kpi-section">
+      <div class="kpi-grid">
+        <div class="kpi-card primary">
+          <div class="kpi-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-number">{{ stats.productos.total }}</div>
+            <div class="kpi-label">Total Productos</div>
+          </div>
+        </div>
+
+        <div class="kpi-card success">
+          <div class="kpi-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-number">{{ stats.categorias.total }}</div>
+            <div class="kpi-label">Total Categorías</div>
+          </div>
+        </div>
+
+        <div class="kpi-card info">
+          <div class="kpi-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.5 8H16c-.8 0-1.54.37-2.01 1.01l-.74 1.48A2 2 0 0 0 15.13 13H16v7h4z"/>
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-number">{{ stats.clientes.total }}</div>
+            <div class="kpi-label">Total Clientes</div>
+          </div>
+        </div>
+
+        <div class="kpi-card warning">
+          <div class="kpi-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-number">{{ stats.pedidos.total }}</div>
+            <div class="kpi-label">Total Pedidos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="charts-grid">
+        
+        <!-- Productos Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Distribución de Productos</h3>
+          </div>
+          <div class="chart-container">
+            <div class="pie-chart-container">
+              <div class="pie-chart" [attr.data-chart]="'productos'">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" stroke-width="20"/>
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="#10b981" stroke-width="20"
+                          [attr.stroke-dasharray]="(stats.productos.activos / stats.productos.total * 502.4) + ' 502.4'"
+                          stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+                </svg>
+                <div class="chart-center-text">
+                  <div class="center-number">{{ stats.productos.activos }}</div>
+                  <div class="center-label">Activos</div>
+                </div>
+              </div>
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #10b981;"></div>
+                  <span>Activos ({{ stats.productos.activos }})</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #f59e0b;"></div>
+                  <span>Sin Stock ({{ stats.productos.sin_stock }})</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pedidos Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Estado de Pedidos</h3>
+          </div>
+          <div class="chart-container">
+            <div class="bar-chart">
+              <div class="bar-item">
+                <div class="bar-label">Pendientes</div>
+                <div class="bar-container">
+                  <div class="bar-fill warning" 
+                       [style.width.%]="(stats.pedidos.pendientes / stats.pedidos.total) * 100">
+                  </div>
+                </div>
+                <div class="bar-value">{{ stats.pedidos.pendientes }}</div>
+              </div>
+              
+              <div class="bar-item">
+                <div class="bar-label">Pagados</div>
+                <div class="bar-container">
+                  <div class="bar-fill success" 
+                       [style.width.%]="(stats.pedidos.pagados / stats.pedidos.total) * 100">
+                  </div>
+                </div>
+                <div class="bar-value">{{ stats.pedidos.pagados }}</div>
+              </div>
+              
+              <div class="bar-item">
+                <div class="bar-label">Enviados</div>
+                <div class="bar-container">
+                  <div class="bar-fill info" 
+                       [style.width.%]="(stats.pedidos.enviados / stats.pedidos.total) * 100">
+                  </div>
+                </div>
+                <div class="bar-value">{{ stats.pedidos.enviados }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clientes Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Tipos de Clientes</h3>
+          </div>
+          <div class="chart-container">
+            <div class="donut-chart">
+              <svg width="200" height="200" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#e5e7eb" stroke-width="30"/>
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#8b5cf6" stroke-width="30"
+                        [attr.stroke-dasharray]="(stats.clientes.registrados / stats.clientes.total * 439.8) + ' 439.8'"
+                        stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#06b6d4" stroke-width="30"
+                        [attr.stroke-dasharray]="(stats.clientes.invitados / stats.clientes.total * 439.8) + ' 439.8'"
+                        [attr.stroke-dashoffset]="-(stats.clientes.registrados / stats.clientes.total * 439.8)"
+                        transform="rotate(-90 100 100)"/>
+              </svg>
+              <div class="donut-center">
+                <div class="center-number">{{ stats.clientes.total }}</div>
+                <div class="center-label">Total</div>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background-color: #8b5cf6;"></div>
+                <span>Registrados ({{ stats.clientes.registrados }})</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background-color: #06b6d4;"></div>
+                <span>Invitados ({{ stats.clientes.invitados }})</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

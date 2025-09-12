@@ -1,0 +1,439 @@
+<div class="carrusel-container">
+  <!-- Header -->
+  <div class="carrusel-header">
+    <h1 class="titulo">Gestión del Carrusel</h1>
+    <div class="header-actions">
+      <button 
+        *ngIf="!modoReordenar" 
+        class="btn btn-secondary" 
+        (click)="activarModoReordenar()"
+        [disabled]="carrusel.length === 0"
+      >
+        <span class="btn-icon">⇅</span>
+        Reordenar
+      </button>
+      <button class="btn btn-primary" (click)="mostrarFormularioCrear()" *ngIf="!modoReordenar">
+        <span class="btn-icon">+</span>
+        Nueva Imagen
+      </button>
+    </div>
+  </div>
+
+  <!-- Modo reordenamiento -->
+  <div *ngIf="modoReordenar" class="reordenar-section">
+    <div class="reordenar-header">
+      <h3>Modo Reordenamiento</h3>
+      <p>Usa las flechas para cambiar el orden de las imágenes</p>
+    </div>
+    <div class="reordenar-actions">
+      <button class="btn btn-secondary" (click)="cancelarReordenamiento()" [disabled]="reordenandoGuardado">
+        Cancelar
+      </button>
+      <button class="btn btn-success" (click)="guardarReordenamiento()" [disabled]="reordenandoGuardado">
+        <span *ngIf="reordenandoGuardado" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        {{ reordenandoGuardado ? 'Guardando...' : 'Guardar Orden' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros (solo si no está en modo reordenar) -->
+  <div *ngIf="!modoReordenar" class="filtros-section">
+    <div class="filtros-row">
+      <!-- Estado -->
+      <div class="filtro-grupo">
+        <label class="filtro-label">Estado:</label>
+        <select class="filtro-select" [(ngModel)]="filtros.estado">
+          <option value="todos">Todos</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
+
+      <!-- Botones de filtro -->
+      <div class="filtro-acciones">
+        <button class="btn btn-secondary" (click)="aplicarFiltros()">
+          Buscar
+        </button>
+        <button class="btn btn-outline" (click)="limpiarFiltros()">
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <div class="loading-spinner"></div>
+    <span>Cargando carrusel...</span>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !cargando" class="error-container">
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
+    <button class="btn btn-secondary" (click)="cargarCarrusel()">
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Grid de imágenes -->
+  <div *ngIf="!cargando && !error" class="imagenes-container">
+    <!-- Info de resultados -->
+    <div class="resultados-info">
+      <span>
+        Mostrando {{ carrusel.length }} imágenes
+      </span>
+    </div>
+
+    <!-- Grid -->
+    <div class="imagenes-grid" *ngIf="!modoReordenar">
+      <div *ngFor="let item of carrusel" class="imagen-card">
+        <!-- Imagen -->
+        <div class="imagen-wrapper">
+          <img [src]="item.imagen_url" [alt]="'Imagen ' + item.orden" class="imagen">
+          <div class="imagen-overlay">
+            <div class="overlay-content">
+              <span class="orden-badge">{{ item.orden }}</span>
+              <span class="estado-badge" [class]="getEstadoClase(item.estado)">
+                {{ item.estado }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información -->
+        <div class="card-info">
+          <div class="info-row">
+            <span class="info-label">Orden:</span>
+            <span class="info-value">{{ item.orden }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Estado:</span>
+            <span class="estado-badge small" [class]="getEstadoClase(item.estado)">
+              {{ item.estado }}
+            </span>
+          </div>
+        <div class="info-row" *ngIf="item.producto_id">
+                <span class="info-label">Producto:</span>
+                <span class="info-value">{{ getProductoNombre(item.producto_id) }}</span>
+                </div>
+                <div class="info-row" *ngIf="item.producto_precio">
+                <span class="info-label">Precio:</span>
+                <span class="info-value">{{ formatearPrecio(item.producto_precio) }}</span>
+        </div>
+          <div class="info-row">
+            <span class="info-label">Creado:</span>
+            <span class="info-value fecha">{{ item.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="card-actions">
+          <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(item)">
+            <i class="fas fa-edit"></i>
+          </button>
+          
+          <button 
+            class="btn-accion btn-estado" 
+            [class.btn-activar]="item.estado === 'inactivo'"
+            [class.btn-desactivar]="item.estado === 'activo'"
+            [title]="item.estado === 'activo' ? 'Desactivar' : 'Activar'"
+            (click)="confirmarCambiarEstado(item)"
+          >
+            <i class="fas" [class.fa-eye-slash]="item.estado === 'activo'" [class.fa-eye]="item.estado === 'inactivo'"></i>
+          </button>
+
+          <button class="btn-accion btn-eliminar" title="Eliminar" (click)="confirmarEliminar(item)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay imágenes -->
+        <div *ngIf="carrusel.length === 0" class="empty-state-container">
+            <div class="empty-state">
+                <div class="empty-icon">🖼️</div>
+                <h3>No hay imágenes en el carrusel</h3>
+                <p>Agrega imágenes para mostrar en el carrusel del sitio web.</p>
+                <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+                Agregar primera imagen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de reordenamiento -->
+    <div class="reordenar-lista" *ngIf="modoReordenar">
+      <div *ngFor="let item of carruselTemporal; let i = index" class="reordenar-item">
+        <div class="item-info">
+          <img [src]="item.imagen_url" [alt]="'Imagen ' + (i + 1)" class="mini-imagen">
+        <div class="item-details">
+            <span class="nuevo-orden">Posición {{ i + 1 }}</span>
+            <span class="estado-badge small" [class]="getEstadoClase(item.estado)">{{ item.estado }}</span>
+            <span *ngIf="item.producto_nombre" class="producto-info">{{ item.producto_nombre }}</span>
+        </div>
+        </div>
+        
+        <div class="reordenar-controles">
+          <button 
+            class="btn-reorden btn-arriba" 
+            (click)="moverArriba(i)" 
+            [disabled]="i === 0"
+            title="Mover hacia arriba"
+          >
+            ↑
+          </button>
+          <button 
+            class="btn-reorden btn-abajo" 
+            (click)="moverAbajo(i)" 
+            [disabled]="i === carruselTemporal.length - 1"
+            title="Mover hacia abajo"
+          >
+            ↓
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de formulario -->
+<div *ngIf="mostrarFormulario" class="modal-overlay" (click)="cerrarFormulario()">
+  <div class="modal-container carrusel-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">{{ getTitulo() }}</h2>
+      <button class="btn-cerrar" (click)="cerrarFormulario()" type="button">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      
+      <!-- Mensaje de respuesta -->
+      <div *ngIf="mensaje" class="mensaje" [class]="'mensaje-' + tipoMensaje">
+        <span class="mensaje-icono">
+          {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
+        </span>
+        {{ mensaje }}
+      </div>
+
+      <!-- Formulario -->
+      <form class="carrusel-form" (ngSubmit)="guardar()" #carruselForm="ngForm">
+        
+        <!-- Imagen actual (solo en edición) -->
+        <div *ngIf="itemEditando && itemEditando.imagen_url && !imagenPreview" class="imagen-actual">
+          <label class="form-label">Imagen actual:</label>
+          <div class="imagen-preview">
+            <img [src]="itemEditando.imagen_url" alt="Imagen actual" class="preview-img">
+          </div>
+        </div>
+
+        <!-- Selección de imagen -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="imagen">
+              {{ itemEditando ? 'Nueva imagen (opcional)' : 'Imagen *' }}
+            </label>
+            <div class="file-input-wrapper">
+              <input
+                type="file"
+                id="imagen"
+                class="file-input"
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                (change)="onImagenSeleccionada($event)"
+                [class.error]="errores.imagen"
+              />
+              <label for="imagen" class="file-input-label">
+                <span class="file-icon">📁</span>
+                Seleccionar imagen
+              </label>
+            </div>
+            <div *ngIf="errores.imagen" class="error-message">
+              {{ errores.imagen }}
+            </div>
+            <div class="file-help">
+              Formatos: JPG, PNG, WebP. Tamaño máximo: 5MB
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview de imagen -->
+        <div *ngIf="imagenPreview" class="form-row">
+          <div class="form-group">
+            <label class="form-label">Vista previa:</label>
+            <div class="imagen-preview">
+              <img [src]="imagenPreview" alt="Preview" class="preview-img">
+              <button type="button" class="btn-remove-preview" (click)="eliminarImagenPreview()" title="Quitar imagen">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Producto asociado -->
+        <div class="form-row">
+        <div class="form-group">
+            <label class="form-label" for="producto_id">
+            Producto asociado
+            </label>
+            <select
+            id="producto_id"
+            class="form-select"
+            [(ngModel)]="formulario.producto_id"
+            name="producto_id"
+            [disabled]="cargandoProductos"
+            >
+              <option value="" disabled selected>
+                -- Selecciona un producto --
+              </option>            <option 
+                *ngFor="let producto of productos" 
+                [ngValue]="producto.id"
+            >
+                {{ producto.nombre }} - {{ formatearPrecio(producto.precio) }}
+            </option>
+            </select>
+            <div *ngIf="cargandoProductos" class="input-help">
+            <div class="loading-spinner-small"></div>
+            Cargando productos...
+            </div>
+            <div class="input-help" *ngIf="!cargandoProductos">
+            Selecciona un producto para asociar con esta imagen
+            </div>
+        </div>
+        </div>
+
+        <!-- Orden -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="orden">
+              Orden (opcional)
+            </label>
+            <input
+              type="number"
+              id="orden"
+              class="form-input"
+              [(ngModel)]="formulario.orden"
+              name="orden"
+              placeholder="  vacío para agregar al final"
+              [class.error]="errores.orden"
+              min="0"
+            />
+            <div *ngIf="errores.orden" class="error-message">
+              {{ errores.orden }}
+            </div>
+            <div class="input-help">
+              Si no especificas un orden, se agregará al final
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="estado">
+              Estado
+            </label>
+            <select
+              id="estado"
+              class="form-select"
+              [(ngModel)]="formulario.estado"
+              name="estado"
+            >
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cerrarFormulario()"
+        [disabled]="enviando"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="guardar()"
+        [disabled]="enviando || (!itemEditando && !formulario.imagen)"
+      >
+        <span *ngIf="enviando" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        {{ getTextoBotonGuardar() }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
+  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">Confirmar acción</h2>
+      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <div class="confirmacion-content">
+        <div class="confirmacion-icon">
+          <span *ngIf="accionConfirmacion === 'eliminar'" class="icon-warning">⚠️</span>
+          <span *ngIf="accionConfirmacion === 'cambiarEstado'" class="icon-question">❓</span>
+        </div>
+        <p class="confirmacion-mensaje">
+          {{ mensajeConfirmacion }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cerrarConfirmacion()"
+        [disabled]="procesandoAccion"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn"
+        [class.btn-danger]="accionConfirmacion === 'eliminar'"
+        [class.btn-primary]="accionConfirmacion === 'cambiarEstado'"
+        (click)="ejecutarAccion()"
+        [disabled]="procesandoAccion"
+      >
+        <span *ngIf="procesandoAccion" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        <span *ngIf="accionConfirmacion === 'eliminar'">
+          {{ procesandoAccion ? 'Eliminando...' : 'Eliminar' }}
+        </span>
+        <span *ngIf="accionConfirmacion === 'cambiarEstado'">
+          {{ procesandoAccion ? 'Cambiando...' : 'Cambiar Estado' }}
+        </span>
+      </button>
+    </div>
+
+  </div>
+</div>

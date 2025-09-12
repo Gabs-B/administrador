@@ -1,0 +1,338 @@
+<div class="productos-container">
+    <!-- Header -->
+    <div class="productos-header">
+        <h1 class="titulo">Gestión de Productos</h1>
+        <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+        <span class="btn-icon">+</span>
+        Nuevo Producto
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-section">
+        <div class="filtros-row">
+        <!-- Búsqueda -->
+        <div class="filtro-grupo">
+            <label class="filtro-label">Buscar:</label>
+            <input
+            type="text"
+            class="filtro-input"
+            placeholder="Buscar por nombre..."
+            [(ngModel)]="filtros.buscar"
+            (keyup.enter)="aplicarFiltros()"
+            />
+        </div>
+
+        <!-- Estado -->
+        <div class="filtro-grupo">
+            <label class="filtro-label">Estado:</label>
+            <select class="filtro-select" [(ngModel)]="filtros.estado">
+            <option value="todos">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+            </select>
+        </div>
+
+        <!-- Sin Stock -->
+        <div class="filtro-grupo">
+            <label class="filtro-checkbox">
+            <input
+                type="checkbox"
+                [(ngModel)]="filtros.sin_stock"
+            />
+            <span class="checkmark"></span>
+            Sin stock
+            </label>
+        </div>
+
+        <!-- Botones de filtro -->
+        <div class="filtro-acciones">
+            <button class="btn btn-secondary" (click)="aplicarFiltros()">
+            Buscar
+            </button>
+            <button class="btn btn-outline" (click)="limpiarFiltros()">
+            Limpiar
+            </button>
+        </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading-container">
+        <div class="loading-spinner"></div>
+        <span>Cargando productos...</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="error-container">
+        <div class="error-message">
+        <span class="error-icon">⚠️</span>
+        {{ error }}
+        </div>
+        <button class="btn btn-secondary" (click)="cargarProductos()">
+        Reintentar
+        </button>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div *ngIf="!cargando && !error" class="tabla-container">
+        <!-- Info de resultados -->
+        <div class="resultados-info">
+        <span>
+            Mostrando {{ productos.length }} de {{ totalProductos }} productos
+        </span>
+        
+        <!-- Productos por página -->
+        <div class="productos-per-page">
+            <label>Mostrar:</label>
+           <select 
+            class="filtro-select small"
+            [value]="productosPorPagina"
+            #perPageSelect
+            (change)="cambiarProductosPorPagina(+perPageSelect.value)"
+            >
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            </select>
+            <span>por página</span>
+        </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="tabla-wrapper">
+        <table class="productos-tabla">
+            <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>SKU</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let producto of productos" class="producto-row">
+                <!-- Imagen -->
+                <td class="imagen-cell">
+                <div class="imagen-container">
+                    <img 
+                    *ngIf="producto.imagen_principal_url"
+                    [src]="producto.imagen_principal_url  "
+                    [alt]="producto.nombre"
+                    class="producto-imagen"
+                    onerror="this.style.display='none'"
+                    />
+                    <div *ngIf="!producto.imagen_principal_url" class="imagen-placeholder">
+                    📦
+                    </div>
+                    <div *ngIf="producto.total_imagenes && producto.total_imagenes > 1" class="badge-imagenes">
+                      +{{ producto.total_imagenes - 1 }}
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Nombre -->
+                <td class="nombre-cell">
+                <div class="producto-info">
+                    <span class="producto-nombre">{{ producto.nombre }}</span>
+                    <span class="producto-descripcion">
+                    {{ producto.descripcion | slice:0:50 }}{{ producto.descripcion.length > 50 ? '...' : '' }}
+                    </span>
+                </div>
+                </td>
+
+                <!-- SKU -->
+                <td class="sku-cell">
+                <span class="sku-text">{{ producto.sku || '-' }}</span>
+                </td>
+
+                <!-- Categoría -->
+                <td class="categoria-cell">
+                <span class="categoria-text">
+                    {{ producto.categoria?.nombre || 'Sin categoría' }}
+                </span>
+                </td>
+
+                <!-- Precio -->
+                <td class="precio-cell">
+                <span class="precio-text">{{ formatearPrecio(producto.precio) }}</span>
+                </td>
+
+                <!-- Stock -->
+                <td class="stock-cell">
+                <span 
+                    class="stock-badge"
+                    [class.stock-bajo]="producto.stock <= 10"
+                    [class.sin-stock]="producto.stock === 0"
+                >
+                    {{ producto.stock }}
+                </span>
+                </td>   
+
+                <!-- Estado -->
+                <td class="estado-cell">
+                <span 
+                    class="estado-badge"
+                    [class]="getEstadoClase(producto.estado)"
+                >
+                    {{ producto.estado }}
+                </span>
+                </td>
+
+                <!-- Acciones -->
+                <td class="acciones-cell">
+                <div class="acciones-buttons">
+
+                    <!-- Editar -->
+                    <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(producto)">
+                    <i class="fas fa-edit"></i>
+                    </button>
+
+                    <!-- Desactivar -->
+                    <button 
+                    *ngIf="producto.estado === 'activo'"
+                    class="btn-accion btn-desactivar" 
+                    title="Desactivar"
+                    (click)="confirmarEliminar(producto)"
+                    >
+                    <i class="fas fa-ban"></i>
+                    </button>
+
+                    <!-- Activar -->
+                    <button 
+                    *ngIf="producto.estado === 'inactivo'"
+                    class="btn-accion btn-activar" 
+                    title="Activar"
+                    (click)="confirmarActivar(producto)"
+                    >
+                    <i class="fas fa-check"></i>
+                    </button>
+
+                </div>
+                </td>
+
+
+            </tr>
+
+            <!-- Mensaje cuando no hay productos -->
+            <tr *ngIf="productos.length === 0" class="empty-row">
+                <td colspan="8" class="empty-cell">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3>No hay productos</h3>
+                    <p>No se encontraron productos con los filtros aplicados.</p>
+                    <button class="btn btn-primary" (click)="limpiarFiltros()">
+                    Ver todos los productos
+                    </button>
+                </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+
+      <!-- Paginación NUEVA -->
+        <div *ngIf="totalPaginas > 1" class="paginacion">
+            <button 
+                class="btn btn-outline"
+                [disabled]="paginaActual === 1"
+                (click)="cambiarPagina(paginaActual - 1)"
+            >
+                Anterior
+            </button>
+            
+            <div class="paginacion-numeros">
+                <ng-container *ngFor="let pagina of getPaginasVisibles()">
+                    <button 
+                        *ngIf="pagina !== -1"
+                        class="btn-pagina"
+                        [class.activa]="pagina === paginaActual"
+                        (click)="cambiarPagina(pagina)"
+                    >
+                        {{ pagina }}
+                    </button>
+                    <span *ngIf="pagina === -1" class="puntos-separacion">...</span>
+                </ng-container>
+            </div>
+            
+            <button 
+                class="btn btn-outline"
+                [disabled]="paginaActual === totalPaginas"
+                (click)="cambiarPagina(paginaActual + 1)"
+            >
+                Siguiente
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de formulario -->
+<app-producto-form
+  [producto]="productoEditando"
+  [mostrar]="mostrarFormulario"
+  (cerrar)="cerrarFormulario()"
+  (guardado)="onProductoGuardado($event)"
+>
+</app-producto-form>
+
+<!-- Modal de confirmación -->
+<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
+  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">Confirmar acción</h2>
+      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <div class="confirmacion-content">
+        <div class="confirmacion-icon">
+          <span *ngIf="accionConfirmacion === 'eliminar'" class="icon-warning">⚠️</span>
+          <span *ngIf="accionConfirmacion === 'activar'" class="icon-question">❓</span>
+        </div>
+        <p class="confirmacion-mensaje">
+          {{ mensajeConfirmacion }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cerrarConfirmacion()"
+        [disabled]="procesandoAccion"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn"
+        [class.btn-danger]="accionConfirmacion === 'eliminar'"
+        [class.btn-success]="accionConfirmacion === 'activar'"
+        (click)="ejecutarAccion()"
+        [disabled]="procesandoAccion"
+      >
+        <span *ngIf="procesandoAccion" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        <span *ngIf="accionConfirmacion === 'eliminar'">
+          {{ procesandoAccion ? 'Desactivando...' : 'Desactivar' }}
+        </span>
+        <span *ngIf="accionConfirmacion === 'activar'">
+          {{ procesandoAccion ? 'Activando...' : 'Activar' }}
+        </span>
+      </button>
+    </div>
+
+  </div>
+</div>

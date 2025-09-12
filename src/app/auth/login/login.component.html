@@ -1,0 +1,82 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>ADMINISTRADOR</h1>
+      <p>Ingresa tus credenciales para acceder</p>
+    </div>
+
+    <!-- Mensaje de error general -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Campo Email -->
+      <div class="form-group">
+        <label for="email">Email: </label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('email')"
+          [disabled]="loading"
+          placeholder="Ingresa tu email"
+        >
+        <div *ngIf="isFieldInvalid('email')" class="error-messages">
+          <!-- Errores de validación del formulario -->
+          <small *ngIf="hasError('email', 'required')" class="error-text">
+            El email es requerido
+          </small>
+          <small *ngIf="hasError('email', 'email')" class="error-text">
+            Ingresa un email válido
+          </small>
+          <!-- Errores del servidor -->
+          <small *ngFor="let error of getServerErrors('email')" class="error-text">
+            {{ error }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Campo Password -->
+      <div class="form-group">
+        <label for="password">Contraseña: </label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('password')"
+          [disabled]="loading"
+          placeholder="Ingresa tu contraseña"
+        >
+        <div *ngIf="isFieldInvalid('password')" class="error-messages">
+          <!-- Errores de validación del formulario -->
+          <small *ngIf="hasError('password', 'required')" class="error-text">
+            La contraseña es requerida
+          </small>
+          <!-- Errores del servidor -->
+          <small *ngFor="let error of getServerErrors('password')" class="error-text">
+            {{ error }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Botón Submit -->
+      <div class="form-group">
+        <button 
+          type="submit" 
+          class="btn-submit"
+          [disabled]="loading || loginForm.invalid"
+          [class.loading]="loading"
+        >
+          <span *ngIf="!loading">Ingresar</span>
+          <span *ngIf="loading" class="loading-text">
+            <span class="spinner"></span>
+            Iniciando sesión...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

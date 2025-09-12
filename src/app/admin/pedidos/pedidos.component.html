@@ -1,0 +1,473 @@
+<div class="pedidos-container">
+    <!-- Header -->
+    <div class="pedidos-header">
+        <h1 class="titulo">Gestión de Pedidos</h1>
+        
+        <!-- Estadísticas rápidas -->
+        <div *ngIf="estadisticas && !cargandoEstadisticas" class="estadisticas-rapidas">
+            <div class="stat-card">
+                <span class="stat-numero">{{ estadisticas.total_pedidos }}</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-numero">{{ estadisticas.pendientes }}</span>
+                <span class="stat-label">Pendientes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-numero">{{ estadisticas.pagados }}</span>
+                <span class="stat-label">Pagados</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-numero">{{ formatearMoneda(estadisticas.monto_total) }}</span>
+                <span class="stat-label">Monto Total</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-section">
+        <div class="filtros-row">
+            <!-- Búsqueda -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Buscar:</label>
+                <input
+                    type="text"
+                    class="filtro-input"
+                    placeholder="Cliente, DNI, email..."
+                    [(ngModel)]="filtros.buscar"
+                    (keyup.enter)="aplicarFiltros()"
+                />
+            </div>
+
+            <!-- Estado -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Estado:</label>
+                <select class="filtro-select" [(ngModel)]="filtros.estado">
+                    <option *ngFor="let estado of estadosDisponibles" [value]="estado.valor">
+                        {{ estado.etiqueta }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Fecha desde -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Desde:</label>
+                <input
+                    type="date"
+                    class="filtro-input"
+                    [(ngModel)]="filtros.fecha_desde"
+                />
+            </div>
+
+            <!-- Fecha hasta -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Hasta:</label>
+                <input
+                    type="date"
+                    class="filtro-input"
+                    [(ngModel)]="filtros.fecha_hasta"
+                />
+            </div>
+
+            <!-- Monto mínimo -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Monto mín:</label>
+                <input
+                    type="number"
+                    class="filtro-input"
+                    placeholder="0.00"
+                    [(ngModel)]="filtros.monto_min"
+                    min="0"
+                    step="0.01"
+                />
+            </div>
+
+            <!-- Monto máximo -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Monto máx:</label>
+                <input
+                    type="number"
+                    class="filtro-input"
+                    placeholder="0.00"
+                    [(ngModel)]="filtros.monto_max"
+                    min="0"
+                    step="0.01"
+                />
+            </div>
+
+            <!-- Botones de filtro -->
+            <div class="filtro-acciones">
+                <button class="btn btn-secondary" (click)="aplicarFiltros()">
+                    Buscar
+                </button>
+                <button class="btn btn-outline" (click)="limpiarFiltros()">
+                    Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading-container">
+        <div class="loading-spinner"></div>
+        <span>Cargando pedidos...</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="error-container">
+        <div class="error-message">
+            <span class="error-icon">⚠️</span>
+            {{ error }}
+        </div>
+        <button class="btn btn-secondary" (click)="cargarPedidos()">
+            Reintentar
+        </button>
+    </div>
+
+    <!-- Tabla de pedidos -->
+    <div *ngIf="!cargando && !error" class="tabla-container">
+        <!-- Info de resultados -->
+        <div class="resultados-info">
+            <span>
+                Mostrando {{ pedidos.length }} de {{ totalPedidos }} pedidos
+            </span>
+            <div class="paginacion-info" *ngIf="paginacion">
+                Página {{ paginacion.current_page }} de {{ paginacion.last_page }}
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="tabla-wrapper">
+            <table class="pedidos-tabla">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Productos</th>
+                        <th>Estado</th>
+                        <th>Pago</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let pedido of pedidos" class="pedido-row">
+                        <!-- ID del pedido -->
+                        <td class="id-cell">
+                        <span class="pedido-id">PED - {{ pedido.id }}</span>
+                        </td>
+
+                        <!-- Cliente -->
+                        <td class="cliente-cell">
+                            <div class="cliente-info">
+                                <span class="cliente-nombre">{{ pedido.cliente.nombre }}</span>
+                                <span class="cliente-detalle">
+                                    {{ pedido.cliente.dni }} • {{ pedido.cliente.email }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- Total -->
+                        <td class="total-cell">
+                            <span class="total-amount">{{ formatearMoneda(pedido.total) }}</span>
+                        </td>
+
+                        <!-- Cantidad de items -->
+                        <td class="items-cell">
+                            <span class="items-count">{{ pedido.cantidad_items }} items</span>
+                        </td>
+
+                        <!-- Estado -->
+                        <td class="estado-cell">
+                        <span 
+                            class="estado-badge"
+                            [class]="getEstadoClase(pedido.estado_pedido)"
+                        >
+                            {{ pedido.estado_pedido | titlecase }}
+                        </span>
+
+                        <div *ngIf="estaEditandoEstado(pedido.id)" class="loading-estado">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        </td>
+
+
+                        <!-- Estado del pago -->
+                        <td class="pago-cell">
+                            <span 
+                                class="pago-estado"
+                                [class.pago-aprobado]="pedido.tiene_pago_aprobado"
+                                [class.pago-pendiente]="!pedido.tiene_pago_aprobado"
+                            >
+                                {{ pedido.tiene_pago_aprobado ? 'Aprobado' : 'Pendiente' }}
+                            </span>
+                            <div *ngIf="pedido.metodos_pago.length > 0" class="metodos-pago">
+                                <span *ngFor="let metodo of pedido.metodos_pago" class="metodo-badge">
+                                    {{ metodo }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- Fecha -->
+                        <td class="fecha-cell">
+                            <span class="fecha-texto">{{ formatearFecha(pedido.fecha_pedido) }}</span>
+                        </td>
+
+                        <!-- Acciones -->
+                        <td class="acciones-cell">
+                            <button 
+                                class="btn btn-sm btn-outline"
+                                (click)="verDetallePedido(pedido.id)"
+                                title="Ver detalles"
+                            >
+                                <i class="fas fa-eye"></i>
+                                Ver
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Mensaje cuando no hay pedidos -->
+                    <tr *ngIf="pedidos.length === 0" class="empty-row">
+                        <td colspan="8" class="empty-cell">
+                            <div class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <h3>No hay pedidos</h3>
+                                <p>No se encontraron pedidos con los filtros aplicados.</p>
+                                <button class="btn btn-primary" (click)="limpiarFiltros()">
+                                    Ver todos los pedidos
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div *ngIf="paginacion && paginacion.last_page > 1" class="paginacion">
+            <button 
+                class="btn btn-outline"
+                [disabled]="paginacion.current_page === 1"
+                (click)="cambiarPagina(paginacion.current_page - 1)"
+            >
+                Anterior
+            </button>
+            
+            <div class="paginacion-numeros">
+                <button 
+                    *ngFor="let pagina of getPaginasVisibles()"
+                    class="btn-pagina"
+                    [class.activa]="pagina === paginacion.current_page"
+                    [disabled]="pagina === -1"
+                    (click)="pagina !== -1 && cambiarPagina(pagina)"
+                >
+                    {{ pagina === -1 ? '...' : pagina }}
+                </button>
+            </div>
+            
+            <button 
+                class="btn btn-outline"
+                [disabled]="paginacion.current_page === paginacion.last_page"
+                (click)="cambiarPagina(paginacion.current_page + 1)"
+            >
+                Siguiente
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Modal de detalle del pedido - Agregar al final del template principal -->
+<div *ngIf="mostrarModal" class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">
+        Detalles del Pedido {{ pedidoDetalle?.id ? 'PED-' + pedidoDetalle?.id : '' }}
+      </h2>
+      <button class="modal-cerrar" (click)="cerrarModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Loading del modal -->
+    <div *ngIf="cargandoDetalle" class="modal-loading">
+      <div class="loading-spinner"></div>
+      <span>Cargando detalles del pedido...</span>
+    </div>
+
+    <!-- Error del modal -->
+    <div *ngIf="errorDetalle && !cargandoDetalle" class="modal-error">
+      <div class="error-message">
+        <span class="error-icon">⚠️</span>
+        {{ errorDetalle }}
+      </div>
+      <button class="btn btn-secondary" (click)="cargarDetallePedido(pedidoSeleccionado!)">
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div *ngIf="pedidoDetalle && !cargandoDetalle && !errorDetalle" class="modal-body">
+      
+      <!-- Información del cliente -->
+      <div class="detalle-seccion">
+        <h3 class="seccion-titulo">
+          <i class="fas fa-user"></i>
+          Información del Cliente
+        </h3>
+        <div class="cliente-detalle-grid">
+          <div class="cliente-detalle-item">
+            <span class="detalle-label">Nombre:</span>
+            <span class="detalle-valor">{{ pedidoDetalle.cliente.nombre }}</span>
+          </div>
+          <div class="cliente-detalle-item">
+            <span class="detalle-label">DNI:</span>
+            <span class="detalle-valor">{{ pedidoDetalle.cliente.dni }}</span>
+          </div>
+          <div class="cliente-detalle-item">
+            <span class="detalle-label">Email:</span>
+            <span class="detalle-valor">{{ pedidoDetalle.cliente.email }}</span>
+          </div>
+          <div class="cliente-detalle-item">
+            <span class="detalle-label">Teléfono:</span>
+            <span class="detalle-valor">{{ pedidoDetalle.cliente.telefono || 'No registrado' }}</span>
+          </div>
+          <div class="cliente-detalle-item full-width">
+            <span class="detalle-label">Dirección de envío:</span>
+            <span class="detalle-valor">{{ pedidoDetalle.direccion_envio }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del pedido -->
+      <div class="detalle-seccion">
+        <h3 class="seccion-titulo">
+          <i class="fas fa-shopping-cart"></i>
+          Resumen del Pedido
+        </h3>
+        <div class="pedido-resumen-grid">
+          <div class="resumen-item">
+            <span class="detalle-label">Estado:</span>
+            <span class="estado-badge" [class]="getEstadoClase(pedidoDetalle.estado_pedido)">
+              {{ pedidoDetalle.estado_pedido | titlecase }}
+            </span>
+          </div>
+          <div class="resumen-item">
+            <span class="detalle-label">Total:</span>
+            <span class="total-amount">{{ formatearMoneda(pedidoDetalle.total) }}</span>
+          </div>
+          <div class="resumen-item">
+            <span class="detalle-label">Fecha del pedido:</span>
+            <span class="detalle-valor">{{ formatearFecha(pedidoDetalle.fecha_pedido) }}</span>
+          </div>
+          <div class="resumen-item">
+            <span class="detalle-label">Última actualización:</span>
+            <span class="detalle-valor">{{ formatearFecha(pedidoDetalle.ultima_actualizacion) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items del pedido -->
+      <div class="detalle-seccion">
+        <h3 class="seccion-titulo">
+          <i class="fas fa-box"></i>
+          Productos ({{ pedidoDetalle.items?.length }} items)
+        </h3>
+        <div class="items-container">
+          <div *ngFor="let item of pedidoDetalle.items" class="item-card">
+            <div class="item-imagen">
+          <img 
+            [src]="getImagenProducto(item.producto)" 
+            alt="{{ item.producto   .nombre }}" 
+            (error)="handleImgError($event)"
+            width="80"
+            />
+
+
+
+
+            </div>
+            <div class="item-info">
+              <h4 class="producto-nombre">{{ item.producto.nombre }}</h4>
+              <p class="producto-sku">SKU: {{ item.producto.sku }}</p>
+              <div class="item-detalles">
+                <span class="item-cantidad">Cantidad: {{ item.cantidad }}</span>
+                <span class="item-precio">{{ formatearMoneda(item.precio_venta) }} c/u</span>
+                <span class="item-subtotal">Subtotal: {{ formatearMoneda(item.subtotal) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información de pagos -->
+      <div class="detalle-seccion" *ngIf="pedidoDetalle.pagos && pedidoDetalle.pagos.length > 0">
+        <h3 class="seccion-titulo">
+          <i class="fas fa-credit-card"></i>
+          Información de Pagos
+        </h3>
+        <div class="pagos-container">
+          <div *ngFor="let pago of pedidoDetalle.pagos" class="pago-card">
+            <div class="pago-header">
+              <span class="pago-metodo">{{ pago.metodo_pago | titlecase }}</span>
+              <span class="pago-estado" [class]="getPagoEstadoClase(pago.estado_pago)">
+                {{ getPagoEstadoTexto(pago.estado_pago) }}
+              </span>
+            </div>
+            <div class="pago-detalles">
+              <div class="pago-item">
+                <span class="detalle-label">Monto:</span>
+                <span class="detalle-valor">{{ formatearMoneda(pago.monto) }} {{ pago.moneda }}</span>
+              </div>
+              <div class="pago-item">
+                <span class="detalle-label">Fecha:</span>
+                <span class="detalle-valor">{{ formatearFecha(pago.fecha_pago) }}</span>
+              </div>
+              <div class="pago-item" *ngIf="pago.culqi_charge_id">
+                <span class="detalle-label">ID Transacción:</span>
+                <span class="detalle-valor transaction-id">{{ pago.culqi_charge_id }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer del modal -->
+    <div *ngIf="!cargandoDetalle && !errorDetalle" class="modal-footer">
+      <!-- Cambio de estado -->
+      <div class="estado-cambio" *ngIf="pedidoDetalle && puedeEditarEstado(pedidoDetalle)">
+        <label class="filtro-label">Cambiar estado:</label>
+        <select 
+          class="estado-select"
+          [(ngModel)]="nuevoEstado"
+          [disabled]="cargandoEstado"
+        >
+          <option [value]="pedidoDetalle.estado_pedido">{{ getEstadoTexto(pedidoDetalle.estado_pedido) }} (Actual)</option>
+          <option *ngFor="let estado of getEstadosDisponibles(pedidoDetalle.estado_pedido)" [value]="estado.valor">
+            {{ estado.etiqueta }}
+          </option>
+        </select>
+        <button 
+          class="btn btn-primary btn-sm"
+          [disabled]="nuevoEstado === pedidoDetalle.estado_pedido || cargandoEstado"
+          (click)="actualizarEstadoPedido(pedidoDetalle.id, nuevoEstado)"
+        >
+          <span *ngIf="cargandoEstado" class="loading-text">
+            <i class="fas fa-spinner fa-spin"></i>
+            Actualizando...
+          </span>
+          <span *ngIf="!cargandoEstado">Actualizar Estado</span>
+        </button>
+      </div>
+
+      <!-- <div class="modal-acciones">
+        <button class="btn btn-outline" (click)="cerrarModal()">
+          Cerrar
+        </button>
+      </div> -->
+    </div>
+
+  </div>
+</div>

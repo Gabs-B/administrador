@@ -1,0 +1,480 @@
+<!-- Modal Overlay -->
+<div *ngIf="mostrar" class="modal-overlay" (click)="cerrarModal()">
+  
+  <!-- Modal Container -->
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">{{ getTitulo() }}</h2>
+      <button class="btn-cerrar" (click)="cerrarModal()" type="button">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      
+      <!-- Mensaje de respuesta -->
+      <div *ngIf="mensaje" class="mensaje" [class]="'mensaje-' + tipoMensaje">
+        <span class="mensaje-icono">
+          {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
+        </span>
+        {{ mensaje }}
+      </div>
+
+      <!-- Formulario -->
+      <form class="producto-form" (ngSubmit)="guardar()" #productoForm="ngForm">
+        
+        <!-- Row 1: Nombre y SKU -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="nombre">
+              Nombre del producto *
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              class="form-input"
+              [(ngModel)]="formulario.nombre"
+              name="nombre"
+              placeholder="Ingresa el nombre del producto"
+              [class.error]="errores.nombre"
+              required
+              maxlength="150"
+            />
+            <div *ngIf="errores.nombre" class="error-message">
+              {{ errores.nombre }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sku">
+              SKU (Código)
+            </label>
+            <input
+              type="text"
+              id="sku"
+              class="form-input"
+              [(ngModel)]="formulario.sku"
+              name="sku"
+              placeholder="Código único del producto"
+              [class.error]="errores.sku"
+              maxlength="50"
+            />
+            <div *ngIf="errores.sku" class="error-message">
+              {{ errores.sku }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Categoría y Tienda -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="categoria">
+              Categoría
+            </label>
+            <select
+              id="categoria"
+              class="form-select"
+              [(ngModel)]="formulario.categoria_id"
+              name="categoria_id"
+              [class.error]="errores.categoria_id"
+            >
+              <option value="" disabled selected>
+                -- Selecciona una categoría --
+              </option>
+              <option *ngFor="let categoria of categorias" [value]="categoria.id">
+                {{ categoria.nombre }}
+              </option>
+            </select>
+            <div *ngIf="cargandoCategorias" class="loading-text">
+              Cargando categorías...
+            </div>
+            <div *ngIf="errores.categoria_id" class="error-message">
+              {{ errores.categoria_id }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tienda">
+              Tienda
+            </label>
+            <select
+              id="tienda"
+              class="form-select"
+              [(ngModel)]="formulario.tienda_id"
+              name="tienda_id"
+              [class.error]="errores.tienda_id"
+            >
+              <option value="" disabled selected>
+                -- Selecciona una tienda --
+              </option>
+              <option *ngFor="let tienda of tiendas" [value]="tienda.id">
+                {{ tienda.nombre }}
+              </option>
+            </select>
+            <div *ngIf="cargandoTiendas" class="loading-text">
+              Cargando tiendas...
+            </div>
+            <div *ngIf="errores.tienda_id" class="error-message">
+              {{ errores.tienda_id }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Precio, Descuento y Stock -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="precio">
+              Precio (PEN) *
+            </label>
+            <input
+              type="number"
+              id="precio"
+              class="form-input"
+              [(ngModel)]="formulario.precio"
+              name="precio"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [class.error]="errores.precio"
+              required
+            />
+            <div *ngIf="errores.precio" class="error-message">
+              {{ errores.precio }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="descuento">
+              Descuento (%)
+            </label>
+            <input
+              type="number"
+              id="descuento"
+              class="form-input"
+              [(ngModel)]="formulario.descuento"
+              name="descuento"
+              placeholder="0"
+              min="0"
+              max="100"
+              step="0.01"
+              [class.error]="errores.descuento"
+              (ngModelChange)="formulario.descuento = $event === null || $event === '' ? 0 : $event"
+            />
+
+            <div class="form-help">
+              Porcentaje de descuento (0-100)
+            </div>
+            <div *ngIf="errores.descuento" class="error-message">
+              {{ errores.descuento }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="stock">
+              Stock *
+            </label>
+            <input
+              type="number"
+              id="stock"
+              class="form-input"
+              [(ngModel)]="formulario.stock"
+              name="stock"
+              placeholder="0"
+              min="0"
+              [class.error]="errores.stock"
+              required
+            />
+            <div *ngIf="errores.stock" class="error-message">
+              {{ errores.stock }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4: Estado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="estado">
+              Estado
+            </label>
+            <select
+              id="estado"
+              class="form-select"
+              [(ngModel)]="formulario.estado"
+              name="estado"
+            >
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 5: Descripción -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="descripcion">
+              Descripción *
+            </label>
+            <textarea
+              id="descripcion"
+              class="form-textarea"
+              [(ngModel)]="formulario.descripcion"
+              name="descripcion"
+              placeholder="Describe las características del producto"
+              rows="4"
+              [class.error]="errores.descripcion"
+              required
+            ></textarea>
+            <div *ngIf="errores.descripcion" class="error-message">
+              {{ errores.descripcion }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 6: Detalle -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="detalle">
+              Detalle adicional
+            </label>
+            <textarea
+              id="detalle"
+              class="form-textarea"
+              [(ngModel)]="formulario.detalle"
+              name="detalle"
+              placeholder="Detalles adicionales del producto"
+              rows="3"
+              [class.error]="errores.detalle"
+            ></textarea>
+            <div *ngIf="errores.detalle" class="error-message">
+              {{ errores.detalle }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 7: Beneficios -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="beneficios">
+              Beneficios
+            </label>
+            <textarea
+              id="beneficios"
+              class="form-textarea"
+              [(ngModel)]="formulario.beneficios"
+              name="beneficios"
+              placeholder="Enumera los beneficios del producto"
+              rows="3"
+              [class.error]="errores.beneficios"
+            ></textarea>
+            <div *ngIf="errores.beneficios" class="error-message">
+              {{ errores.beneficios }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 8: Modo de uso -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="modo_uso">
+              Modo de uso
+            </label>
+            <textarea
+              id="modo_uso"
+              class="form-textarea"
+              [(ngModel)]="formulario.modo_uso"
+              name="modo_uso"
+              placeholder="Instrucciones de uso del producto"
+              rows="3"
+              [class.error]="errores.modo_uso"
+            ></textarea>
+            <div *ngIf="errores.modo_uso" class="error-message">
+              {{ errores.modo_uso }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 9: Gestión de Imágenes Múltiples -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label class="form-label" for="imagenes">
+              Imágenes del producto ({{ getTotalImagenesActivas() }}/10)
+            </label>
+            
+            <!-- Input para seleccionar múltiples archivos -->
+            <div class="file-input-wrapper">
+              <input
+                type="file"
+                id="imagenes"
+                class="file-input"
+                (change)="onArchivosSeleccionados($event)"
+                accept="image/*"
+                multiple
+                [class.error]="errores.imagenes"
+              />
+              <label for="imagenes" class="file-input-label">
+                <span class="file-icon">📁</span>
+                Agregar imágenes
+              </label>
+            </div>
+
+            <!-- Contenedor de imágenes existentes -->
+            <div *ngIf="imagenesExistentes.length > 0" class="imagenes-existentes">
+  <h4 class="imagenes-titulo">Imágenes actuales</h4>
+  <div class="imagenes-grid">
+    <div 
+      *ngFor="let imagen of imagenesExistentes; let i = index" 
+      class="imagen-item"
+      [class.imagen-eliminada]="estaMarcadaParaEliminar(imagen.id)"
+      [class.imagen-principal]="imagen.es_principal && !estaMarcadaParaEliminar(imagen.id)"
+    >
+      <div class="imagen-container">
+        <img [src]="imagen.imagen_url" [alt]="imagen.alt_text" class="imagen-preview" />
+        
+        <!-- Badge de imagen principal -->
+        <div *ngIf="imagen.es_principal && !estaMarcadaParaEliminar(imagen.id)" class="badge-principal">
+          Principal
+        </div>
+        
+        <!-- Overlay de eliminada -->
+        <div *ngIf="estaMarcadaParaEliminar(imagen.id)" class="overlay-eliminada">
+          <span>Será eliminada</span>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="imagen-actions">
+          <!-- Botón para establecer como principal (solo si no es principal y no está marcada para eliminar) -->
+          <button
+            type="button"
+            class="btn-action btn-principal"
+            (click)="establecerImagenExistentePrincipal(imagen.id)"
+            *ngIf="!imagen.es_principal && !estaMarcadaParaEliminar(imagen.id) && !enviando"
+            title="Establecer como principal"
+            [disabled]="enviando"
+          >
+            ⭐
+          </button>
+          
+          <!-- Botón eliminar -->
+          <button
+            type="button"
+            class="btn-action btn-delete"
+            (click)="marcarEliminarImagenExistente(imagen.id)"
+            *ngIf="!estaMarcadaParaEliminar(imagen.id)"
+            title="Eliminar imagen"
+            [disabled]="enviando"
+          >
+            🗑️
+          </button>
+          
+          <!-- Botón restaurar -->
+          <button
+            type="button"
+            class="btn-action btn-restore"
+            (click)="cancelarEliminarImagenExistente(imagen.id)"
+            *ngIf="estaMarcadaParaEliminar(imagen.id)"
+            title="Cancelar eliminación"
+            [disabled]="enviando"
+          >
+            ↶
+          </button>
+        </div>
+      </div>
+      <div class="imagen-info">
+        <span class="imagen-nombre">
+          Imagen {{ i + 1 }}
+          <span *ngIf="imagen.es_principal && !estaMarcadaParaEliminar(imagen.id)" class="text-primary"> (Principal)</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+            <!-- Contenedor de nuevas imágenes seleccionadas -->
+            <div *ngIf="imagenesSeleccionadas.length > 0" class="imagenes-nuevas">
+              <h4 class="imagenes-titulo">Nuevas imágenes</h4>
+              <div class="imagenes-grid">
+                <div 
+                  *ngFor="let preview of previsualizacionImagenes; let i = index" 
+                  class="imagen-item"
+                  [class.imagen-principal]="imagenPrincipalIndex === i && !tieneImagenPrincipalExistente()"
+                >
+                  <div class="imagen-container">
+                    <img [src]="preview" [alt]="'Nueva imagen ' + (i + 1)" class="imagen-preview" />
+                    
+                    <!-- Badge de imagen principal (solo si no hay principal existente) -->
+                    <div *ngIf="imagenPrincipalIndex === i && !tieneImagenPrincipalExistente()" class="badge-principal">
+                      Principal
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="imagen-actions">
+                      <button
+                        type="button"
+                        class="btn-action btn-principal"
+                        (click)="establecerImagenPrincipal(i)"
+                        *ngIf="!tieneImagenPrincipalExistente() && imagenPrincipalIndex !== i"
+                        title="Establecer como principal"
+                      >
+                        ⭐
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-action btn-delete"
+                        (click)="eliminarImagenSeleccionada(i)"
+                        title="Quitar imagen"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                  <div class="imagen-info">
+                    <span class="imagen-nombre">{{ imagenesSeleccionadas[i].name }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ayuda y validación -->
+            <div class="form-help">
+              Formatos permitidos: JPG, PNG, WEBP. Tamaño máximo: 2MB por imagen. Máximo 10 imágenes.
+            </div>
+
+            <div *ngIf="errores.imagenes" class="error-message">
+              {{ errores.imagenes }}
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cerrarModal()"
+        [disabled]="enviando"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="guardar()"
+        [disabled]="enviando || !productoForm.valid"
+      >
+        <span *ngIf="enviando" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        {{ getTextoBotonGuardar() }}
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,502 @@
+<div class="cyberwow-container">
+  <!-- Header -->
+  <div class="cyberwow-header">
+    <h1 class="titulo">Gestión CyberWow</h1>
+    <div class="header-actions">
+
+    </div>
+  </div>
+
+  <!-- Información de espacios -->
+<div *ngIf="datosAuxiliares" class="espacios-info">
+  <div class="info-card">
+    <h4>Espacios Disponibles</h4>
+    <div class="espacios-grid">
+      <div class="espacio-item">
+        <span class="espacio-label">Categoría:</span>
+        <span class="espacio-badge" 
+              [class.disponible]="datosAuxiliares.espacios_disponibles.categoria" 
+              [class.ocupado]="!datosAuxiliares.espacios_disponibles.categoria">
+          {{ datosAuxiliares.espacios_disponibles.categoria ? 'Disponible' : 'Ocupado' }}
+        </span>
+      </div>
+      <div class="espacio-item">
+        <span class="espacio-label">Tiendas:</span>
+        <span class="espacio-badge" 
+              [class.disponible]="datosAuxiliares.espacios_disponibles.tiendas" 
+              [class.ocupado]="!datosAuxiliares.espacios_disponibles.tiendas">
+          {{ datosAuxiliares.espacios_disponibles.tiendas ? 'Disponible' : 'Ocupado' }}
+        </span>
+      </div>
+      <div class="espacio-item">
+        <span class="espacio-label">Productos:</span>
+        <span class="espacio-badge disponible">
+          {{ datosAuxiliares.espacios_disponibles.productos }} de 4 disponibles
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="datosAuxiliares && !cargando && !error" class="acciones-banner">
+  <div class="acciones-container">
+    <h4 class="acciones-titulo">Crear Nuevo Banner</h4>
+    <div class="botones-crear">
+
+      <!-- Banner Categoría -->
+      <button 
+        class="btn-crear btn-categoria" 
+        (click)="mostrarFormularioCrear('categoria')"
+        [disabled]="!datosAuxiliares.espacios_disponibles.categoria"
+      >
+        <span class="btn-crear-icon">
+          <i class="fas fa-tags"></i>
+        </span>
+        <div class="btn-crear-content">
+          <span class="btn-crear-titulo">Banner Categoría</span>
+          <small *ngIf="!datosAuxiliares.espacios_disponibles.categoria" class="btn-crear-estado ocupado">No disponible</small>
+          <small *ngIf="datosAuxiliares.espacios_disponibles.categoria" class="btn-crear-estado disponible">Disponible</small>
+        </div>
+      </button>
+
+      <!-- Banner Tiendas -->
+      <button 
+        class="btn-crear btn-tiendas" 
+        (click)="mostrarFormularioCrear('tiendas')"
+        [disabled]="!datosAuxiliares.espacios_disponibles.tiendas"
+      >
+        <span class="btn-crear-icon">
+          <i class="fas fa-store"></i>
+        </span>
+        <div class="btn-crear-content">
+          <span class="btn-crear-titulo">Banner Tiendas</span>
+          <small *ngIf="!datosAuxiliares.espacios_disponibles.tiendas" class="btn-crear-estado ocupado">No disponible</small>
+          <small *ngIf="datosAuxiliares.espacios_disponibles.tiendas" class="btn-crear-estado disponible">Disponible</small>
+        </div>
+      </button>
+
+      <!-- Banner Producto -->
+      <button 
+        class="btn-crear btn-producto" 
+        (click)="mostrarFormularioCrear('producto')"
+        [disabled]="datosAuxiliares.espacios_disponibles.productos <= 0"
+      >
+        <span class="btn-crear-icon">
+          <i class="fas fa-box"></i>
+        </span>
+        <div class="btn-crear-content">
+          <span class="btn-crear-titulo">Banner Producto</span>
+          <small *ngIf="datosAuxiliares.espacios_disponibles.productos <= 0" class="btn-crear-estado ocupado">No disponible</small>
+          <small *ngIf="datosAuxiliares.espacios_disponibles.productos > 0" class="btn-crear-estado disponible">
+            {{ datosAuxiliares.espacios_disponibles.productos }} disponibles
+          </small>
+        </div>
+      </button>
+
+    </div>
+  </div>
+</div>
+    
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <div class="loading-spinner"></div>
+    <span>Cargando banners CyberWow...</span>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !cargando" class="error-container">
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
+    <button class="btn btn-secondary" (click)="cargarBanners()">
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Grid de banners -->
+  <div *ngIf="!cargando && !error" class="banners-container">
+    <!-- Info de resultados -->
+    <div class="resultados-info">
+      <span>
+        Mostrando {{ banners.length }} banners
+      </span>
+    </div>
+
+    <!-- Grid -->
+    <div class="banners-grid">
+      <div *ngFor="let banner of banners" class="banner-card">
+        <!-- Imagen -->
+        <div class="banner-wrapper">
+          <img [src]="banner.imagen_url" [alt]="banner.titulo" class="banner-imagen">
+          <div class="banner-overlay">
+            <div class="overlay-content">
+              <span class="orden-badge">{{ banner.orden }}</span>
+              <span class="estado-badge" [class]="getEstadoClase(banner.estado)">
+                {{ banner.estado }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información -->
+        <div class="card-info">
+          <h3 class="banner-titulo">{{ banner.titulo }}</h3>
+          
+          <div class="info-row">
+            <span class="info-label">Tipo:</span>
+            <span class="info-value tipo-badge">{{ getTipoBanner(banner) }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Orden:</span>
+            <span class="info-value">{{ banner.orden }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Estado:</span>
+            <span class="estado-badge small" [class]="getEstadoClase(banner.estado)">
+              {{ banner.estado }}
+            </span>
+          </div>
+
+          <!-- Información específica por tipo -->
+          <div *ngIf="banner.categoria" class="info-row">
+            <span class="info-label">Categoría:</span>
+            <span class="info-value">{{ banner.categoria.nombre }}</span>
+          </div>
+
+          <div *ngIf="banner.producto" class="info-row">
+            <span class="info-label">Producto:</span>
+            <span class="info-value">{{ banner.producto.nombre }}</span>
+          </div>
+
+          <div *ngIf="banner.producto" class="info-row">
+            <span class="info-label">Precio:</span>
+            <span class="info-value">{{ formatearPrecio(banner.producto.precio) }}</span>
+          </div>
+
+          <div *ngIf="banner.tiendas && banner.tiendas.length > 0" class="info-row">
+            <span class="info-label">Tiendas:</span>
+            <span class="info-value">
+              <div class="tiendas-list">
+                <span *ngFor="let tienda of banner.tiendas; let last = last" class="tienda-item">
+                  {{ tienda.nombre }}<span *ngIf="!last">, </span>
+                </span>
+              </div>
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Creado:</span>
+            <span class="info-value fecha">{{ banner.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="card-actions">
+          <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(banner)">
+            <i class="fas fa-edit"></i>
+          </button>
+
+<!--           <button class="btn-accion btn-eliminar" title="Desactivar" (click)="confirmarEliminar(banner)">
+            <i class="fas fa-trash"></i>
+          </button> -->
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay banners -->
+      <div *ngIf="banners.length === 0" class="empty-state-container">
+        <div class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <h3>No hay banners CyberWow</h3>
+          <p>Crea banners para promocionar categorías, tiendas y productos especiales.</p>
+          <div class="empty-actions" *ngIf="datosAuxiliares">
+            <button 
+              class="btn btn-primary" 
+              (click)="mostrarFormularioCrear('categoria')"
+              [disabled]="!datosAuxiliares.espacios_disponibles.categoria"
+            >
+              Crear primer banner
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de formulario -->
+<div *ngIf="mostrarFormulario" class="modal-overlay" (click)="cerrarFormulario()">
+  <div class="modal-container cyberwow-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">{{ getTitulo() }}</h2>
+      <button class="btn-cerrar" (click)="cerrarFormulario()" type="button">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      
+      <!-- Mensaje de respuesta -->
+      <div *ngIf="mensaje" class="mensaje" [class]="'mensaje-' + tipoMensaje">
+        <span class="mensaje-icono">
+          {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
+        </span>
+        {{ mensaje }}
+      </div>
+
+      <!-- Formulario -->
+      <form class="cyberwow-form" (ngSubmit)="guardar()" #cyberwowForm="ngForm">
+        
+        <!-- Imagen actual (solo en edición) -->
+        <div *ngIf="bannerEditando && bannerEditando.imagen_url && !imagenPreview" class="imagen-actual">
+          <div class="imagen-preview">
+            <img [src]="bannerEditando.imagen_url" alt="Imagen actual" class="preview-img">
+          </div>
+        </div>
+
+        <!-- Título -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="titulo">Título *</label>
+            <input
+              type="text"
+              id="titulo"
+              class="form-input"
+              [(ngModel)]="formulario.titulo"
+              name="titulo"
+              placeholder="Título del banner"
+              [class.error]="errores.titulo"
+              maxlength="150"
+            />
+            <div *ngIf="errores.titulo" class="error-message">
+              {{ errores.titulo }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Selección de imagen -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="imagen">
+              {{ bannerEditando ? 'Nueva imagen (opcional)' : 'Imagen *' }}
+            </label>
+            <div class="file-input-wrapper">
+              <input
+                type="file"
+                id="imagen"
+                class="file-input"
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                (change)="onImagenSeleccionada($event)"
+                [class.error]="errores.imagen"
+              />
+              <label for="imagen" class="file-input-label">
+                <span class="file-icon">📁</span>
+                Seleccionar imagen
+              </label>
+            </div>
+            <div *ngIf="errores.imagen" class="error-message">
+              {{ errores.imagen }}
+            </div>
+            <div class="file-help">
+              Formatos: JPG, PNG, WebP. Tamaño máximo: 2MB
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview de imagen -->
+        <div *ngIf="imagenPreview" class="form-row">
+          <div class="form-group">
+            <label class="form-label">Vista previa:</label>
+            <div class="imagen-preview">
+              <img [src]="imagenPreview" alt="Preview" class="preview-img">
+              <button type="button" class="btn-remove-preview" (click)="eliminarImagenPreview()" title="Quitar imagen">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos específicos según el tipo -->
+        
+        <!-- CATEGORÍA -->
+        <div *ngIf="tipoFormulario === 'categoria'" class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="categoria_id">Categoría *</label>
+            <select
+              id="categoria_id"
+              class="form-select"
+              [(ngModel)]="formulario.categoria_id"
+              name="categoria_id"
+              [class.error]="errores.categoria_id"
+            >
+              <option value="" disabled selected>-- Selecciona una categoría --</option>
+              <option 
+                *ngFor="let categoria of datosAuxiliares?.categorias" 
+                [ngValue]="categoria.id"
+              >
+                {{ categoria.nombre }}
+              </option>
+            </select>
+            <div *ngIf="errores.categoria_id" class="error-message">
+              {{ errores.categoria_id }}
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTO -->
+        <div *ngIf="tipoFormulario === 'producto'" class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="producto_id">Producto *</label>
+            <select
+              id="producto_id"
+              class="form-select"
+              [(ngModel)]="formulario.producto_id"
+              name="producto_id"
+              [class.error]="errores.producto_id"
+            >
+              <option value="" disabled selected>-- Selecciona un producto --</option>
+              <option 
+                *ngFor="let producto of datosAuxiliares?.productos" 
+                [ngValue]="producto.id"
+              >
+                {{ producto.nombre }} - {{ formatearPrecio(producto.precio) }}
+              </option>
+            </select>
+            <div *ngIf="errores.producto_id" class="error-message">
+              {{ errores.producto_id }}
+            </div>
+          </div>
+        </div>
+
+        <!-- TIENDAS -->
+        <div *ngIf="tipoFormulario === 'tiendas'" class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tiendas *</label>
+            <div class="tiendas-checkbox-container" [class.error]="errores.tiendas">
+              <div 
+                *ngFor="let tienda of datosAuxiliares?.tiendas" 
+                class="checkbox-item"
+              >
+                <input
+                  type="checkbox"
+                  [id]="'tienda_' + tienda.id"
+                  [checked]="isTiendaSeleccionada(tienda.id)"
+                  (change)="onTiendaChange(tienda.id, $event)"
+                />
+                <label [for]="'tienda_' + tienda.id" class="checkbox-label">
+                  {{ tienda.nombre }}
+                </label>
+              </div>
+            </div>
+            <div *ngIf="errores.tiendas" class="error-message">
+              {{ errores.tiendas }}
+            </div>
+            <div class="input-help">
+              Selecciona las tiendas que aparecerán en este banner
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="estado">Estado</label>
+            <select
+              id="estado"
+              class="form-select"
+              [(ngModel)]="formulario.estado"
+              name="estado"
+            >
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cerrarFormulario()"
+        [disabled]="enviando"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="guardar()"
+        [disabled]="enviando || (!bannerEditando && !formulario.imagen)"
+      >
+        <span *ngIf="enviando" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        {{ getTextoBotonGuardar() }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
+  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-titulo">Confirmar desactivación</h2>
+      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <div class="confirmacion-content">
+        <div class="confirmacion-icon">
+          <span class="icon-warning">⚠️</span>
+        </div>
+        <p class="confirmacion-mensaje">
+          ¿Estás seguro de que deseas desactivar el banner "{{ bannerParaEliminar?.titulo }}"?
+        </p>
+        <p class="confirmacion-detalle">
+          El banner se desactivará y no aparecerá en CyberWow, pero no se eliminará permanentemente.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cerrarConfirmacion()"
+        [disabled]="procesandoEliminacion"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-danger"
+        (click)="ejecutarEliminacion()"
+        [disabled]="procesandoEliminacion"
+      >
+        <span *ngIf="procesandoEliminacion" class="btn-loading">
+          <div class="loading-spinner-small"></div>
+        </span>
+        {{ procesandoEliminacion ? 'Desactivando...' : 'Desactivar' }}
+      </button>
+    </div>
+
+  </div>
+</div>

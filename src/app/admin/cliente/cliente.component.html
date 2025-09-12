@@ -1,0 +1,179 @@
+<div class="clientes-container">
+    <!-- Header -->
+    <div class="clientes-header">
+        <h1 class="titulo">Gestión de Clientes</h1>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-section">
+        <div class="filtros-row">
+            <!-- Búsqueda -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Buscar:</label>
+                <input
+                    type="text"
+                    class="filtro-input"
+                    placeholder="Buscar por nombre, DNI o email..."
+                    [(ngModel)]="filtros.buscar"
+                    (keyup.enter)="aplicarFiltros()"
+                />
+            </div>
+
+            <!-- Tipo -->
+            <div class="filtro-grupo">
+                <label class="filtro-label">Tipo:</label>
+                <select class="filtro-select" [(ngModel)]="filtros.tipo">
+                    <option value="todos">Todos</option>
+                    <option value="registrado">Registrados</option>
+                    <option value="invitado">Invitados</option>
+                </select>
+            </div>
+
+            <!-- Botones de filtro -->
+            <div class="filtro-acciones">
+                <button class="btn btn-secondary" (click)="aplicarFiltros()">
+                    Buscar
+                </button>
+                <button class="btn btn-outline" (click)="limpiarFiltros()">
+                    Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading-container">
+        <div class="loading-spinner"></div>
+        <span>Cargando clientes...</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="error-container">
+        <div class="error-message">
+            <span class="error-icon">⚠️</span>
+            {{ error }}
+        </div>
+        <button class="btn btn-secondary" (click)="cargarClientes()">
+            Reintentar
+        </button>
+    </div>
+
+    <!-- Tabla de clientes -->
+    <div *ngIf="!cargando && !error" class="tabla-container">
+        <!-- Info de resultados -->
+        <div class="resultados-info">
+            <span>
+                Mostrando {{ clientes.length }} de {{ totalClientes }} clientes
+            </span>
+            <div class="paginacion-info" *ngIf="paginacion">
+                Página {{ paginacion.current_page }} de {{ paginacion.last_page }}
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="tabla-wrapper">
+            <table class="clientes-tabla">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>DNI</th>
+                        <th>Contacto</th>
+                        <th>Tipo</th>
+                        <th>Fecha de Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cliente of clientes" class="cliente-row">
+                        <!-- Cliente (Nombre) -->
+                        <td class="nombre-cell">
+                            <div class="cliente-info">
+                                <span class="cliente-nombre">{{ cliente.nombre }}</span>
+<!--                                 <span class="cliente-id" *ngIf="cliente.user_id">#{{ cliente.user_id }}</span>
+ -->                            </div>
+                        </td>
+
+                        <!-- DNI -->
+                        <td class="dni-cell">
+                            <span class="dni-text">{{ cliente.dni }}</span>
+                        </td>
+
+                        <!-- Contacto -->
+                        <td class="contacto-cell">
+                            <div class="contacto-info">
+                                <span class="email-text" *ngIf="cliente.email">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ cliente.email }}
+                                </span>
+                                <span class="telefono-text" *ngIf="cliente.telefono">
+                                    <i class="fas fa-phone"></i>
+                                    {{ cliente.telefono }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- Tipo -->
+                        <td class="tipo-cell">
+                            <span 
+                                class="tipo-badge"
+                                [class]="getTipoClase(cliente.tipo)"
+                            >
+                                {{ cliente.tipo }}
+                            </span>
+                        </td>
+
+                        <!-- Fecha de registro -->
+                        <td class="fecha-cell">
+                            <span class="fecha-text">
+                                {{ cliente.created_at | date:'dd/MM/yyyy HH:mm' }}
+                            </span>
+                        </td>
+                    </tr>
+
+                    <!-- Mensaje cuando no hay clientes -->
+                    <tr *ngIf="clientes.length === 0" class="empty-row">
+                        <td colspan="5" class="empty-cell">
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <h3>No hay clientes</h3>
+                                <p>No se encontraron clientes con los filtros aplicados.</p>
+                                <button class="btn btn-primary" (click)="limpiarFiltros()">
+                                    Ver todos los clientes
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div *ngIf="paginacion && paginacion.last_page > 1" class="paginacion">
+            <button 
+                class="btn btn-outline"
+                [disabled]="paginacion.current_page === 1"
+                (click)="cambiarPagina(paginacion.current_page - 1)"
+            >
+                Anterior
+            </button>
+            
+            <div class="paginacion-numeros">
+                <button 
+                    *ngFor="let pagina of getPaginasVisibles()"
+                    class="btn-pagina"
+                    [class.activa]="pagina === paginacion.current_page"
+                    (click)="cambiarPagina(pagina)"
+                >
+                    {{ pagina }}
+                </button>
+            </div>
+            
+            <button 
+                class="btn btn-outline"
+                [disabled]="paginacion.current_page === paginacion.last_page"
+                (click)="cambiarPagina(paginacion.current_page + 1)"
+            >
+                Siguiente
+            </button>
+        </div>
+    </div>
+</div>
