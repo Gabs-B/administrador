@@ -444,6 +444,29 @@ getImagenProducto(producto: Producto): string {
     : '/assets/images/no-image.png';
 }
 
+getEstadisticasArray() {
+  if (!this.estadisticas) return [];
+  
+  return [
+    {
+      valor: this.estadisticas.total_pedidos,
+      label: 'Total'
+    },
+    {
+      valor: this.estadisticas.pendientes,
+      label: 'Pendientes'
+    },
+    {
+      valor: this.estadisticas.pagados,
+      label: 'Pagados'
+    },
+    {
+      valor: this.formatearMoneda(this.estadisticas.monto_total),
+      label: 'Monto Total'
+    }
+  ];
+}
+
 
 
 }
