@@ -1,141 +1,158 @@
-<div class="clientes-container">
+<div class="container-fluid py-4 bg-light">
     <!-- Header -->
-    <div class="clientes-header">
-        <h1 class="titulo">Gestión de Clientes</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <h1 class="h2 mb-0 text-dark fw-bold">Gestión de Clientes</h1>
     </div>
 
     <!-- Filtros -->
-    <div class="filtros-section">
-        <div class="filtros-row">
-            <!-- Búsqueda -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Buscar:</label>
-                <input
-                    type="text"
-                    class="filtro-input"
-                    placeholder="Buscar por nombre, DNI o email..."
-                    [(ngModel)]="filtros.buscar"
-                    (keyup.enter)="aplicarFiltros()"
-                />
-            </div>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                
+                <!-- Búsqueda -->
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Buscar:</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Buscar por nombre, DNI o email..."
+                        [(ngModel)]="filtros.buscar"
+                        (keyup.enter)="aplicarFiltros()"
+                    />
+                </div>
 
-            <!-- Tipo -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Tipo:</label>
-                <select class="filtro-select" [(ngModel)]="filtros.tipo">
-                    <option value="todos">Todos</option>
-                    <option value="registrado">Registrados</option>
-                    <option value="invitado">Invitados</option>
-                </select>
-            </div>
+                <!-- Tipo -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-medium">Tipo:</label>
+                    <select class="form-select" [(ngModel)]="filtros.tipo">
+                        <option value="todos">Todos</option>
+                        <option value="registrado">Registrados</option>
+                        <option value="invitado">Invitados</option>
+                    </select>
+                </div>
 
-            <!-- Botones de filtro -->
-            <div class="filtro-acciones">
-                <button class="btn btn-secondary" (click)="aplicarFiltros()">
-                    Buscar
-                </button>
-                <button class="btn btn-outline" (click)="limpiarFiltros()">
-                    Limpiar
-                </button>
+                <!-- Botones de filtro -->
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-secondary" (click)="aplicarFiltros()">
+                            Buscar
+                        </button>
+                        <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Loading -->
-    <div *ngIf="cargando" class="loading-container">
-        <div class="loading-spinner"></div>
-        <span>Cargando clientes...</span>
+    <div *ngIf="cargando" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="loading-spinner mx-auto mb-3"></div>
+            <span class="text-muted">Cargando clientes...</span>
+        </div>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error && !cargando" class="error-container">
-        <div class="error-message">
-            <span class="error-icon">⚠️</span>
-            {{ error }}
+    <div *ngIf="error && !cargando" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="text-danger mb-3">
+                <span class="fs-2">⚠️</span>
+                <div class="mt-2">{{ error }}</div>
+            </div>
+            <button class="btn btn-secondary" (click)="cargarClientes()">
+                Reintentar
+            </button>
         </div>
-        <button class="btn btn-secondary" (click)="cargarClientes()">
-            Reintentar
-        </button>
     </div>
 
     <!-- Tabla de clientes -->
-    <div *ngIf="!cargando && !error" class="tabla-container">
+    <div *ngIf="!cargando && !error" class="card shadow-sm">
+        
         <!-- Info de resultados -->
-        <div class="resultados-info">
-            <span>
+        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span class="text-muted small">
                 Mostrando {{ clientes.length }} de {{ totalClientes }} clientes
             </span>
-            <div class="paginacion-info" *ngIf="paginacion">
+            <div class="small fw-medium text-muted" *ngIf="paginacion">
                 Página {{ paginacion.current_page }} de {{ paginacion.last_page }}
             </div>
         </div>
 
         <!-- Tabla -->
-        <div class="tabla-wrapper">
-            <table class="clientes-tabla">
-                <thead>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
                     <tr>
-                        <th>Cliente</th>
-                        <th>DNI</th>
-                        <th>Contacto</th>
-                        <th>Tipo</th>
-                        <th>Fecha de Registro</th>
+                        <th scope="col" style="min-width: 200px;">Cliente</th>
+                        <th scope="col" style="width: 120px;">DNI</th>
+                        <th scope="col" style="min-width: 220px;">Contacto</th>
+                        <th scope="col" style="width: 120px;">Tipo</th>
+                        <th scope="col" style="width: 160px;">Fecha de Registro</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let cliente of clientes" class="cliente-row">
+                    <tr *ngFor="let cliente of clientes">
+                        
                         <!-- Cliente (Nombre) -->
-                        <td class="nombre-cell">
-                            <div class="cliente-info">
-                                <span class="cliente-nombre">{{ cliente.nombre }}</span>
-<!--                                 <span class="cliente-id" *ngIf="cliente.user_id">#{{ cliente.user_id }}</span>
- -->                            </div>
+                        <td>
+                            <div>
+                                <div class="fw-semibold text-dark small">{{ cliente.nombre }}</div>
+                                <!-- Uncomment if needed: -->
+                                <!-- <small class="badge bg-light text-muted" *ngIf="cliente.user_id">#{{ cliente.user_id }}</small> -->
+                            </div>
                         </td>
 
                         <!-- DNI -->
-                        <td class="dni-cell">
-                            <span class="dni-text">{{ cliente.dni }}</span>
+                        <td>
+                            <code class="dni-text bg-light px-2 py-1 rounded small">
+                                {{ cliente.dni }}
+                            </code>
                         </td>
 
                         <!-- Contacto -->
-                        <td class="contacto-cell">
+                        <td>
                             <div class="contacto-info">
-                                <span class="email-text" *ngIf="cliente.email">
-                                    <i class="fas fa-envelope"></i>
-                                    {{ cliente.email }}
-                                </span>
-                                <span class="telefono-text" *ngIf="cliente.telefono">
-                                    <i class="fas fa-phone"></i>
-                                    {{ cliente.telefono }}
-                                </span>
+                                <div class="d-flex align-items-center gap-2 mb-1" *ngIf="cliente.email">
+                                    <i class="fas fa-envelope text-muted"></i>
+                                    <small class="text-muted">{{ cliente.email }}</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" *ngIf="cliente.telefono">
+                                    <i class="fas fa-phone text-muted"></i>
+                                    <small class="text-muted">{{ cliente.telefono }}</small>
+                                </div>
                             </div>
                         </td>
 
                         <!-- Tipo -->
-                        <td class="tipo-cell">
-                            <span 
-                                class="tipo-badge"
-                                [class]="getTipoClase(cliente.tipo)"
-                            >
+                        <td>
+                            <span class="badge"
+                                  [class]="'badge-' + (cliente.tipo === 'registrado' ? 'success' : cliente.tipo === 'invitado' ? 'warning' : 'secondary')"
+                                  [class.tipo-registrado]="cliente.tipo === 'registrado'"
+                                  [class.tipo-invitado]="cliente.tipo === 'invitado'"
+                                  [class.tipo-default]="cliente.tipo !== 'registrado' && cliente.tipo !== 'invitado'">
                                 {{ cliente.tipo }}
                             </span>
                         </td>
 
                         <!-- Fecha de registro -->
-                        <td class="fecha-cell">
-                            <span class="fecha-text">
+                        <td>
+                            <small class="fecha-text text-muted">
                                 {{ cliente.created_at | date:'dd/MM/yyyy HH:mm' }}
-                            </span>
+                            </small>
                         </td>
                     </tr>
 
                     <!-- Mensaje cuando no hay clientes -->
-                    <tr *ngIf="clientes.length === 0" class="empty-row">
-                        <td colspan="5" class="empty-cell">
-                            <div class="empty-state">
-                                <div class="empty-icon">👥</div>
-                                <h3>No hay clientes</h3>
-                                <p>No se encontraron clientes con los filtros aplicados.</p>
+                    <tr *ngIf="clientes.length === 0">
+                        <td colspan="5" class="text-center py-5">
+                            <div>
+                                <div class="display-1 opacity-50 mb-3">👥</div>
+                                <h5 class="text-muted">No hay clientes</h5>
+                                <p class="text-muted small mb-3">
+                                    No se encontraron clientes con los filtros aplicados.
+                                </p>
                                 <button class="btn btn-primary" (click)="limpiarFiltros()">
                                     Ver todos los clientes
                                 </button>
@@ -147,33 +164,43 @@
         </div>
 
         <!-- Paginación -->
-        <div *ngIf="paginacion && paginacion.last_page > 1" class="paginacion">
-            <button 
-                class="btn btn-outline"
-                [disabled]="paginacion.current_page === 1"
-                (click)="cambiarPagina(paginacion.current_page - 1)"
-            >
-                Anterior
-            </button>
-            
-            <div class="paginacion-numeros">
-                <button 
-                    *ngFor="let pagina of getPaginasVisibles()"
-                    class="btn-pagina"
-                    [class.activa]="pagina === paginacion.current_page"
-                    (click)="cambiarPagina(pagina)"
-                >
-                    {{ pagina }}
-                </button>
-            </div>
-            
-            <button 
-                class="btn btn-outline"
-                [disabled]="paginacion.current_page === paginacion.last_page"
-                (click)="cambiarPagina(paginacion.current_page + 1)"
-            >
-                Siguiente
-            </button>
+        <div *ngIf="paginacion && paginacion.last_page > 1" class="card-footer bg-white">
+            <nav aria-label="Paginación de clientes">
+                <ul class="pagination justify-content-center mb-0">
+                    
+                    <!-- Anterior -->
+                    <li class="page-item" [class.disabled]="paginacion.current_page === 1">
+                        <button class="page-link" 
+                                [disabled]="paginacion.current_page === 1"
+                                (click)="cambiarPagina(paginacion.current_page - 1)">
+                            Anterior
+                        </button>
+                    </li>
+                    
+                    <!-- Números de página -->
+                    <ng-container *ngFor="let pagina of getPaginasVisibles()">
+                        <li *ngIf="pagina !== -1" 
+                            class="page-item" 
+                            [class.active]="pagina === paginacion.current_page">
+                            <button class="page-link" (click)="cambiarPagina(pagina)">
+                                {{ pagina }}
+                            </button>
+                        </li>
+                        <li *ngIf="pagina === -1" class="page-item disabled">
+                            <span class="page-link puntos-separacion">...</span>
+                        </li>
+                    </ng-container>
+                    
+                    <!-- Siguiente -->
+                    <li class="page-item" [class.disabled]="paginacion.current_page === paginacion.last_page">
+                        <button class="page-link" 
+                                [disabled]="paginacion.current_page === paginacion.last_page"
+                                (click)="cambiarPagina(paginacion.current_page + 1)">
+                            Siguiente
+                        </button>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

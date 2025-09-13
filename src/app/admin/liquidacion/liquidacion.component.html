@@ -1,176 +1,185 @@
-<div class="liquidacion-container">
+<div class="container-fluid py-4">
   <!-- Header -->
-  <div class="liquidacion-header">
-    <h1 class="titulo">Gestión de Liquidaciones</h1>
-    <div class="header-actions">
-      <button 
-        class="btn btn-primary" 
-        (click)="mostrarFormularioCrear()"
-        [disabled]="!puedeCrearNueva()"
-        [title]="!puedeCrearNueva() ? getMensajeLimite() : ''"
-      >
-        <span class="btn-icon">+</span>
-        Nueva Liquidación
-        <span *ngIf="!puedeCrearNueva()" class="btn-count">({{ liquidaciones.length }}/{{ MAX_LIQUIDACIONES }})</span>
-      </button>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+        <h1 class="h2 text-dark fw-bold mb-0"> Gestión de Liquidaciones</h1>
+        <button 
+          class="btn btn-primary"
+          (click)="mostrarFormularioCrear()"
+          [disabled]="!puedeCrearNueva()"
+          [title]="!puedeCrearNueva() ? getMensajeLimite() : ''"
+        >
+          <i class="fas fa-plus me-2"></i>
+          Nueva Liquidación
+          <span *ngIf="!puedeCrearNueva()" class="badge bg-light text-dark ms-2">
+            {{ liquidaciones.length }}/{{ MAX_LIQUIDACIONES }}
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Mensaje de límite -->
-<!--     <div *ngIf="liquidaciones.length >= MAX_LIQUIDACIONES" class="limite-mensaje">
-    <svg class="limite-icono" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M11 7h2v2h-2V7zm0 4h2v6h-2v-6zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 
-                10-4.48 10-10S17.52 2 12 2z"/>
-    </svg>
-    <span class="limite-texto">Has alcanzado el límite de {{ MAX_LIQUIDACIONES }} liquidaciones.</span>
-    </div> -->
-
-
   <!-- Loading -->
-  <div *ngIf="cargando" class="loading-container">
-    <div class="loading-spinner"></div>
-    <span>Cargando liquidaciones...</span>
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando liquidaciones...</p>
   </div>
 
   <!-- Error -->
-  <div *ngIf="error && !cargando" class="error-container">
-    <div class="error-message">
-      <span class="error-icon">⚠️</span>
+  <div *ngIf="error && !cargando" class="alert alert-danger" role="alert">
+    <div class="d-flex align-items-center">
+      <i class="fas fa-exclamation-triangle me-2"></i>
       {{ error }}
     </div>
-    <button class="btn btn-secondary" (click)="cargarLiquidaciones()">
+    <button class="btn btn-outline-danger mt-2" (click)="cargarLiquidaciones()">
       Reintentar
     </button>
   </div>
 
-  <!-- Grid de liquidaciones -->
-  <div *ngIf="!cargando && !error" class="liquidaciones-container">
+  <!-- Container de liquidaciones -->
+  <div *ngIf="!cargando && !error" class="card">
     <!-- Info de resultados -->
-    <div class="resultados-info">
-      <span>
+    <div class="card-header bg-light">
+      <small class="text-muted">
         Mostrando {{ liquidaciones.length }} de {{ MAX_LIQUIDACIONES }} liquidaciones máximas
-      </span>
+      </small>
     </div>
 
-    <!-- Grid -->
-    <div class="liquidaciones-grid">
-      <div *ngFor="let liquidacion of liquidaciones" class="liquidacion-card">
-        <!-- Imagen -->
-        <div class="liquidacion-wrapper">
-          <img [src]="liquidacion.imagen_url" [alt]="liquidacion.producto.nombre" class="liquidacion-imagen">
-          <div class="liquidacion-overlay">
-            <div class="overlay-content">
-              <span class="orden-badge">{{ liquidacion.orden }}</span>
+    <!-- Grid de liquidaciones -->
+    <div class="card-body p-4">
+      <div class="row g-4" *ngIf="liquidaciones.length > 0">
+        <div class="col-lg-4 col-md-6" *ngFor="let liquidacion of liquidaciones">
+          <div class="card h-100 shadow-sm liquidacion-card">
+            <!-- Imagen -->
+            <div class="position-relative overflow-hidden liquidacion-img-container">
+              <img 
+                [src]="liquidacion.imagen_url" 
+                [alt]="liquidacion.producto.nombre" 
+                class="card-img-top liquidacion-img"
+              >
+              <div class="position-absolute top-0 start-0 p-3">
+                <span class="badge bg-primary">{{ liquidacion.orden }}</span>
+              </div>
+            </div>
+
+            <!-- Información -->
+            <div class="card-body">
+              <h5 class="card-title text-truncate">{{ liquidacion.producto.nombre }}</h5>
+              
+              <div class="small mb-2">
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted">Producto:</span>
+                  <span class="fw-medium">{{ liquidacion.producto.nombre }}</span>
+                </div>
+              </div>
+
+              <div class="small mb-2">
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted">Precio:</span>
+                  <span class="fw-bold text-success">{{ formatearPrecio(liquidacion.producto.precio) }}</span>
+                </div>
+              </div>
+
+              <div class="small mb-2">
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted">Orden:</span>
+                  <span class="fw-medium">{{ liquidacion.orden }}</span>
+                </div>
+              </div>
+
+              <div class="small">
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted">Creado:</span>
+                  <span class="text-muted">{{ liquidacion.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card-footer bg-light border-0">
+              <div class="d-flex justify-content-center gap-2">
+                <button 
+                  class="btn btn-outline-primary btn-sm"
+                  title="Editar" 
+                  (click)="mostrarFormularioEditar(liquidacion)"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Información -->
-        <div class="card-info">
-          <h3 class="liquidacion-titulo">{{ liquidacion.producto.nombre }}</h3>
-          
-          <div class="info-row">
-            <span class="info-label">Producto:</span>
-            <span class="info-value">{{ liquidacion.producto.nombre }}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Precio:</span>
-            <span class="info-value precio">{{ formatearPrecio(liquidacion.producto.precio) }}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Orden:</span>
-            <span class="info-value">{{ liquidacion.orden }}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Creado:</span>
-            <span class="info-value fecha">{{ liquidacion.created_at | date:'dd/MM/yyyy' }}</span>
-          </div>
-        </div>
-
-        <!-- Acciones -->
-        <div class="card-actions">
-          <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(liquidacion)">
-            <i class="fas fa-edit"></i>
-          </button>
-
-<!--           <button class="btn-accion btn-eliminar" title="Eliminar" (click)="confirmarEliminar(liquidacion)">
-            <i class="fas fa-trash"></i>
-          </button> -->
-        </div>
       </div>
 
-      <!-- Mensaje cuando no hay liquidaciones -->
-      <div *ngIf="liquidaciones.length === 0" class="empty-state-container">
-        <div class="empty-state">
-          <div class="empty-icon">💥</div>
-          <h3>No hay liquidaciones</h3>
-          <p>Crea liquidaciones para promocionar productos en oferta especial.</p>
-          <p class="limite-info">Puedes crear hasta {{ MAX_LIQUIDACIONES }} liquidaciones.</p>
-          <div class="empty-actions">
-            <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
-              Crear primera liquidación
-            </button>
-          </div>
-        </div>
+      <!-- Estado vacío -->
+      <div *ngIf="liquidaciones.length === 0" class="text-center py-5">
+        <div class="display-1 mb-3">💥</div>
+        <h3 class="mb-3">No hay liquidaciones</h3>
+        <p class="text-muted mb-3">Crea liquidaciones para promocionar productos en oferta especial.</p>
+        <p class="small text-muted mb-4">Puedes crear hasta {{ MAX_LIQUIDACIONES }} liquidaciones.</p>
+        <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+          Crear primera liquidación
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Mensajes globales -->
-<div *ngIf="mensaje && !mostrarFormulario && !mostrarConfirmacion" class="mensaje-global" [class]="'mensaje-' + tipoMensaje">
-  <span class="mensaje-icono">
-    {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
-  </span>
-  {{ mensaje }}
+<div *ngIf="mensaje && !mostrarFormulario && !mostrarConfirmacion" 
+     class="position-fixed top-0 start-50 translate-middle-x mt-3" 
+     style="z-index: 1050;">
+  <div class="alert" [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" role="alert">
+    <i [class]="tipoMensaje === 'success' ? 'fas fa-check' : 'fas fa-exclamation-triangle'"></i>
+    {{ mensaje }}
+  </div>
 </div>
 
 <!-- Modal de formulario -->
-<div *ngIf="mostrarFormulario" class="modal-overlay" (click)="cerrarFormulario()">
-  <div class="modal-container liquidacion-modal" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">{{ getTitulo() }}</h2>
-      <button class="btn-cerrar" (click)="cerrarFormulario()" type="button">
-        ✕
-      </button>
-    </div>
-
-    <!-- Content -->
+<div *ngIf="mostrarFormulario" class="modal d-block" style="background-color: rgba(0,0,0,0.5);" (click)="cerrarFormulario()">
+  <div class="modal-dialog modal-lg modal-dialog-centered" (click)="$event.stopPropagation()">
     <div class="modal-content">
       
-      <!-- Mensaje de respuesta -->
-      <div *ngIf="mensaje" class="mensaje" [class]="'mensaje-' + tipoMensaje">
-        <span class="mensaje-icono">
-          {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
-        </span>
-        {{ mensaje }}
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">{{ getTitulo() }}</h5>
+        <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
       </div>
 
-      <!-- Formulario -->
-      <form class="liquidacion-form" (ngSubmit)="guardar()" #liquidacionForm="ngForm">
+      <!-- Content -->
+      <div class="modal-body">
         
-        <!-- Imagen actual (solo en edición) -->
-        <div *ngIf="liquidacionEditando && liquidacionEditando.imagen_url && !imagenPreview" class="imagen-actual">
-          <div class="imagen-preview">
-            <img [src]="liquidacionEditando.imagen_url" alt="Imagen actual" class="preview-img">
-          </div>
+        <!-- Mensaje de respuesta -->
+        <div *ngIf="mensaje" class="alert" [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" role="alert">
+          <i [class]="tipoMensaje === 'success' ? 'fas fa-check' : 'fas fa-exclamation-triangle'"></i>
+          {{ mensaje }}
         </div>
 
-        <!-- Producto -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="producto_id">Producto *</label>
+        <!-- Formulario -->
+        <form (ngSubmit)="guardar()" #liquidacionForm="ngForm">
+          
+          <!-- Imagen actual (solo en edición) -->
+          <div *ngIf="liquidacionEditando && liquidacionEditando.imagen_url && !imagenPreview" class="mb-4">
+            <label class="form-label">Imagen actual:</label>
+            <div class="text-center">
+              <img [src]="liquidacionEditando.imagen_url" alt="Imagen actual" class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+            </div>
+          </div>
+
+          <!-- Producto -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="producto_id">
+              Producto <span class="text-danger">*</span>
+            </label>
             <select
               id="producto_id"
               class="form-select"
+              [class.is-invalid]="errores.producto_id"
               [(ngModel)]="formulario.producto_id"
               name="producto_id"
-              [class.error]="errores.producto_id"
               [disabled]="cargandoProductos"
             >
               <option value="" disabled selected>
@@ -183,25 +192,25 @@
                 {{ producto.nombre }} - {{ formatearPrecio(producto.precio) }}
               </option>
             </select>
-            <div *ngIf="errores.producto_id" class="error-message">
+            <div *ngIf="errores.producto_id" class="invalid-feedback">
               {{ errores.producto_id }}
             </div>
-            <div *ngIf="!liquidacionEditando" class="input-help">
+            <div *ngIf="!liquidacionEditando" class="form-text">
               Solo se muestran productos sin liquidación activa
             </div>
           </div>
-        </div>
 
-        <!-- Orden -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="orden">Orden de visualización *</label>
+          <!-- Orden -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="orden">
+              Orden de visualización <span class="text-danger">*</span>
+            </label>
             <select
               id="orden"
               class="form-select"
+              [class.is-invalid]="errores.orden"
               [(ngModel)]="formulario.orden"
               name="orden"
-              [class.error]="errores.orden"
             >
               <option value="" disabled>-- Selecciona el orden --</option>
               <option 
@@ -211,135 +220,130 @@
                 {{ opcion }}
               </option>
             </select>
-            <div *ngIf="errores.orden" class="error-message">
+            <div *ngIf="errores.orden" class="invalid-feedback">
               {{ errores.orden }}
             </div>
-            <div class="input-help">
+            <div class="form-text">
               Posición donde aparecerá la liquidación (1 = primera posición)
             </div>
           </div>
-        </div>
 
-        <!-- Selección de imagen -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="imagen">
-              {{ liquidacionEditando ? 'Nueva imagen (opcional)' : 'Imagen *' }}
+          <!-- Selección de imagen -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="imagen">
+              {{ liquidacionEditando ? 'Nueva imagen (opcional)' : 'Imagen' }}
+              <span *ngIf="!liquidacionEditando" class="text-danger">*</span>
             </label>
-            <div class="file-input-wrapper">
+            <div class="input-group">
               <input
                 type="file"
                 id="imagen"
-                class="file-input"
+                class="form-control"
+                [class.is-invalid]="errores.imagen"
                 accept="image/jpeg,image/png,image/jpg,image/webp"
                 (change)="onImagenSeleccionada($event)"
-                [class.error]="errores.imagen"
               />
-              <label for="imagen" class="file-input-label">
-                <span class="file-icon">📁</span>
-                Seleccionar imagen
+              <label class="input-group-text" for="imagen">
+                <i class="fas fa-image"></i>
               </label>
             </div>
-            <div *ngIf="errores.imagen" class="error-message">
+            <div *ngIf="errores.imagen" class="invalid-feedback">
               {{ errores.imagen }}
             </div>
-            <div class="file-help">
+            <div class="form-text">
               Formatos: JPG, PNG, WebP. Tamaño máximo: 2MB
             </div>
           </div>
-        </div>
 
-        <!-- Preview de imagen -->
-        <div *ngIf="imagenPreview" class="form-row">
-          <div class="form-group">
-            <label class="form-label">Vista previa:</label>
-            <div class="imagen-preview">
-              <img [src]="imagenPreview" alt="Preview" class="preview-img">
-              <button type="button" class="btn-remove-preview" (click)="eliminarImagenPreview()" title="Quitar imagen">
-                ✕
+          <!-- Preview de imagen -->
+          <div *ngIf="imagenPreview" class="mb-3">
+            <label class="form-label fw-semibold">Vista previa:</label>
+            <div class="position-relative d-inline-block">
+              <img [src]="imagenPreview" alt="Preview" class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+              <button 
+                type="button" 
+                class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle m-1" 
+                (click)="eliminarImagenPreview()" 
+                title="Quitar imagen"
+                style="width: 30px; height: 30px; padding: 0;"
+              >
+                <i class="fas fa-times"></i>
               </button>
             </div>
           </div>
-        </div>
 
-      </form>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="cerrarFormulario()"
+          [disabled]="enviando"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="guardar()"
+          [disabled]="enviando || (!liquidacionEditando && !formulario.imagen)"
+        >
+          <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
+          {{ getTextoBotonGuardar() }}
+        </button>
+      </div>
+
     </div>
-
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarFormulario()"
-        [disabled]="enviando"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn btn-primary" 
-        (click)="guardar()"
-        [disabled]="enviando || (!liquidacionEditando && !formulario.imagen)"
-      >
-        <span *ngIf="enviando" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        {{ getTextoBotonGuardar() }}
-      </button>
-    </div>
-
   </div>
 </div>
 
 <!-- Modal de confirmación -->
-<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
-  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">Confirmar eliminación</h2>
-      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
-        ✕
-      </button>
-    </div>
-
-    <!-- Content -->
+<div *ngIf="mostrarConfirmacion" class="modal d-block" style="background-color: rgba(0,0,0,0.5);" (click)="cerrarConfirmacion()">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
     <div class="modal-content">
-      <div class="confirmacion-content">
-        <div class="confirmacion-icon">
-          <span class="icon-warning">⚠️</span>
-        </div>
-        <p class="confirmacion-mensaje">
-            ¿Estás seguro de que deseas eliminar la liquidación de "{{ liquidacionParaEliminar?.producto?.nombre }}"?
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" (click)="cerrarConfirmacion()"></button>
+      </div>
+
+      <!-- Content -->
+      <div class="modal-body text-center">
+        <div class="display-4 text-warning mb-3">⚠️</div>
+        <p class="mb-2">
+          ¿Estás seguro de que deseas eliminar la liquidación de 
+          <strong>"{{ liquidacionParaEliminar?.producto?.nombre }}"</strong>?
         </p>
-        <p class="confirmacion-detalle">
+        <p class="text-muted small">
           Esta acción no se puede deshacer. La liquidación se eliminará permanentemente.
         </p>
       </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarConfirmacion()"
-        [disabled]="procesandoEliminacion"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn btn-danger"
-        (click)="ejecutarEliminacion()"
-        [disabled]="procesandoEliminacion"
-      >
-        <span *ngIf="procesandoEliminacion" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        {{ procesandoEliminacion ? 'Eliminando...' : 'Eliminar' }}
-      </button>
-    </div>
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="cerrarConfirmacion()"
+          [disabled]="procesandoEliminacion"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-danger"
+          (click)="ejecutarEliminacion()"
+          [disabled]="procesandoEliminacion"
+        >
+          <span *ngIf="procesandoEliminacion" class="spinner-border spinner-border-sm me-2"></span>
+          {{ procesandoEliminacion ? 'Eliminando...' : 'Eliminar' }}
+        </button>
+      </div>
 
+    </div>
   </div>
 </div>

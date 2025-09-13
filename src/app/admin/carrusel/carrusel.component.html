@@ -1,200 +1,251 @@
-<div class="carrusel-container">
+<div class="container-fluid py-4">
   <!-- Header -->
-  <div class="carrusel-header">
-    <h1 class="titulo">Gestión del Carrusel</h1>
-    <div class="header-actions">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+    <h1 class="h2 mb-0 text-dark fw-bold">Gestión del Carrusel</h1>
+    <div class="d-flex gap-2">
       <button 
         *ngIf="!modoReordenar" 
-        class="btn btn-secondary" 
+        class="btn btn-secondary d-flex align-items-center gap-2" 
         (click)="activarModoReordenar()"
         [disabled]="carrusel.length === 0"
       >
-        <span class="btn-icon">⇅</span>
-        Reordenar
+        <i class="fas fa-arrows-alt-v"></i>
+        <span class="d-none d-sm-inline">Reordenar</span>
       </button>
-      <button class="btn btn-primary" (click)="mostrarFormularioCrear()" *ngIf="!modoReordenar">
-        <span class="btn-icon">+</span>
-        Nueva Imagen
+      <button 
+        class="btn btn-primary d-flex align-items-center gap-2" 
+        (click)="mostrarFormularioCrear()" 
+        *ngIf="!modoReordenar"
+      >
+        <i class="fas fa-plus"></i>
+        <span class="d-none d-sm-inline">Nueva Imagen</span>
       </button>
     </div>
   </div>
 
   <!-- Modo reordenamiento -->
-  <div *ngIf="modoReordenar" class="reordenar-section">
-    <div class="reordenar-header">
-      <h3>Modo Reordenamiento</h3>
-      <p>Usa las flechas para cambiar el orden de las imágenes</p>
-    </div>
-    <div class="reordenar-actions">
-      <button class="btn btn-secondary" (click)="cancelarReordenamiento()" [disabled]="reordenandoGuardado">
-        Cancelar
-      </button>
-      <button class="btn btn-success" (click)="guardarReordenamiento()" [disabled]="reordenandoGuardado">
-        <span *ngIf="reordenandoGuardado" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        {{ reordenandoGuardado ? 'Guardando...' : 'Guardar Orden' }}
-      </button>
+  <div *ngIf="modoReordenar" class="alert alert-warning mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h5 class="alert-heading mb-2">
+          <i class="fas fa-arrows-alt-v me-2"></i>
+          Modo Reordenamiento
+        </h5>
+        <p class="mb-0 small">Usa las flechas para cambiar el orden de las imágenes</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button 
+          class="btn btn-outline-secondary btn-sm" 
+          (click)="cancelarReordenamiento()" 
+          [disabled]="reordenandoGuardado"
+        >
+          Cancelar
+        </button>
+        <button 
+          class="btn btn-success btn-sm d-flex align-items-center gap-2" 
+          (click)="guardarReordenamiento()" 
+          [disabled]="reordenandoGuardado"
+        >
+          <div *ngIf="reordenandoGuardado" class="loading-spinner-small"></div>
+          {{ reordenandoGuardado ? 'Guardando...' : 'Guardar Orden' }}
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Filtros (solo si no está en modo reordenar) -->
-  <div *ngIf="!modoReordenar" class="filtros-section">
-    <div class="filtros-row">
-      <!-- Estado -->
-      <div class="filtro-grupo">
-        <label class="filtro-label">Estado:</label>
-        <select class="filtro-select" [(ngModel)]="filtros.estado">
-          <option value="todos">Todos</option>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
-      </div>
+  <div *ngIf="!modoReordenar" class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <!-- Estado -->
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold text-muted">Estado:</label>
+          <select class="form-select form-select-sm" [(ngModel)]="filtros.estado">
+            <option value="todos">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
 
-      <!-- Botones de filtro -->
-      <div class="filtro-acciones">
-        <button class="btn btn-secondary" (click)="aplicarFiltros()">
-          Buscar
-        </button>
-        <button class="btn btn-outline" (click)="limpiarFiltros()">
-          Limpiar
-        </button>
+        <!-- Botones de filtro -->
+        <div class="col-md-3">
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm flex-fill" (click)="aplicarFiltros()">
+              <i class="fas fa-search me-1"></i>
+              Buscar
+            </button>
+            <button class="btn btn-outline-secondary btn-sm flex-fill" (click)="limpiarFiltros()">
+              <i class="fas fa-times me-1"></i>
+              Limpiar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Loading -->
-  <div *ngIf="cargando" class="loading-container">
-    <div class="loading-spinner"></div>
-    <span>Cargando carrusel...</span>
+  <div *ngIf="cargando" class="d-flex flex-column align-items-center justify-content-center py-5">
+    <div class="loading-spinner mb-3"></div>
+    <span class="text-muted">Cargando carrusel...</span>
   </div>
 
   <!-- Error -->
-  <div *ngIf="error && !cargando" class="error-container">
-    <div class="error-message">
-      <span class="error-icon">⚠️</span>
-      {{ error }}
+  <div *ngIf="error && !cargando" class="alert alert-danger text-center">
+    <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+      <i class="fas fa-exclamation-triangle fs-4"></i>
+      <span>{{ error }}</span>
     </div>
-    <button class="btn btn-secondary" (click)="cargarCarrusel()">
+    <button class="btn btn-outline-danger" (click)="cargarCarrusel()">
+      <i class="fas fa-redo me-2"></i>
       Reintentar
     </button>
   </div>
 
   <!-- Grid de imágenes -->
-  <div *ngIf="!cargando && !error" class="imagenes-container">
+  <div *ngIf="!cargando && !error" class="card">
     <!-- Info de resultados -->
-    <div class="resultados-info">
-      <span>
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <small class="text-muted">
         Mostrando {{ carrusel.length }} imágenes
-      </span>
+      </small>
     </div>
 
     <!-- Grid -->
-    <div class="imagenes-grid" *ngIf="!modoReordenar">
-      <div *ngFor="let item of carrusel" class="imagen-card">
-        <!-- Imagen -->
-        <div class="imagen-wrapper">
-          <img [src]="item.imagen_url" [alt]="'Imagen ' + item.orden" class="imagen">
-          <div class="imagen-overlay">
-            <div class="overlay-content">
-              <span class="orden-badge">{{ item.orden }}</span>
-              <span class="estado-badge" [class]="getEstadoClase(item.estado)">
-                {{ item.estado }}
-              </span>
+    <div class="card-body" *ngIf="!modoReordenar">
+      <div class="row g-4" *ngIf="carrusel.length > 0">
+        <div *ngFor="let item of carrusel" class="col-sm-6 col-md-4 col-lg-3">
+          <div class="card h-100 imagen-card shadow-sm">
+            <!-- Imagen -->
+            <div class="position-relative">
+              <img [src]="item.imagen_url" [alt]="'Imagen ' + item.orden" class="card-img-top">
+              <div class="imagen-overlay">
+                <div class="d-flex w-100 justify-content-between align-items-start">
+                  <span class="badge bg-primary">{{ item.orden }}</span>
+                  <span class="badge" [class]="item.estado === 'activo' ? 'bg-success' : 'bg-danger'">
+                    {{ item.estado }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información -->
+            <div class="card-body p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted">Orden:</small>
+                <small class="fw-semibold">{{ item.orden }}</small>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted">Estado:</small>
+                <span class="badge badge-sm" [class]="item.estado === 'activo' ? 'bg-success' : 'bg-danger'">
+                  {{ item.estado }}
+                </span>
+              </div>
+              <div *ngIf="item.producto_id" class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted">Producto:</small>
+                <small class="fw-semibold text-end" style="max-width: 120px; font-size: 0.7rem;">
+                  {{ getProductoNombre(item.producto_id) }}
+                </small>
+              </div>
+              <div *ngIf="item.producto_precio" class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted">Precio:</small>
+                <small class="fw-semibold">{{ formatearPrecio(item.producto_precio) }}</small>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Creado:</small>
+                <small class="font-monospace text-muted">{{ item.created_at | date:'dd/MM/yyyy' }}</small>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card-footer bg-light p-2">
+              <div class="d-flex justify-content-center gap-1">
+                <button 
+                  class="btn-action-circle"
+                  [class]="'btn btn-light text-primary'"
+                  title="Editar" 
+                  (click)="mostrarFormularioEditar(item)"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                
+                <button 
+                  class="btn-action-circle btn"
+                  [class]="item.estado === 'activo' ? 'btn-light text-warning' : 'btn-light text-success'"
+                  [title]="item.estado === 'activo' ? 'Desactivar' : 'Activar'"
+                  (click)="confirmarCambiarEstado(item)"
+                >
+                  <i class="fas" [class]="item.estado === 'activo' ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+
+                <button 
+                  class="btn-action-circle btn btn-light text-danger" 
+                  title="Eliminar" 
+                  (click)="confirmarEliminar(item)"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Información -->
-        <div class="card-info">
-          <div class="info-row">
-            <span class="info-label">Orden:</span>
-            <span class="info-value">{{ item.orden }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Estado:</span>
-            <span class="estado-badge small" [class]="getEstadoClase(item.estado)">
-              {{ item.estado }}
-            </span>
-          </div>
-        <div class="info-row" *ngIf="item.producto_id">
-                <span class="info-label">Producto:</span>
-                <span class="info-value">{{ getProductoNombre(item.producto_id) }}</span>
-                </div>
-                <div class="info-row" *ngIf="item.producto_precio">
-                <span class="info-label">Precio:</span>
-                <span class="info-value">{{ formatearPrecio(item.producto_precio) }}</span>
-        </div>
-          <div class="info-row">
-            <span class="info-label">Creado:</span>
-            <span class="info-value fecha">{{ item.created_at | date:'dd/MM/yyyy' }}</span>
-          </div>
-        </div>
-
-        <!-- Acciones -->
-        <div class="card-actions">
-          <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(item)">
-            <i class="fas fa-edit"></i>
-          </button>
-          
-          <button 
-            class="btn-accion btn-estado" 
-            [class.btn-activar]="item.estado === 'inactivo'"
-            [class.btn-desactivar]="item.estado === 'activo'"
-            [title]="item.estado === 'activo' ? 'Desactivar' : 'Activar'"
-            (click)="confirmarCambiarEstado(item)"
-          >
-            <i class="fas" [class.fa-eye-slash]="item.estado === 'activo'" [class.fa-eye]="item.estado === 'inactivo'"></i>
-          </button>
-
-          <button class="btn-accion btn-eliminar" title="Eliminar" (click)="confirmarEliminar(item)">
-            <i class="fas fa-trash"></i>
-          </button>
         </div>
       </div>
 
       <!-- Mensaje cuando no hay imágenes -->
-        <div *ngIf="carrusel.length === 0" class="empty-state-container">
-            <div class="empty-state">
-                <div class="empty-icon">🖼️</div>
-                <h3>No hay imágenes en el carrusel</h3>
-                <p>Agrega imágenes para mostrar en el carrusel del sitio web.</p>
-                <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
-                Agregar primera imagen
-                </button>
-            </div>
+      <div *ngIf="carrusel.length === 0" class="text-center py-5">
+        <div class="mb-4">
+          <i class="fas fa-images display-1 text-muted mb-3"></i>
+          <h4 class="text-muted">No hay imágenes en el carrusel</h4>
+          <p class="text-muted">Agrega imágenes para mostrar en el carrusel del sitio web.</p>
+          <button class="btn btn-primary mt-3" (click)="mostrarFormularioCrear()">
+            <i class="fas fa-plus me-2"></i>
+            Agregar primera imagen
+          </button>
         </div>
+      </div>
     </div>
 
     <!-- Lista de reordenamiento -->
-    <div class="reordenar-lista" *ngIf="modoReordenar">
-      <div *ngFor="let item of carruselTemporal; let i = index" class="reordenar-item">
-        <div class="item-info">
-          <img [src]="item.imagen_url" [alt]="'Imagen ' + (i + 1)" class="mini-imagen">
-        <div class="item-details">
-            <span class="nuevo-orden">Posición {{ i + 1 }}</span>
-            <span class="estado-badge small" [class]="getEstadoClase(item.estado)">{{ item.estado }}</span>
-            <span *ngIf="item.producto_nombre" class="producto-info">{{ item.producto_nombre }}</span>
-        </div>
-        </div>
-        
-        <div class="reordenar-controles">
-          <button 
-            class="btn-reorden btn-arriba" 
-            (click)="moverArriba(i)" 
-            [disabled]="i === 0"
-            title="Mover hacia arriba"
-          >
-            ↑
-          </button>
-          <button 
-            class="btn-reorden btn-abajo" 
-            (click)="moverAbajo(i)" 
-            [disabled]="i === carruselTemporal.length - 1"
-            title="Mover hacia abajo"
-          >
-            ↓
-          </button>
+    <div class="card-body" *ngIf="modoReordenar">
+      <div class="d-flex flex-column gap-3">
+        <div *ngFor="let item of carruselTemporal; let i = index" class="card">
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <img [src]="item.imagen_url" [alt]="'Imagen ' + (i + 1)" class="mini-imagen rounded">
+                <div>
+                  <div class="fw-semibold">Posición {{ i + 1 }}</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-sm" [class]="item.estado === 'activo' ? 'bg-success' : 'bg-danger'">
+                      {{ item.estado }}
+                    </span>
+                    <small *ngIf="item.producto_nombre" class="text-muted">
+                      {{ item.producto_nombre }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-1">
+                <button 
+                  class="btn btn-sm btn-outline-success" 
+                  (click)="moverArriba(i)" 
+                  [disabled]="i === 0"
+                  title="Mover hacia arriba"
+                >
+                  <i class="fas fa-arrow-up"></i>
+                </button>
+                <button 
+                  class="btn btn-sm btn-outline-danger" 
+                  (click)="moverAbajo(i)" 
+                  [disabled]="i === carruselTemporal.length - 1"
+                  title="Mover hacia abajo"
+                >
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -202,238 +253,208 @@
 </div>
 
 <!-- Modal de formulario -->
-<div *ngIf="mostrarFormulario" class="modal-overlay" (click)="cerrarFormulario()">
-  <div class="modal-container carrusel-modal" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">{{ getTitulo() }}</h2>
-      <button class="btn-cerrar" (click)="cerrarFormulario()" type="button">
-        ✕
-      </button>
-    </div>
-
-    <!-- Content -->
+<div *ngIf="mostrarFormulario" class="modal d-block" tabindex="-1" (click)="cerrarFormulario()">
+  <div class="modal-dialog modal-lg modal-appear" (click)="$event.stopPropagation()">
     <div class="modal-content">
       
-      <!-- Mensaje de respuesta -->
-      <div *ngIf="mensaje" class="mensaje" [class]="'mensaje-' + tipoMensaje">
-        <span class="mensaje-icono">
-          {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
-        </span>
-        {{ mensaje }}
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">{{ getTitulo() }}</h5>
+        <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
       </div>
 
-      <!-- Formulario -->
-      <form class="carrusel-form" (ngSubmit)="guardar()" #carruselForm="ngForm">
+      <!-- Body -->
+      <div class="modal-body">
         
-        <!-- Imagen actual (solo en edición) -->
-        <div *ngIf="itemEditando && itemEditando.imagen_url && !imagenPreview" class="imagen-actual">
-          <label class="form-label">Imagen actual:</label>
-          <div class="imagen-preview">
-            <img [src]="itemEditando.imagen_url" alt="Imagen actual" class="preview-img">
+        <!-- Mensaje de respuesta -->
+        <div *ngIf="mensaje" class="alert mb-3" [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas" [class]="tipoMensaje === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+            {{ mensaje }}
           </div>
         </div>
 
-        <!-- Selección de imagen -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="imagen">
+        <!-- Formulario -->
+        <form (ngSubmit)="guardar()" #carruselForm="ngForm">
+          
+          <!-- Imagen actual (solo en edición) -->
+          <div *ngIf="itemEditando && itemEditando.imagen_url && !imagenPreview" class="mb-3">
+            <label class="form-label fw-semibold">Imagen actual:</label>
+            <div class="imagen-preview">
+              <img [src]="itemEditando.imagen_url" alt="Imagen actual" class="preview-img rounded">
+            </div>
+          </div>
+
+          <!-- Selección de imagen -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
               {{ itemEditando ? 'Nueva imagen (opcional)' : 'Imagen *' }}
             </label>
-            <div class="file-input-wrapper">
+            <div class="file-input-custom">
               <input
                 type="file"
                 id="imagen"
-                class="file-input"
                 accept="image/jpeg,image/png,image/jpg,image/webp"
                 (change)="onImagenSeleccionada($event)"
-                [class.error]="errores.imagen"
+                [class.is-invalid]="errores.imagen"
               />
-              <label for="imagen" class="file-input-label">
-                <span class="file-icon">📁</span>
+              <label for="imagen" class="form-control text-center">
+                <i class="fas fa-cloud-upload-alt me-2"></i>
                 Seleccionar imagen
               </label>
             </div>
-            <div *ngIf="errores.imagen" class="error-message">
+            <div *ngIf="errores.imagen" class="invalid-feedback d-block">
               {{ errores.imagen }}
             </div>
-            <div class="file-help">
+            <div class="form-text">
               Formatos: JPG, PNG, WebP. Tamaño máximo: 5MB
             </div>
           </div>
-        </div>
 
-        <!-- Preview de imagen -->
-        <div *ngIf="imagenPreview" class="form-row">
-          <div class="form-group">
-            <label class="form-label">Vista previa:</label>
+          <!-- Preview de imagen -->
+          <div *ngIf="imagenPreview" class="mb-3">
+            <label class="form-label fw-semibold">Vista previa:</label>
             <div class="imagen-preview">
-              <img [src]="imagenPreview" alt="Preview" class="preview-img">
-              <button type="button" class="btn-remove-preview" (click)="eliminarImagenPreview()" title="Quitar imagen">
-                ✕
+              <img [src]="imagenPreview" alt="Preview" class="preview-img rounded">
+              <button type="button" class="btn-remove-preview" (click)="eliminarImagenPreview()">
+                <i class="fas fa-times"></i>
               </button>
             </div>
           </div>
-        </div>
-        <!-- Producto asociado -->
-        <div class="form-row">
-        <div class="form-group">
-            <label class="form-label" for="producto_id">
-            Producto asociado
-            </label>
-            <select
-            id="producto_id"
-            class="form-select"
-            [(ngModel)]="formulario.producto_id"
-            name="producto_id"
-            [disabled]="cargandoProductos"
-            >
-              <option value="" disabled selected>
-                -- Selecciona un producto --
-              </option>            <option 
-                *ngFor="let producto of productos" 
-                [ngValue]="producto.id"
-            >
-                {{ producto.nombre }} - {{ formatearPrecio(producto.precio) }}
-            </option>
-            </select>
-            <div *ngIf="cargandoProductos" class="input-help">
-            <div class="loading-spinner-small"></div>
-            Cargando productos...
-            </div>
-            <div class="input-help" *ngIf="!cargandoProductos">
-            Selecciona un producto para asociar con esta imagen
-            </div>
-        </div>
-        </div>
 
-        <!-- Orden -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="orden">
-              Orden (opcional)
-            </label>
-            <input
-              type="number"
-              id="orden"
-              class="form-input"
-              [(ngModel)]="formulario.orden"
-              name="orden"
-              placeholder="  vacío para agregar al final"
-              [class.error]="errores.orden"
-              min="0"
-            />
-            <div *ngIf="errores.orden" class="error-message">
-              {{ errores.orden }}
-            </div>
-            <div class="input-help">
-              Si no especificas un orden, se agregará al final
-            </div>
-          </div>
-        </div>
-
-        <!-- Estado -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="estado">
-              Estado
-            </label>
+          <!-- Producto asociado -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Producto asociado</label>
             <select
-              id="estado"
               class="form-select"
-              [(ngModel)]="formulario.estado"
-              name="estado"
+              [(ngModel)]="formulario.producto_id"
+              name="producto_id"
+              [disabled]="cargandoProductos"
             >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
+              <option value="" disabled selected>-- Selecciona un producto --</option>            
+              <option *ngFor="let producto of productos" [ngValue]="producto.id">
+                {{ producto.nombre }} - {{ formatearPrecio(producto.precio) }}
+              </option>
             </select>
+            <div *ngIf="cargandoProductos" class="form-text">
+              <div class="d-flex align-items-center gap-2">
+                <div class="loading-spinner-small"></div>
+                Cargando productos...
+              </div>
+            </div>
+            <div class="form-text" *ngIf="!cargandoProductos">
+              Selecciona un producto para asociar con esta imagen
+            </div>
           </div>
-        </div>
 
-      </form>
+          <div class="row">
+            <!-- Orden -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Orden (opcional)</label>
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="formulario.orden"
+                name="orden"
+                placeholder="Dejar vacío para agregar al final"
+                [class.is-invalid]="errores.orden"
+                min="0"
+              />
+              <div *ngIf="errores.orden" class="invalid-feedback">
+                {{ errores.orden }}
+              </div>
+              <div class="form-text">
+                Si no especificas un orden, se agregará al final
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Estado</label>
+              <select class="form-select" [(ngModel)]="formulario.estado" name="estado">
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="cerrarFormulario()"
+          [disabled]="enviando"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary d-flex align-items-center gap-2" 
+          (click)="guardar()"
+          [disabled]="enviando || (!itemEditando && !formulario.imagen)"
+        >
+          <div *ngIf="enviando" class="loading-spinner-small"></div>
+          {{ getTextoBotonGuardar() }}
+        </button>
+      </div>
+
     </div>
-
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarFormulario()"
-        [disabled]="enviando"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn btn-primary" 
-        (click)="guardar()"
-        [disabled]="enviando || (!itemEditando && !formulario.imagen)"
-      >
-        <span *ngIf="enviando" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        {{ getTextoBotonGuardar() }}
-      </button>
-    </div>
-
   </div>
 </div>
 
 <!-- Modal de confirmación -->
-<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
-  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">Confirmar acción</h2>
-      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
-        ✕
-      </button>
-    </div>
-
-    <!-- Content -->
+<div *ngIf="mostrarConfirmacion" class="modal d-block" tabindex="-1" (click)="cerrarConfirmacion()">
+  <div class="modal-dialog modal-appear" (click)="$event.stopPropagation()">
     <div class="modal-content">
-      <div class="confirmacion-content">
-        <div class="confirmacion-icon">
-          <span *ngIf="accionConfirmacion === 'eliminar'" class="icon-warning">⚠️</span>
-          <span *ngIf="accionConfirmacion === 'cambiarEstado'" class="icon-question">❓</span>
-        </div>
-        <p class="confirmacion-mensaje">
-          {{ mensajeConfirmacion }}
-        </p>
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar acción</h5>
+        <button type="button" class="btn-close" (click)="cerrarConfirmacion()"></button>
       </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarConfirmacion()"
-        [disabled]="procesandoAccion"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn"
-        [class.btn-danger]="accionConfirmacion === 'eliminar'"
-        [class.btn-primary]="accionConfirmacion === 'cambiarEstado'"
-        (click)="ejecutarAccion()"
-        [disabled]="procesandoAccion"
-      >
-        <span *ngIf="procesandoAccion" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        <span *ngIf="accionConfirmacion === 'eliminar'">
-          {{ procesandoAccion ? 'Eliminando...' : 'Eliminar' }}
-        </span>
-        <span *ngIf="accionConfirmacion === 'cambiarEstado'">
-          {{ procesandoAccion ? 'Cambiando...' : 'Cambiar Estado' }}
-        </span>
-      </button>
-    </div>
+      <!-- Body -->
+      <div class="modal-body text-center">
+        <div class="mb-3">
+          <i *ngIf="accionConfirmacion === 'eliminar'" 
+             class="fas fa-exclamation-triangle display-4 text-warning"></i>
+          <i *ngIf="accionConfirmacion === 'cambiarEstado'" 
+             class="fas fa-question-circle display-4 text-info"></i>
+        </div>
+        <p class="lead">{{ mensajeConfirmacion }}</p>
+      </div>
 
+      <!-- Footer -->
+      <div class="modal-footer justify-content-center">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="cerrarConfirmacion()"
+          [disabled]="procesandoAccion"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn d-flex align-items-center gap-2"
+          [class]="accionConfirmacion === 'eliminar' ? 'btn-danger' : 'btn-primary'"
+          (click)="ejecutarAccion()"
+          [disabled]="procesandoAccion"
+        >
+          <div *ngIf="procesandoAccion" class="loading-spinner-small"></div>
+          <span *ngIf="accionConfirmacion === 'eliminar'">
+            {{ procesandoAccion ? 'Eliminando...' : 'Eliminar' }}
+          </span>
+          <span *ngIf="accionConfirmacion === 'cambiarEstado'">
+            {{ procesandoAccion ? 'Cambiando...' : 'Cambiar Estado' }}
+          </span>
+        </button>
+      </div>
+
+    </div>
   </div>
 </div>

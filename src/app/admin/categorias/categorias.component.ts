@@ -308,8 +308,15 @@ export class CategoriasComponent implements OnInit {
 
   // =================== MÉTODOS AUXILIARES ===================
 
-  getEstadoClase(estado: string): string {
-    return estado === 'activo' ? 'estado-activo' : 'estado-inactivo';
+   getEstadoClase(estado: string): string {
+    switch (estado) {
+      case 'activo':
+        return 'estado-activo'; 
+      case 'inactivo':
+        return 'estado-inactivo'; 
+      default:
+        return 'bg-secondary text-white';
+    }
   }
 
   getTitulo(): string {
@@ -330,4 +337,6 @@ export class CategoriasComponent implements OnInit {
   tieneImagenParaMostrar(): boolean {
     return !!(this.previewImagen || (this.categoriaEditando?.imagen_url && !this.eliminarImagenExistente));
   }
+
+
 }

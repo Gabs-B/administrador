@@ -1,93 +1,114 @@
-<div class="categorias-container">
-    <!-- Header -->
-    <div class="categorias-header">
-        <h1 class="titulo">Gestión de Categorías</h1>
-        <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
-        <span class="btn-icon">+</span>
-        Nueva Categoría
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+        <h1 class="h2 mb-0 text-dark fw-bold">Gestión de Categorías</h1>
+        <button class="btn btn-primary d-flex align-items-center gap-2" (click)="mostrarFormularioCrear()">
+          <i class="fas fa-plus"></i>
+          Nueva Categoría
         </button>
+      </div>
     </div>
+  </div>
 
-    <!-- Filtros -->
-    <div class="filtros-section">
-        <div class="filtros-row">
-        <!-- Búsqueda -->
-        <div class="filtro-grupo">
-            <label class="filtro-label">Buscar:</label>
-            <input
-            type="text"
-            class="filtro-input"
-            placeholder="Buscar por nombre..."
-            [(ngModel)]="filtros.buscar"
-            (keyup.enter)="aplicarFiltros()"
-            />
-        </div>
+  <!-- Filtros -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <!-- Búsqueda -->
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Buscar:</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Buscar por nombre..."
+                [(ngModel)]="filtros.buscar"
+                (keyup.enter)="aplicarFiltros()"
+              />
+            </div>
 
-        <!-- Estado -->
-        <div class="filtro-grupo">
-            <label class="filtro-label">Estado:</label>
-            <select class="filtro-select" [(ngModel)]="filtros.estado">
-            <option value="todos">Todos</option>
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-            </select>
-        </div>
+            <!-- Estado -->
+            <div class="col-md-3">
+              <label class="form-label fw-medium">Estado:</label>
+              <select class="form-select" [(ngModel)]="filtros.estado">
+                <option value="todos">Todos</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
 
-        <!-- Botones de filtro -->
-        <div class="filtro-acciones">
-            <button class="btn btn-secondary" (click)="aplicarFiltros()">
-            Buscar
-            </button>
-            <button class="btn btn-outline" (click)="limpiarFiltros()">
-            Limpiar
-            </button>
+            <!-- Botones de filtro -->
+            <div class="col-md-5 d-flex gap-2">
+              <button class="btn btn-secondary" (click)="aplicarFiltros()">
+                <i class="fas fa-search me-1"></i>
+                Buscar
+              </button>
+              <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+                <i class="fas fa-times me-1"></i>
+                Limpiar
+              </button>
+            </div>
+          </div>
         </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Loading -->
-    <div *ngIf="cargando" class="loading-container">
-        <div class="loading-spinner"></div>
-        <span>Cargando categorías...</span>
-    </div>
+  <!-- Loading -->
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="loading-spinner mx-auto mb-3"></div>
+    <p class="text-muted">Cargando categorías...</p>
+  </div>
 
-    <!-- Error -->
-    <div *ngIf="error && !cargando" class="error-container">
-        <div class="error-message">
-        <span class="error-icon">⚠️</span>
-        {{ error }}
+  <!-- Error -->
+  <div *ngIf="error && !cargando" class="row">
+    <div class="col-12">
+      <div class="card border-danger">
+        <div class="card-body text-center py-5">
+          <div class="text-danger mb-3">
+            <i class="fas fa-exclamation-triangle fa-3x"></i>
+          </div>
+          <h5 class="text-danger">{{ error }}</h5>
+          <button class="btn btn-outline-danger mt-3" (click)="cargarCategorias()">
+            <i class="fas fa-redo me-2"></i>
+            Reintentar
+          </button>
         </div>
-        <button class="btn btn-secondary" (click)="cargarCategorias()">
-        Reintentar
-        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- Tabla de categorías -->
-    <div *ngIf="!cargando && !error" class="tabla-container">
+  <!-- Tabla de categorías -->
+  <div *ngIf="!cargando && !error" class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
         <!-- Info de resultados -->
-        <div class="resultados-info">
-        <span>
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <small class="text-muted">
             Mostrando {{ categorias.length }} categorías
-        </span>
+          </small>
         </div>
 
         <!-- Tabla -->
-        <div class="tabla-wrapper">
-        <table class="categorias-tabla">
-            <thead>
-            <tr>
-                <th>Imagen</th>
-                <th>Nombre</th>
-                <th>Estado</th>
-                <th>Fecha de Creación</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let categoria of categorias" class="categoria-row">
-              <!-- Imagen -->
-                <td class="imagen-cell">
-                  <div class="imagen-container">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" width="80">Imagen</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col" width="120">Estado</th>
+                  <th scope="col" width="180">Fecha de Creación</th>
+                  <th scope="col" width="120" class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let categoria of categorias">
+                  <!-- Imagen -->
+                  <td>
                     <img 
                       *ngIf="categoria.imagen_url" 
                       [src]="categoria.imagen_url" 
@@ -97,299 +118,299 @@
                     />
                     <div 
                       *ngIf="!categoria.imagen_url" 
-                      class="imagen-placeholder"
+                      class="d-flex align-items-center justify-content-center bg-light rounded border"
+                      style="width: 60px; height: 60px;"
                     >
-                      <i class="fas fa-image"></i>
+                      <i class="fas fa-image text-muted"></i>
                     </div>
-                  </div>
-                </td>
-                <!-- Nombre -->
-                <td class="nombre-cell">
-                <div class="categoria-info">
-                    <span class="categoria-nombre">{{ categoria.nombre }}</span>
-                </div>
-                </td>
+                  </td>
 
-                <!-- Productos count -->
-<!--                 <td class="productos-cell">
-                <span class="productos-count">
-                    {{ categoria.productos_count || 0 }} productos
-                </span>
-                </td> -->
+                  <!-- Nombre -->
+                  <td>
+                    <span class="fw-medium">{{ categoria.nombre }}</span>
+                  </td>
 
-                <!-- Estado -->
-                <td class="estado-cell">
-                <span 
-                    class="estado-badge"
-                    [class]="getEstadoClase(categoria.estado)"
-                >
-                    {{ categoria.estado }}
-                </span>
-                </td>
-
-                <!-- Fecha de creación -->
-                <td class="fecha-cell">
-                <span class="fecha-text">
-                    {{ categoria.created_at | date:'dd/MM/yyyy HH:mm' }}
-                </span>
-                </td>
-
-                <!-- Acciones -->
-                <td class="acciones-cell">
-                <div class="acciones-buttons">
-
-                    <!-- Editar -->
-                    <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(categoria)">
-                    <i class="fas fa-edit"></i>
-                    </button>
-
-                    <!-- Desactivar -->
-                    <button 
-                    *ngIf="categoria.estado === 'activo'"
-                    class="btn-accion btn-desactivar" 
-                    title="Desactivar"
-                    (click)="confirmarEliminar(categoria)"
+                  <!-- Estado -->
+                  <td>
+                    <span 
+                      class="badge px-3 py-2"
+                      [class]="getEstadoClase(categoria.estado)"
                     >
-                    <i class="fas fa-ban"></i>
-                    </button>
+                      {{ categoria.estado }}
+                    </span>
+                  </td>
 
-                    <!-- Activar -->
-                    <button 
-                    *ngIf="categoria.estado === 'inactivo'"
-                    class="btn-accion btn-activar" 
-                    title="Activar"
-                    (click)="confirmarActivar(categoria)"
-                    >
-                    <i class="fas fa-check"></i>
-                    </button>
+                  <!-- Fecha de creación -->
+                  <td>
+                    <small class="text-muted font-monospace">
+                      {{ categoria.created_at | date:'dd/MM/yyyy HH:mm' }}
+                    </small>
+                  </td>
 
-                </div>
-                </td>
+                  <!-- Acciones -->
+                  <td class="text-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <!-- Editar -->
+                      <button 
+                        class="btn btn-outline-primary" 
+                        title="Editar" 
+                        (click)="mostrarFormularioEditar(categoria)"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
 
-            </tr>
+                      <!-- Desactivar -->
+                      <button 
+                        *ngIf="categoria.estado === 'activo'"
+                        class="btn btn-outline-danger" 
+                        title="Desactivar"
+                        (click)="confirmarEliminar(categoria)"
+                      >
+                        <i class="fas fa-ban"></i>
+                      </button>
 
-            <!-- Mensaje cuando no hay categorías -->
-            <tr *ngIf="categorias.length === 0" class="empty-row">
-                <td colspan="5" class="empty-cell">
-                <div class="empty-state">
-                    <div class="empty-icon">🏷️</div>
-                    <h3>No hay categorías</h3>
-                    <p>No se encontraron categorías con los filtros aplicados.</p>
-                    <button class="btn btn-primary" (click)="limpiarFiltros()">
-                    Ver todas las categorías
-                    </button>
-                </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                      <!-- Activar -->
+                      <button 
+                        *ngIf="categoria.estado === 'inactivo'"
+                        class="btn btn-outline-success" 
+                        title="Activar"
+                        (click)="confirmarActivar(categoria)"
+                      >
+                        <i class="fas fa-check"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Mensaje cuando no hay categorías -->
+                <tr *ngIf="categorias.length === 0">
+                  <td colspan="5" class="text-center py-5">
+                    <div class="d-flex flex-column align-items-center gap-3">
+                      <i class="fas fa-tags text-muted" style="font-size: 4rem; opacity: 0.5;"></i>
+                      <div>
+                        <h5 class="text-muted">No hay categorías</h5>
+                        <p class="text-muted mb-3">No se encontraron categorías con los filtros aplicados.</p>
+                        <button class="btn btn-primary" (click)="limpiarFiltros()">
+                          Ver todas las categorías
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Modal de formulario -->
-<div *ngIf="mostrarFormulario" class="modal-overlay" (click)="cerrarFormulario()">
-  <!-- Modal Container -->
-  <div class="modal-container" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">{{ getTitulo() }}</h2>
-      <button class="btn-cerrar" (click)="cerrarFormulario()" type="button">
-        ✕
-      </button>
-    </div>
-
-    <!-- Content -->
+<div class="modal fade" 
+     [class.show]="mostrarFormulario" 
+     [style.display]="mostrarFormulario ? 'block' : 'none'"
+     tabindex="-1" 
+     (click)="cerrarFormulario()">
+  
+  <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
     <div class="modal-content">
       
-      <!-- Mensaje de respuesta -->
-      <div *ngIf="mensaje" class="mensaje" [class]="'mensaje-' + tipoMensaje">
-        <span class="mensaje-icono">
-          {{ tipoMensaje === 'success' ? '✓' : '⚠️' }}
-        </span>
-        {{ mensaje }}
+      <!-- Header -->
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">{{ getTitulo() }}</h1>
+        <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
       </div>
 
-      <!-- Formulario -->
-      <form class="categoria-form" (ngSubmit)="guardar()" #categoriaForm="ngForm">
+      <!-- Body -->
+      <div class="modal-body">
         
-        <!-- Nombre -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="nombre">
-              Nombre de la categoría *
-            </label>
-            <input
-              type="text"
-              id="nombre"
-              class="form-input"
-              [(ngModel)]="formulario.nombre"
-              name="nombre"
-              placeholder="Ingresa el nombre de la categoría"
-              [class.error]="errores.nombre"
-              required
-              maxlength="150"
-            />
-            <div *ngIf="errores.nombre" class="error-message">
-              {{ errores.nombre }}
+        <!-- Mensaje de respuesta -->
+        <div *ngIf="mensaje" class="alert" [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" role="alert">
+          <i class="fas" [class]="tipoMensaje === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+          {{ mensaje }}
+        </div>
+
+        <!-- Formulario -->
+        <form (ngSubmit)="guardar()" #categoriaForm="ngForm">
+          
+          <!-- Nombre -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <label class="form-label fw-medium" for="nombre">
+                Nombre de la categoría <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                id="nombre"
+                class="form-control"
+                [class.is-invalid]="errores.nombre"
+                [(ngModel)]="formulario.nombre"
+                name="nombre"
+                placeholder="Ingresa el nombre de la categoría"
+                required
+                maxlength="150"
+              />
+              <div *ngIf="errores.nombre" class="invalid-feedback">
+                {{ errores.nombre }}
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Estado -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="estado">
-              Estado
-            </label>
-            <select
-              id="estado"
-              class="form-select"
-              [(ngModel)]="formulario.estado"
-              name="estado"
-            >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
+          <!-- Estado -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-medium" for="estado">
+                Estado
+              </label>
+              <select
+                id="estado"
+                class="form-select"
+                [(ngModel)]="formulario.estado"
+                name="estado"
+              >
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <!-- Imagen -->
-<div class="form-row">
-  <div class="form-group">
-    <label class="form-label" for="imagen">
-      Imagen de la categoría
-    </label>
-    
-    <!-- Preview de imagen actual o nueva -->
-    <div *ngIf="tieneImagenParaMostrar()" class="imagen-preview">
-      <img 
-        [src]="previewImagen" 
-        alt="Preview"
-        class="preview-img"
-      />
-      <div class="imagen-acciones">
+
+          <!-- Imagen -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <label class="form-label fw-medium">Imagen de la categoría</label>
+              
+              <!-- Preview de imagen actual o nueva -->
+              <div *ngIf="tieneImagenParaMostrar()" class="position-relative d-inline-block mb-3">
+                <img 
+                  [src]="previewImagen" 
+                  alt="Preview"
+                  class="preview-img border"
+                />
+                <button 
+                  type="button" 
+                  class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" 
+                  (click)="eliminarImagen()"
+                  title="Eliminar imagen"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+
+              <!-- Input de archivo -->
+              <div class="mb-2">
+                <input
+                  type="file"
+                  id="imagen"
+                  class="file-input"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  (change)="onImagenSeleccionada($event)"
+                  #fileInput
+                />
+                <label for="imagen" class="btn btn-outline-secondary d-flex align-items-center gap-2" style="width: fit-content;">
+                  <i class="fas fa-upload"></i>
+                  <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
+                  <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
+                </label>
+              </div>
+
+              <div *ngIf="errores.imagen" class="text-danger small">
+                {{ errores.imagen }}
+              </div>
+              
+              <div class="form-text">
+                Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 2MB
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
         <button 
           type="button" 
-          class="btn-imagen-accion btn-eliminar-imagen" 
-          (click)="eliminarImagen()"
-          title="Eliminar imagen"
+          class="btn btn-secondary" 
+          (click)="cerrarFormulario()"
+          [disabled]="enviando"
         >
-          <i class="fas fa-trash"></i>
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary d-flex align-items-center gap-2" 
+          (click)="guardar()"
+          [disabled]="enviando || !categoriaForm.valid"
+        >
+          <div *ngIf="enviando" class="loading-spinner-small"></div>
+          {{ getTextoBotonGuardar() }}
         </button>
       </div>
+
     </div>
-
-      <!-- Input de archivo -->
-      <div class="file-input-container">
-        <input
-          type="file"
-          id="imagen"
-          class="file-input"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          (change)="onImagenSeleccionada($event)"
-          #fileInput
-        />
-        <label for="imagen" class="file-label">
-          <i class="fas fa-upload"></i>
-          <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
-          <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
-        </label>
-      </div>
-
-      <div *ngIf="errores.imagen" class="error-message">
-        {{ errores.imagen }}
-      </div>
-      
-      <div class="file-help">
-        Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 2MB
-      </div>
-    </div>
-  </div>
-
-      </form>
-    </div>
-
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarFormulario()"
-        [disabled]="enviando"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn btn-primary" 
-        (click)="guardar()"
-        [disabled]="enviando || !categoriaForm.valid"
-      >
-        <span *ngIf="enviando" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        {{ getTextoBotonGuardar() }}
-      </button>
-    </div>
-
   </div>
 </div>
+
+<!-- Modal backdrop -->
+<div *ngIf="mostrarFormulario" class="modal-backdrop fade show"></div>
 
 <!-- Modal de confirmación -->
-<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
-  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">Confirmar acción</h2>
-      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
-        ✕
-      </button>
-    </div>
-
-    <!-- Content -->
+<div class="modal fade" 
+     [class.show]="mostrarConfirmacion" 
+     [style.display]="mostrarConfirmacion ? 'block' : 'none'"
+     tabindex="-1" 
+     (click)="cerrarConfirmacion()">
+  
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
     <div class="modal-content">
-      <div class="confirmacion-content">
-        <div class="confirmacion-icon">
-          <span *ngIf="accionConfirmacion === 'eliminar'" class="icon-warning">⚠️</span>
-          <span *ngIf="accionConfirmacion === 'activar'" class="icon-question">❓</span>
-        </div>
-        <p class="confirmacion-mensaje">
-          {{ mensajeConfirmacion }}
-        </p>
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Confirmar acción</h1>
+        <button type="button" class="btn-close" (click)="cerrarConfirmacion()"></button>
       </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarConfirmacion()"
-        [disabled]="procesandoAccion"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn"
-        [class.btn-danger]="accionConfirmacion === 'eliminar'"
-        [class.btn-success]="accionConfirmacion === 'activar'"
-        (click)="ejecutarAccion()"
-        [disabled]="procesandoAccion"
-      >
-        <span *ngIf="procesandoAccion" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        <span *ngIf="accionConfirmacion === 'eliminar'">
-          {{ procesandoAccion ? 'Desactivando...' : 'Desactivar' }}
-        </span>
-        <span *ngIf="accionConfirmacion === 'activar'">
-          {{ procesandoAccion ? 'Activando...' : 'Activar' }}
-        </span>
-      </button>
-    </div>
+      <!-- Body -->
+      <div class="modal-body text-center py-4">
+        <div class="mb-4">
+          <i *ngIf="accionConfirmacion === 'eliminar'" class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+          <i *ngIf="accionConfirmacion === 'activar'" class="fas fa-question-circle text-primary" style="font-size: 3rem;"></i>
+        </div>
+        <p class="mb-0">{{ mensajeConfirmacion }}</p>
+      </div>
 
+      <!-- Footer -->
+      <div class="modal-footer justify-content-center">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="cerrarConfirmacion()"
+          [disabled]="procesandoAccion"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn d-flex align-items-center gap-2"
+          [class.btn-danger]="accionConfirmacion === 'eliminar'"
+          [class.btn-success]="accionConfirmacion === 'activar'"
+          (click)="ejecutarAccion()"
+          [disabled]="procesandoAccion"
+        >
+          <div *ngIf="procesandoAccion" class="loading-spinner-small"></div>
+          <span *ngIf="accionConfirmacion === 'eliminar'">
+            {{ procesandoAccion ? 'Desactivando...' : 'Desactivar' }}
+          </span>
+          <span *ngIf="accionConfirmacion === 'activar'">
+            {{ procesandoAccion ? 'Activando...' : 'Activar' }}
+          </span>
+        </button>
+      </div>
+
+    </div>
   </div>
 </div>
+
+<!-- Modal backdrop para confirmación -->
+<div *ngIf="mostrarConfirmacion" class="modal-backdrop fade show"></div>

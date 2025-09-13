@@ -1,338 +1,364 @@
-<div class="productos-container">
+<div class="container-fluid py-4 bg-light productos-container">
     <!-- Header -->
-    <div class="productos-header">
-        <h1 class="titulo">Gestión de Productos</h1>
-        <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
-        <span class="btn-icon">+</span>
-        Nuevo Producto
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <h1 class="h2 mb-0 text-dark fw-bold">Gestión de Productos</h1>
+        <button class="btn btn-primary d-flex align-items-center gap-2" (click)="mostrarFormularioCrear()">
+            <span>+</span>
+            Nuevo Producto
         </button>
     </div>
 
     <!-- Filtros -->
-    <div class="filtros-section">
-        <div class="filtros-row">
-        <!-- Búsqueda -->
-        <div class="filtro-grupo">
-            <label class="filtro-label">Buscar:</label>
-            <input
-            type="text"
-            class="filtro-input"
-            placeholder="Buscar por nombre..."
-            [(ngModel)]="filtros.buscar"
-            (keyup.enter)="aplicarFiltros()"
-            />
-        </div>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                
+                <!-- Búsqueda -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-medium">Buscar:</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Buscar por nombre..."
+                        [(ngModel)]="filtros.buscar"
+                        (keyup.enter)="aplicarFiltros()"
+                    />
+                </div>
 
-        <!-- Estado -->
-        <div class="filtro-grupo">
-            <label class="filtro-label">Estado:</label>
-            <select class="filtro-select" [(ngModel)]="filtros.estado">
-            <option value="todos">Todos</option>
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-            </select>
-        </div>
+                <!-- Estado -->
+                <div class="col-md-2">
+                    <label class="form-label small fw-medium">Estado:</label>
+                    <select class="form-select" [(ngModel)]="filtros.estado">
+                        <option value="todos">Todos</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
 
-        <!-- Sin Stock -->
-        <div class="filtro-grupo">
-            <label class="filtro-checkbox">
-            <input
-                type="checkbox"
-                [(ngModel)]="filtros.sin_stock"
-            />
-            <span class="checkmark"></span>
-            Sin stock
-            </label>
-        </div>
+                <!-- Sin Stock -->
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            id="sinStock"
+                            [(ngModel)]="filtros.sin_stock"
+                        />
+                        <label class="form-check-label small" for="sinStock">
+                            Sin stock
+                        </label>
+                    </div>
+                </div>
 
-        <!-- Botones de filtro -->
-        <div class="filtro-acciones">
-            <button class="btn btn-secondary" (click)="aplicarFiltros()">
-            Buscar
-            </button>
-            <button class="btn btn-outline" (click)="limpiarFiltros()">
-            Limpiar
-            </button>
-        </div>
+                <!-- Botones de filtro -->
+                <div class="col-md-auto ms-auto">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-secondary" (click)="aplicarFiltros()">
+                            Buscar
+                        </button>
+                        <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Loading -->
-    <div *ngIf="cargando" class="loading-container">
-        <div class="loading-spinner"></div>
-        <span>Cargando productos...</span>
+    <div *ngIf="cargando" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="loading-spinner mx-auto mb-3"></div>
+            <span class="text-muted">Cargando productos...</span>
+        </div>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error && !cargando" class="error-container">
-        <div class="error-message">
-        <span class="error-icon">⚠️</span>
-        {{ error }}
+    <div *ngIf="error && !cargando" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="text-danger mb-3">
+                <span class="fs-2">⚠️</span>
+                <div class="mt-2">{{ error }}</div>
+            </div>
+            <button class="btn btn-secondary" (click)="cargarProductos()">
+                Reintentar
+            </button>
         </div>
-        <button class="btn btn-secondary" (click)="cargarProductos()">
-        Reintentar
-        </button>
     </div>
 
     <!-- Tabla de productos -->
-    <div *ngIf="!cargando && !error" class="tabla-container">
-        <!-- Info de resultados -->
-        <div class="resultados-info">
-        <span>
-            Mostrando {{ productos.length }} de {{ totalProductos }} productos
-        </span>
+    <div *ngIf="!cargando && !error" class="card shadow-sm">
         
-        <!-- Productos por página -->
-        <div class="productos-per-page">
-            <label>Mostrar:</label>
-           <select 
-            class="filtro-select small"
-            [value]="productosPorPagina"
-            #perPageSelect
-            (change)="cambiarProductosPorPagina(+perPageSelect.value)"
-            >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            </select>
-            <span>por página</span>
-        </div>
+        <!-- Info de resultados -->
+        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span class="text-muted small">
+                Mostrando {{ productos.length }} de {{ totalProductos }} productos
+            </span>
+            
+            <!-- Productos por página -->
+            <div class="d-flex align-items-center gap-2 small">
+                <label class="mb-0">Mostrar:</label>
+                <select 
+                    class="form-select form-select-sm"
+                    style="width: auto;"
+                    [value]="productosPorPagina"
+                    #perPageSelect
+                    (change)="cambiarProductosPorPagina(+perPageSelect.value)"
+                >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <span class="mb-0">por página</span>
+            </div>
         </div>
 
         <!-- Tabla -->
-        <div class="tabla-wrapper">
-        <table class="productos-tabla">
-            <thead>
-            <tr>
-                <th>Imagen</th>
-                <th>Nombre</th>
-                <th>SKU</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let producto of productos" class="producto-row">
-                <!-- Imagen -->
-                <td class="imagen-cell">
-                <div class="imagen-container">
-                    <img 
-                    *ngIf="producto.imagen_principal_url"
-                    [src]="producto.imagen_principal_url  "
-                    [alt]="producto.nombre"
-                    class="producto-imagen"
-                    onerror="this.style.display='none'"
-                    />
-                    <div *ngIf="!producto.imagen_principal_url" class="imagen-placeholder">
-                    📦
-                    </div>
-                    <div *ngIf="producto.total_imagenes && producto.total_imagenes > 1" class="badge-imagenes">
-                      +{{ producto.total_imagenes - 1 }}
-                    </div>
-                  </div>
-                </td>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" style="width: 80px;">Imagen</th>
+                        <th scope="col" style="min-width: 200px;">Nombre</th>
+                        <th scope="col" style="width: 120px;">SKU</th>
+                        <th scope="col" style="width: 150px;">Categoría</th>
+                        <th scope="col" style="width: 120px;">Precio</th>
+                        <th scope="col" style="width: 80px;">Stock</th>
+                        <th scope="col" style="width: 100px;">Estado</th>
+                        <th scope="col" style="width: 120px;" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let producto of productos">
+                        
+                        <!-- Imagen -->
+                        <td>
+                            <div class="position-relative d-inline-block">
+                                <img 
+                                    *ngIf="producto.imagen_principal_url"
+                                    [src]="producto.imagen_principal_url"
+                                    [alt]="producto.nombre"
+                                    class="producto-imagen rounded"
+                                    onerror="this.style.display='none'"
+                                />
+                                <div *ngIf="!producto.imagen_principal_url" class="imagen-placeholder rounded">
+                                    📦
+                                </div>
+                                <span *ngIf="producto.total_imagenes && producto.total_imagenes > 1" 
+                                      class="badge bg-primary badge-imagenes">
+                                    +{{ producto.total_imagenes - 1 }}
+                                </span>
+                            </div>
+                        </td>
 
-                <!-- Nombre -->
-                <td class="nombre-cell">
-                <div class="producto-info">
-                    <span class="producto-nombre">{{ producto.nombre }}</span>
-                    <span class="producto-descripcion">
-                    {{ producto.descripcion | slice:0:50 }}{{ producto.descripcion.length > 50 ? '...' : '' }}
-                    </span>
-                </div>
-                </td>
+                        <!-- Nombre -->
+                        <td>
+                            <div>
+                                <div class="fw-semibold text-dark">{{ producto.nombre }}</div>
+                                <small class="text-muted">
+                                    {{ producto.descripcion | slice:0:50 }}{{ producto.descripcion.length > 50 ? '...' : '' }}
+                                </small>
+                            </div>
+                        </td>
 
-                <!-- SKU -->
-                <td class="sku-cell">
-                <span class="sku-text">{{ producto.sku || '-' }}</span>
-                </td>
+                        <!-- SKU -->
+                        <td>
+                            <code class="sku-text bg-light px-2 py-1 rounded small">
+                                {{ producto.sku || '-' }}
+                            </code>
+                        </td>
 
-                <!-- Categoría -->
-                <td class="categoria-cell">
-                <span class="categoria-text">
-                    {{ producto.categoria?.nombre || 'Sin categoría' }}
-                </span>
-                </td>
+                        <!-- Categoría -->
+                        <td>
+                            <span class="small">
+                                {{ producto.categoria?.nombre || 'Sin categoría' }}
+                            </span>
+                        </td>
 
-                <!-- Precio -->
-                <td class="precio-cell">
-                <span class="precio-text">{{ formatearPrecio(producto.precio) }}</span>
-                </td>
+                        <!-- Precio -->
+                        <td>
+                            <span class="fw-semibold text-success small">
+                                {{ formatearPrecio(producto.precio) }}
+                            </span>
+                        </td>
 
-                <!-- Stock -->
-                <td class="stock-cell">
-                <span 
-                    class="stock-badge"
-                    [class.stock-bajo]="producto.stock <= 10"
-                    [class.sin-stock]="producto.stock === 0"
-                >
-                    {{ producto.stock }}
-                </span>
-                </td>   
+                        <!-- Stock -->
+                        <td class="text-center">
+                            <span class="badge"
+                                  [class]="'badge-' + (producto.stock === 0 ? 'danger' : producto.stock <= 10 ? 'warning' : 'success')"
+                                  [class.stock-bajo]="producto.stock <= 10 && producto.stock > 0"
+                                  [class.sin-stock]="producto.stock === 0">
+                                {{ producto.stock }}
+                            </span>
+                        </td>
 
-                <!-- Estado -->
-                <td class="estado-cell">
-                <span 
-                    class="estado-badge"
-                    [class]="getEstadoClase(producto.estado)"
-                >
-                    {{ producto.estado }}
-                </span>
-                </td>
+                        <!-- Estado -->
+                        <td>
+                            <span class="badge"
+                                  [class]="'badge-' + (producto.estado === 'activo' ? 'success' : 'danger')"
+                                  [class.estado-activo]="producto.estado === 'activo'"
+                                  [class.estado-inactivo]="producto.estado === 'inactivo'">
+                                {{ producto.estado }}
+                            </span>
+                        </td>
 
-                <!-- Acciones -->
-                <td class="acciones-cell">
-                <div class="acciones-buttons">
+                        <!-- Acciones -->
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                
+                                <!-- Editar -->
+                                <button class="btn btn-outline-primary btn-sm btn-accion" 
+                                        title="Editar" 
+                                        (click)="mostrarFormularioEditar(producto)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
 
-                    <!-- Editar -->
-                    <button class="btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(producto)">
-                    <i class="fas fa-edit"></i>
-                    </button>
+                                <!-- Desactivar -->
+                                <button *ngIf="producto.estado === 'activo'"
+                                        class="btn btn-outline-danger btn-sm btn-accion" 
+                                        title="Desactivar"
+                                        (click)="confirmarEliminar(producto)">
+                                    <i class="fas fa-ban"></i>
+                                </button>
 
-                    <!-- Desactivar -->
-                    <button 
-                    *ngIf="producto.estado === 'activo'"
-                    class="btn-accion btn-desactivar" 
-                    title="Desactivar"
-                    (click)="confirmarEliminar(producto)"
-                    >
-                    <i class="fas fa-ban"></i>
-                    </button>
+                                <!-- Activar -->
+                                <button *ngIf="producto.estado === 'inactivo'"
+                                        class="btn btn-outline-success btn-sm btn-accion" 
+                                        title="Activar"
+                                        (click)="confirmarActivar(producto)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                
+                            </div>
+                        </td>
+                    </tr>
 
-                    <!-- Activar -->
-                    <button 
-                    *ngIf="producto.estado === 'inactivo'"
-                    class="btn-accion btn-activar" 
-                    title="Activar"
-                    (click)="confirmarActivar(producto)"
-                    >
-                    <i class="fas fa-check"></i>
-                    </button>
-
-                </div>
-                </td>
-
-
-            </tr>
-
-            <!-- Mensaje cuando no hay productos -->
-            <tr *ngIf="productos.length === 0" class="empty-row">
-                <td colspan="8" class="empty-cell">
-                <div class="empty-state">
-                    <div class="empty-icon">📦</div>
-                    <h3>No hay productos</h3>
-                    <p>No se encontraron productos con los filtros aplicados.</p>
-                    <button class="btn btn-primary" (click)="limpiarFiltros()">
-                    Ver todos los productos
-                    </button>
-                </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    <!-- Mensaje cuando no hay productos -->
+                    <tr *ngIf="productos.length === 0">
+                        <td colspan="8" class="text-center py-5">
+                            <div>
+                                <div class="display-1 opacity-50 mb-3">📦</div>
+                                <h5 class="text-muted">No hay productos</h5>
+                                <p class="text-muted small mb-3">
+                                    No se encontraron productos con los filtros aplicados.
+                                </p>
+                                <button class="btn btn-primary" (click)="limpiarFiltros()">
+                                    Ver todos los productos
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-      <!-- Paginación NUEVA -->
-        <div *ngIf="totalPaginas > 1" class="paginacion">
-            <button 
-                class="btn btn-outline"
-                [disabled]="paginaActual === 1"
-                (click)="cambiarPagina(paginaActual - 1)"
-            >
-                Anterior
-            </button>
-            
-            <div class="paginacion-numeros">
-                <ng-container *ngFor="let pagina of getPaginasVisibles()">
-                    <button 
-                        *ngIf="pagina !== -1"
-                        class="btn-pagina"
-                        [class.activa]="pagina === paginaActual"
-                        (click)="cambiarPagina(pagina)"
-                    >
-                        {{ pagina }}
-                    </button>
-                    <span *ngIf="pagina === -1" class="puntos-separacion">...</span>
-                </ng-container>
-            </div>
-            
-            <button 
-                class="btn btn-outline"
-                [disabled]="paginaActual === totalPaginas"
-                (click)="cambiarPagina(paginaActual + 1)"
-            >
-                Siguiente
-            </button>
+        <!-- Paginación -->
+        <div *ngIf="totalPaginas > 1" class="card-footer bg-white">
+            <nav aria-label="Paginación de productos">
+                <ul class="pagination justify-content-center mb-0">
+                    
+                    <!-- Anterior -->
+                    <li class="page-item" [class.disabled]="paginaActual === 1">
+                        <button class="page-link" 
+                                [disabled]="paginaActual === 1"
+                                (click)="cambiarPagina(paginaActual - 1)">
+                            Anterior
+                        </button>
+                    </li>
+                    
+                    <!-- Números de página -->
+                    <ng-container *ngFor="let pagina of getPaginasVisibles()">
+                        <li *ngIf="pagina !== -1" 
+                            class="page-item" 
+                            [class.active]="pagina === paginaActual">
+                            <button class="page-link" (click)="cambiarPagina(pagina)">
+                                {{ pagina }}
+                            </button>
+                        </li>
+                        <li *ngIf="pagina === -1" class="page-item disabled">
+                            <span class="page-link puntos-separacion">...</span>
+                        </li>
+                    </ng-container>
+                    
+                    <!-- Siguiente -->
+                    <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+                        <button class="page-link" 
+                                [disabled]="paginaActual === totalPaginas"
+                                (click)="cambiarPagina(paginaActual + 1)">
+                            Siguiente
+                        </button>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
 
 <!-- Modal de formulario -->
 <app-producto-form
-  [producto]="productoEditando"
-  [mostrar]="mostrarFormulario"
-  (cerrar)="cerrarFormulario()"
-  (guardado)="onProductoGuardado($event)"
+    [producto]="productoEditando"
+    [mostrar]="mostrarFormulario"
+    (cerrar)="cerrarFormulario()"
+    (guardado)="onProductoGuardado($event)"
 >
 </app-producto-form>
 
 <!-- Modal de confirmación -->
-<div *ngIf="mostrarConfirmacion" class="modal-overlay" (click)="cerrarConfirmacion()">
-  <div class="modal-container confirmacion-modal" (click)="$event.stopPropagation()">
+<div *ngIf="mostrarConfirmacion" 
+     class="modal fade show d-block modal-overlay" 
+     style="background-color: rgba(0,0,0,0.5);"
+     (click)="cerrarConfirmacion()">
     
-    <!-- Header -->
-    <div class="modal-header">
-      <h2 class="modal-titulo">Confirmar acción</h2>
-      <button class="btn-cerrar" (click)="cerrarConfirmacion()" type="button">
-        ✕
-      </button>
-    </div>
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar acción</h5>
+                <button type="button" 
+                        class="btn-close" 
+                        (click)="cerrarConfirmacion()"
+                        [disabled]="procesandoAccion">
+                </button>
+            </div>
 
-    <!-- Content -->
-    <div class="modal-content">
-      <div class="confirmacion-content">
-        <div class="confirmacion-icon">
-          <span *ngIf="accionConfirmacion === 'eliminar'" class="icon-warning">⚠️</span>
-          <span *ngIf="accionConfirmacion === 'activar'" class="icon-question">❓</span>
+            <!-- Body -->
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <span *ngIf="accionConfirmacion === 'eliminar'" class="display-4">⚠️</span>
+                    <span *ngIf="accionConfirmacion === 'activar'" class="display-4">❓</span>
+                </div>
+                <p class="mb-0">{{ mensajeConfirmacion }}</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" 
+                        class="btn btn-secondary" 
+                        (click)="cerrarConfirmacion()"
+                        [disabled]="procesandoAccion">
+                    Cancelar
+                </button>
+                <button type="button" 
+                        class="btn"
+                        [class.btn-danger]="accionConfirmacion === 'eliminar'"
+                        [class.btn-success]="accionConfirmacion === 'activar'"
+                        (click)="ejecutarAccion()"
+                        [disabled]="procesandoAccion">
+                    
+                    <span *ngIf="procesandoAccion" class="d-flex align-items-center">
+                        <div class="loading-spinner-small me-2"></div>
+                    </span>
+                    
+                    <span *ngIf="accionConfirmacion === 'eliminar'">
+                        {{ procesandoAccion ? 'Desactivando...' : 'Desactivar' }}
+                    </span>
+                    <span *ngIf="accionConfirmacion === 'activar'">
+                        {{ procesandoAccion ? 'Activando...' : 'Activar' }}
+                    </span>
+                </button>
+            </div>
+
         </div>
-        <p class="confirmacion-mensaje">
-          {{ mensajeConfirmacion }}
-        </p>
-      </div>
     </div>
-
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="cerrarConfirmacion()"
-        [disabled]="procesandoAccion"
-      >
-        Cancelar
-      </button>
-      <button 
-        type="button" 
-        class="btn"
-        [class.btn-danger]="accionConfirmacion === 'eliminar'"
-        [class.btn-success]="accionConfirmacion === 'activar'"
-        (click)="ejecutarAccion()"
-        [disabled]="procesandoAccion"
-      >
-        <span *ngIf="procesandoAccion" class="btn-loading">
-          <div class="loading-spinner-small"></div>
-        </span>
-        <span *ngIf="accionConfirmacion === 'eliminar'">
-          {{ procesandoAccion ? 'Desactivando...' : 'Desactivar' }}
-        </span>
-        <span *ngIf="accionConfirmacion === 'activar'">
-          {{ procesandoAccion ? 'Activando...' : 'Activar' }}
-        </span>
-      </button>
-    </div>
-
-  </div>
 </div>

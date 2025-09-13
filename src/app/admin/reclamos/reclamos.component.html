@@ -1,152 +1,197 @@
-<div class="reclamos-container">
+<div class="container-fluid py-4">
     <!-- Header -->
-    <div class="reclamos-header">
-        <h1 class="titulo">Gestión de Reclamos y Quejas</h1>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h2 fw-bold">Gestión de Reclamos y Quejas</h1>
+        </div>
     </div>
 
     <!-- Estadísticas -->
-    <div class="estadisticas-section" *ngIf="estadisticas">
-        <div class="estadisticas-grid">
-            <div class="estadistica-card total">
-                <div class="estadistica-info">
-                    <span class="estadistica-numero">{{ estadisticas.total }}</span>
-                    <span class="estadistica-label">Total</span>
+    <div class="row mb-4" *ngIf="estadisticas">
+        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+            <div class="card border-primary border-start border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.total }}</div>
+                            <div class="small text-muted">Total</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="estadistica-card pendientes">
-                <div class="estadistica-info">
-                    <span class="estadistica-numero">{{ estadisticas.pendientes }}</span>
-                    <span class="estadistica-label">Pendientes</span>
+        </div>
+        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+            <div class="card border-warning border-start border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.pendientes }}</div>
+                            <div class="small text-muted">Pendientes</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="estadistica-card proceso">
-                <div class="estadistica-info">
-                    <span class="estadistica-numero">{{ estadisticas.en_proceso }}</span>
-                    <span class="estadistica-label">En Proceso</span>
+        </div>
+        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+            <div class="card border-info border-start border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.en_proceso }}</div>
+                            <div class="small text-muted">En Proceso</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="estadistica-card resueltas">
-                <div class="estadistica-info">
-                    <span class="estadistica-numero">{{ estadisticas.resueltas }}</span>
-                    <span class="estadistica-label">Resueltas</span>
+        </div>
+        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+            <div class="card border-success border-start border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.resueltas }}</div>
+                            <div class="small text-muted">Resueltas</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="estadistica-card reclamos">
-                <div class="estadistica-info">
-                    <span class="estadistica-numero">{{ estadisticas.reclamos }}</span>
-                    <span class="estadistica-label">Reclamos</span>
+        </div>
+        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+            <div class="card border-danger border-start border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.reclamos }}</div>
+                            <div class="small text-muted">Reclamos</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="estadistica-card quejas">
-                <div class="estadistica-info">
-                    <span class="estadistica-numero">{{ estadisticas.quejas }}</span>
-                    <span class="estadistica-label">Quejas</span>
+        </div>
+        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+            <div class="card border-secondary border-start border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.quejas }}</div>
+                            <div class="small text-muted">Quejas</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Filtros -->
-    <div class="filtros-section">
-        <div class="filtros-grid">
-            <!-- Búsqueda -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Buscar:</label>
-                <input
-                    type="text"
-                    class="filtro-input"
-                    placeholder="Número de reclamo, DNI, nombre o email..."
-                    [(ngModel)]="filtros.buscar"
-                    (keyup.enter)="aplicarFiltros()"
-                />
-            </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Búsqueda -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Buscar:</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Número, DNI, nombre o email..."
+                        [(ngModel)]="filtros.buscar"
+                        (keyup.enter)="aplicarFiltros()"
+                    />
+                </div>
 
-            <!-- Estado -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Estado:</label>
-                <select class="filtro-select" [(ngModel)]="filtros.estado">
-                    <option *ngFor="let opcion of estadosOptions" [value]="opcion.value">
-                        {{ opcion.label }}
-                    </option>
-                </select>
-            </div>
+                <!-- Estado -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Estado:</label>
+                    <select class="form-select" [(ngModel)]="filtros.estado">
+                        <option *ngFor="let opcion of estadosOptions" [value]="opcion.value">
+                            {{ opcion.label }}
+                        </option>
+                    </select>
+                </div>
 
-            <!-- Tipo de reclamo -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Tipo:</label>
-                <select class="filtro-select" [(ngModel)]="filtros.tipo_reclamo">
-                    <option *ngFor="let opcion of tiposReclamoOptions" [value]="opcion.value">
-                        {{ opcion.label }}
-                    </option>
-                </select>
-            </div>
+                <!-- Tipo -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Tipo:</label>
+                    <select class="form-select" [(ngModel)]="filtros.tipo_reclamo">
+                        <option *ngFor="let opcion of tiposReclamoOptions" [value]="opcion.value">
+                            {{ opcion.label }}
+                        </option>
+                    </select>
+                </div>
 
-            <!-- Fecha desde -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Desde:</label>
-                <input
-                    type="date"
-                    class="filtro-input"
-                    [(ngModel)]="filtros.fecha_desde"
-                />
-            </div>
+                <!-- Fecha desde -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Desde:</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        [(ngModel)]="filtros.fecha_desde"
+                    />
+                </div>
 
-            <!-- Fecha hasta -->
-            <div class="filtro-grupo">
-                <label class="filtro-label">Hasta:</label>
-                <input
-                    type="date"
-                    class="filtro-input"
-                    [(ngModel)]="filtros.fecha_hasta"
-                />
-            </div>
+                <!-- Fecha hasta -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Hasta:</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        [(ngModel)]="filtros.fecha_hasta"
+                    />
+                </div>
 
-            <!-- Botones de filtro -->
-            <div class="filtro-acciones">
-                <button class="btn btn-primary" (click)="aplicarFiltros()" [disabled]="cargando">
-                    <span *ngIf="!cargando">Buscar</span>
-                    <span *ngIf="cargando">Cargando...</span>
-                </button>
-                <button class="btn btn-outline" (click)="limpiarFiltros()" [disabled]="cargando">
-                    Limpiar
-                </button>
+                <!-- Botones -->
+                <div class="col-md-1 d-flex align-items-end">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" (click)="aplicarFiltros()" [disabled]="cargando">
+                            <span *ngIf="!cargando">🔍</span>
+                            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+                            {{ cargando ? 'Cargando...' : 'Buscar' }}
+                        </button>
+                        <button class="btn btn-outline-secondary" (click)="limpiarFiltros()" [disabled]="cargando">
+                            🗑️ Limpiar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Loading -->
-    <div *ngIf="cargando" class="loading-container">
-        <div class="loading-spinner"></div>
-        <span>Cargando reclamos...</span>
+    <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3">Cargando reclamos...</p>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error && !cargando" class="error-container">
-        <div class="error-message">
-            <span class="error-icon">⚠️</span>
+    <div *ngIf="error && !cargando" class="alert alert-danger" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
             {{ error }}
         </div>
-        <button class="btn btn-secondary" (click)="cargarReclamos()">
+        <button class="btn btn-outline-danger mt-2" (click)="cargarReclamos()">
             Reintentar
         </button>
     </div>
 
     <!-- Tabla de reclamos -->
-    <div *ngIf="!cargando && !error" class="tabla-container">
+    <div *ngIf="!cargando && !error" class="card">
         <!-- Info de resultados -->
-        <div class="resultados-info" *ngIf="paginacion">
-            <span>
-                Mostrando {{ paginacion.from }} - {{ paginacion.to }} de {{ paginacion.total }} reclamos
-            </span>
-            <div class="paginacion-info">
-                Página {{ paginacion.current_page }} de {{ paginacion.last_page }}
+        <div class="card-header bg-light" *ngIf="paginacion">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    Mostrando {{ paginacion.from }} - {{ paginacion.to }} de {{ paginacion.total }} reclamos
+                </small>
+                <small class="text-muted">
+                    Página {{ paginacion.current_page }} de {{ paginacion.last_page }}
+                </small>
             </div>
         </div>
 
         <!-- Tabla -->
-        <div class="tabla-wrapper">
-            <table class="reclamos-tabla">
-                <thead>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
                     <tr>
                         <th>N° Reclamo</th>
                         <th>Cliente</th>
@@ -154,75 +199,67 @@
                         <th>Tipo</th>
                         <th>Estado</th>
                         <th>Fecha</th>
-                        <th class="acciones-header">Acciones</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let reclamo of reclamos" class="reclamo-row">
-                        <!-- Número de reclamo -->
-                        <td class="numero-cell">
-                            <span class="numero-reclamo">{{ reclamo.numero_reclamo }}</span>
+                    <tr *ngFor="let reclamo of reclamos">
+                        <!-- Número -->
+                        <td>
+                            <code class="text-primary fw-bold">{{ reclamo.numero_reclamo }}</code>
                         </td>
 
                         <!-- Cliente -->
-                        <td class="cliente-cell">
-                            <div class="cliente-info">
-                                <span class="cliente-nombre">{{ getNombreCompleto(reclamo) }}</span>
-                                <span class="cliente-email" *ngIf="reclamo.email">{{ reclamo.email }}</span>
+                        <td>
+                            <div>
+                                <div class="fw-semibold">{{ getNombreCompleto(reclamo) }}</div>
+                                <small class="text-muted" *ngIf="reclamo.email">{{ reclamo.email }}</small>
                             </div>
                         </td>
 
                         <!-- Documento -->
-                        <td class="documento-cell">
-                            <span class="documento-numero">{{ reclamo.numero_documento }}</span>
+                        <td>
+                            <code class="text-muted">{{ reclamo.numero_documento }}</code>
                         </td>
 
                         <!-- Tipo -->
-                        <td class="tipo-cell">
-                            <span 
-                                class="tipo-badge"
-                                [class]="getTipoClase(reclamo.tipo_reclamo)"
-                            >
+                        <td>
+                            <span class="badge" 
+                                  [class]="reclamo.tipo_reclamo === 'reclamo' ? 'bg-danger' : 'bg-secondary'">
                                 {{ reclamo.tipo_reclamo | titlecase }}
                             </span>
                         </td>
 
-                        <!-- Estado (ahora solo lectura) -->
-                        <td class="estado-cell">
-                            <span 
-                                class="estado-badge"
-                                [class]="getEstadoClase(reclamo.estado)"
-                            >
+                        <!-- Estado -->
+                        <td>
+                            <span class="badge" 
+                                  [class]="reclamo.estado === 'pendiente' ? 'bg-warning text-dark' : 
+                                           reclamo.estado === 'en_proceso' ? 'bg-info' : 'bg-success'">
                                 {{ reclamo.estado === 'en_proceso' ? 'En Proceso' : (reclamo.estado | titlecase) }}
                             </span>
                         </td>
 
                         <!-- Fecha -->
-                        <td class="fecha-cell">
-                            <span class="fecha-text">
-                                {{ formatearFecha(reclamo.created_at) }}
-                            </span>
+                        <td>
+                            <small class="text-muted">{{ formatearFecha(reclamo.created_at) }}</small>
                         </td>
 
                         <!-- Acciones -->
-                        <td class="acciones-cell">
-                            <button 
-                                class="btn btn-sm btn-outline"
-                                (click)="verDetalle(reclamo)"
-                                title="Ver detalle"
-                            >
-                                <i class="fas fa-eye"></i>
-                                Ver
+                        <td class="text-center">
+                            <button class="btn btn-outline-primary btn-sm" 
+                                    (click)="verDetalle(reclamo)"
+                                    title="Ver detalle">
+                                <i class="fas fa-eye"></i> Ver
                             </button>
                         </td>
                     </tr>
 
-                    <!-- Mensaje cuando no hay reclamos -->
-                    <tr *ngIf="reclamos.length === 0" class="empty-row">
-                        <td colspan="7" class="empty-cell">
-                            <div class="empty-state">
-                                <div class="empty-icon">📝</div>
-                                <h3>No hay reclamos</h3>
+                    <!-- Estado vacío -->
+                    <tr *ngIf="reclamos.length === 0">
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <div class="display-1 mb-3">📝</div>
+                                <h4>No hay reclamos</h4>
                                 <p>No se encontraron reclamos con los filtros aplicados.</p>
                                 <button class="btn btn-primary" (click)="limpiarFiltros()">
                                     Ver todos los reclamos
@@ -235,159 +272,216 @@
         </div>
 
         <!-- Paginación -->
-        <div *ngIf="paginacion && paginacion.last_page > 1" class="paginacion">
-            <button 
-                class="btn btn-outline"
-                [disabled]="paginacion.current_page === 1"
-                (click)="cambiarPagina(paginacion.current_page - 1)"
-            >
-                Anterior
-            </button>
-            
-            <div class="paginacion-numeros">
-                <button 
-                    *ngFor="let pagina of getPaginasVisibles()"
-                    class="btn-pagina"
-                    [class.activa]="pagina === paginacion.current_page"
-                    [disabled]="pagina === -1"
-                    (click)="cambiarPagina(pagina)"
-                >
-                    <span *ngIf="pagina !== -1">{{ pagina }}</span>
-                    <span *ngIf="pagina === -1">...</span>
-                </button>
-            </div>
-            
-            <button 
-                class="btn btn-outline"
-                [disabled]="paginacion.current_page === paginacion.last_page"
-                (click)="cambiarPagina(paginacion.current_page + 1)"
-            >
-                Siguiente
-            </button>
+        <div *ngIf="paginacion && paginacion.last_page > 1" class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item" [class.disabled]="paginacion.current_page === 1">
+                        <button class="page-link" 
+                                (click)="cambiarPagina(paginacion.current_page - 1)"
+                                [disabled]="paginacion.current_page === 1">
+                            Anterior
+                        </button>
+                    </li>
+                    
+                    <li *ngFor="let pagina of getPaginasVisibles()" 
+                        class="page-item"
+                        [class.active]="pagina === paginacion.current_page"
+                        [class.disabled]="pagina === -1">
+                        <button class="page-link" 
+                                (click)="cambiarPagina(pagina)"
+                                [disabled]="pagina === -1">
+                            <span *ngIf="pagina !== -1">{{ pagina }}</span>
+                            <span *ngIf="pagina === -1">...</span>
+                        </button>
+                    </li>
+                    
+                    <li class="page-item" [class.disabled]="paginacion.current_page === paginacion.last_page">
+                        <button class="page-link" 
+                                (click)="cambiarPagina(paginacion.current_page + 1)"
+                                [disabled]="paginacion.current_page === paginacion.last_page">
+                            Siguiente
+                        </button>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 
     <!-- Modal de detalle -->
-    <div *ngIf="mostrandoDetalle && reclamoSeleccionado" class="modal-overlay" (click)="cerrarDetalle()">
-        <div class="modal-detalle" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-                <h2>Detalle del Reclamo {{ reclamoSeleccionado.numero_reclamo }}</h2>
-                <button class="btn-cerrar" (click)="cerrarDetalle()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    <div *ngIf="mostrandoDetalle && reclamoSeleccionado" 
+         class="modal d-block" tabindex="-1" 
+         style="background-color: rgba(0,0,0,0.5);"
+         (click)="cerrarDetalle()">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable" (click)="$event.stopPropagation()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        🔍 Detalle del Reclamo {{ reclamoSeleccionado.numero_reclamo }}
+                    </h5>
+                    <button type="button" class="btn-close" (click)="cerrarDetalle()"></button>
+                </div>
 
-            <div class="modal-body">
-                <div class="detalle-grid">
-                    <!-- Información del cliente -->
-                    <div class="detalle-seccion">
-                        <h3>Información del Cliente</h3>
-                        <div class="detalle-campo">
-                            <label>Nombre completo:</label>
-                            <span>{{ getNombreCompleto(reclamoSeleccionado) }}</span>
+                <div class="modal-body">
+                    <div class="row g-4">
+                        <!-- Información del cliente -->
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">👤 Información del Cliente</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Nombre completo:</label>
+                                        <p class="mb-0">{{ getNombreCompleto(reclamoSeleccionado) }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Documento:</label>
+                                        <p class="mb-0">{{ reclamoSeleccionado.tipo_documento | uppercase }} - {{ reclamoSeleccionado.numero_documento }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Email:</label>
+                                        <p class="mb-0">{{ reclamoSeleccionado.email }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Teléfono:</label>
+                                        <p class="mb-0">{{ reclamoSeleccionado.telefono }}</p>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label fw-semibold">Dirección:</label>
+                                        <p class="mb-0">{{ reclamoSeleccionado.direccion }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="detalle-campo">
-                            <label>Documento:</label>
-                            <span>{{ reclamoSeleccionado.tipo_documento | uppercase }} - {{ reclamoSeleccionado.numero_documento }}</span>
-                        </div>
-                        <div class="detalle-campo">
-                            <label>Email:</label>
-                            <span>{{ reclamoSeleccionado.email }}</span>
-                        </div>
-                        <div class="detalle-campo">
-                            <label>Teléfono:</label>
-                            <span>{{ reclamoSeleccionado.telefono }}</span>
-                        </div>
-                        <div class="detalle-campo">
-                            <label>Dirección:</label>
-                            <span>{{ reclamoSeleccionado.direccion }}</span>
-                        </div>
-                    </div>
 
-                    <!-- Información del reclamo -->
-                    <div class="detalle-seccion">
-                        <h3>Información del Reclamo</h3>    
-                        <div class="detalle-campo">
-                            <label>Tipo:</label>
-                            <span class="tipo-badge" [class]="getTipoClase(reclamoSeleccionado.tipo_reclamo)">
-                                {{ reclamoSeleccionado.tipo_reclamo | titlecase }}
-                            </span>
+                        <!-- Información del reclamo -->
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">📋 Información del Reclamo</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Tipo:</label>
+                                        <div>
+                                            <span class="badge" 
+                                                  [class]="reclamoSeleccionado.tipo_reclamo === 'reclamo' ? 'bg-danger' : 'bg-secondary'">
+                                                {{ reclamoSeleccionado.tipo_reclamo | titlecase }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Estado:</label>
+                                        <div>
+                                            <span class="badge" 
+                                                  [class]="reclamoSeleccionado.estado === 'pendiente' ? 'bg-warning text-dark' : 
+                                                           reclamoSeleccionado.estado === 'en_proceso' ? 'bg-info' : 'bg-success'">
+                                                {{ reclamoSeleccionado.estado | titlecase }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Fecha del incidente:</label>
+                                        <p class="mb-0">{{ reclamoSeleccionado.fecha_incidente | date:'dd/MM/yyyy' }}</p>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label fw-semibold">Monto reclamado:</label>
+                                        <p class="mb-0">
+                                            <span *ngIf="reclamoSeleccionado.monto_reclamado">
+                                                {{ formatearMonto(reclamoSeleccionado.monto_reclamado) }}
+                                            </span>
+                                            <span *ngIf="!reclamoSeleccionado.monto_reclamado" class="text-muted">
+                                                No especificado
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="detalle-campo">
-                            <label>Estado:</label>
-                            <span class="estado-badge" [class]="getEstadoClase(reclamoSeleccionado.estado)">
-                                {{ reclamoSeleccionado.estado | titlecase }}
-                            </span>
-                        </div>
-                        <div class="detalle-campo">
-                            <label>Fecha del incidente:</label>
-                            <span>{{ reclamoSeleccionado.fecha_incidente | date:'dd/MM/yyyy' }}</span>
-                        </div>
-                        <div class="detalle-campo">
-                            <label>Monto reclamado:</label>
-                            <span *ngIf="reclamoSeleccionado.monto_reclamado">
-                                {{ formatearMonto(reclamoSeleccionado.monto_reclamado) }}
-                            </span>
-                            <span *ngIf="!reclamoSeleccionado.monto_reclamado">No especificado</span>
-                        </div>
-                    </div>
 
-                    <!-- Información del bien -->
-                    <div class="detalle-seccion">
-                        <h3>Bien o Servicio</h3>
-                        <div class="detalle-campo">
-                            <label>Tipo:</label>
-                            <span>{{ reclamoSeleccionado.tipo_bien | titlecase }}</span>
+                        <!-- Bien o servicio -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">🛍️ Bien o Servicio</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Tipo:</label>
+                                                <p class="mb-0">{{ reclamoSeleccionado.tipo_bien | titlecase }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6" *ngIf="reclamoSeleccionado.pedido_concreto">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Pedido específico:</label>
+                                                <p class="mb-0">{{ reclamoSeleccionado.pedido_concreto }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label fw-semibold">Descripción:</label>
+                                        <div class="border p-3 bg-light rounded">
+                                            <p class="mb-0">{{ reclamoSeleccionado.descripcion_bien }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="detalle-campo descripcion-campo">
-                            <label>Descripción:</label>
-                            <span>{{ reclamoSeleccionado.descripcion_bien }}</span>
-                        </div>
-                        <div class="detalle-campo" *ngIf="reclamoSeleccionado.pedido_concreto">
-                            <label>Pedido específico:</label>
-                            <span>{{ reclamoSeleccionado.pedido_concreto }}</span>
-                        </div>
-                    </div>
 
-                    <!-- Detalle del reclamo -->
-                    <div class="detalle-seccion detalle-completo">
-                        <h3>Detalle del {{ reclamoSeleccionado.tipo_reclamo | titlecase }}</h3>
-                        <div class="detalle-campo descripcion-campo">
-                            <p>{{ reclamoSeleccionado.detalle_reclamo }}</p>
+                        <!-- Detalle del reclamo -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">📝 Detalle del {{ reclamoSeleccionado.tipo_reclamo | titlecase }}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="border p-3 bg-light rounded">
+                                        <p class="mb-0">{{ reclamoSeleccionado.detalle_reclamo }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Fechas -->
-                    <div class="detalle-seccion">
-                        <h3>Fechas</h3>
-                        <div class="detalle-campo">
-                            <label>Fecha de registro:</label>
-                            <span>{{ formatearFecha(reclamoSeleccionado.created_at) }}</span>
-                        </div>
-                        <div class="detalle-campo">
-                            <label>Última actualización:</label>
-                            <span>{{ formatearFecha(reclamoSeleccionado.updated_at) }}</span>
+                        <!-- Fechas -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">📅 Fechas</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Fecha de registro:</label>
+                                            <p class="mb-0">{{ formatearFecha(reclamoSeleccionado.created_at) }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Última actualización:</label>
+                                            <p class="mb-0">{{ formatearFecha(reclamoSeleccionado.updated_at) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Acciones del modal -->
-                <div class="modal-acciones">
-                    <div class="estado-cambio">
-                        <label>Cambiar estado:</label>
-                       <select 
-                        class="estado-select-modal"
-                        [value]="reclamoSeleccionado.estado"
-                        (change)="actualizarEstado(reclamoSeleccionado, estadoSelect.value)"
-                        [disabled]="actualizandoEstado"
-                        #estadoSelect
-                        >
-                        <option value="pendiente">Pendiente</option>
-                        <option value="en_proceso">En Proceso</option>
-                        <option value="resuelto">Resuelto</option>
+                <div class="modal-footer">
+                    <div class="d-flex align-items-center gap-3">
+                        <label class="form-label fw-semibold mb-0">Cambiar estado:</label>
+                        <select class="form-select" 
+                                style="width: auto;"
+                                [value]="reclamoSeleccionado.estado"
+                                (change)="actualizarEstado(reclamoSeleccionado, estadoSelect.value)"
+                                [disabled]="actualizandoEstado"
+                                #estadoSelect>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="en_proceso">En Proceso</option>
+                            <option value="resuelto">Resuelto</option>
                         </select>
-                        <!-- Indicador de carga -->
-                        <span *ngIf="actualizandoEstado" class="loading-text">
+                        <span *ngIf="actualizandoEstado" class="text-muted">
+                            <div class="spinner-border spinner-border-sm me-1"></div>
                             Actualizando...
                         </span>
                     </div>
