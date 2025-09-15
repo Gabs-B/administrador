@@ -204,32 +204,36 @@
 
                         <!-- Acciones -->
                         <td class="text-center">
-                            <div class="d-flex justify-content-center gap-1">
-                                
-                                <!-- Editar -->
-                                <button class="btn btn-outline-primary btn-sm btn-accion" 
-                                        title="Editar" 
-                                        (click)="mostrarFormularioEditar(producto)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                        <div class="d-flex justify-content-center gap-1">
+                            <!-- Editar -->
+                            <button 
+                            class="btn btn-outline-primary btn-sm" 
+                            title="Editar" 
+                            (click)="mostrarFormularioEditar(producto)"
+                            >
+                            <i class="fas fa-edit"></i>
+                            </button>
 
-                                <!-- Desactivar -->
-                                <button *ngIf="producto.estado === 'activo'"
-                                        class="btn btn-outline-danger btn-sm btn-accion" 
-                                        title="Desactivar"
-                                        (click)="confirmarEliminar(producto)">
-                                    <i class="fas fa-ban"></i>
-                                </button>
+                            <!-- Desactivar -->
+                            <button 
+                            *ngIf="producto.estado === 'activo'"
+                            class="btn btn-outline-warning btn-sm" 
+                            title="Desactivar"
+                            (click)="confirmarEliminar(producto)"
+                            >
+                            <i class="fas fa-ban"></i>
+                            </button>
 
-                                <!-- Activar -->
-                                <button *ngIf="producto.estado === 'inactivo'"
-                                        class="btn btn-outline-success btn-sm btn-accion" 
-                                        title="Activar"
-                                        (click)="confirmarActivar(producto)">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                
-                            </div>
+                            <!-- Activar -->
+                            <button 
+                            *ngIf="producto.estado === 'inactivo'"
+                            class="btn btn-outline-success btn-sm" 
+                            title="Activar"
+                            (click)="confirmarActivar(producto)"
+                            >
+                            <i class="fas fa-check"></i>
+                            </button>
+                        </div>
                         </td>
                     </tr>
 

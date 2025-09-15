@@ -218,18 +218,28 @@
               </div>
 
               <!-- Acciones -->
-              <div class="card-footer bg-white border-top">
-                <div class="d-flex justify-content-center gap-2">
-                  <button class="btn btn-accion btn-editar" title="Editar" (click)="mostrarFormularioEditar(banner)">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <!-- Uncomment if needed
-                  <button class="btn btn-accion btn-eliminar" title="Desactivar" (click)="confirmarEliminar(banner)">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                  -->
-                </div>
+              <div class="card-footer bg-light p-2">
+              <div class="d-flex justify-content-center gap-1">
+                <!-- Editar -->
+                <button 
+                  class="btn btn-outline-primary btn-sm" 
+                  title="Editar" 
+                  (click)="mostrarFormularioEditar(banner)"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                
+                <!-- Si necesitas más botones, descomenta:
+                <button 
+                  class="btn btn-outline-danger btn-sm" 
+                  title="Eliminar" 
+                  (click)="confirmarEliminar(banner)"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+                -->
               </div>
+          </div>
             </div>
           </div>
 
@@ -257,6 +267,7 @@
 </div>
 
 <!-- Modal de formulario -->
+ <div *ngIf="mostrarFormulario" class="modal-backdrop fade show"></div>
 <div *ngIf="mostrarFormulario" class="modal d-block" tabindex="-1" (click)="cerrarFormulario()">
   <div class="modal-dialog modal-lg modal-container-custom" (click)="$event.stopPropagation()">
     <div class="modal-content">

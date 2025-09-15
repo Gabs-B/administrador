@@ -26,3 +26,192 @@ code {
     margin: 0.5rem;
   }
 }
+/* Estilos para las tarjetas de estadísticas */
+.stat-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 12px !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.stat-card .card-body {
+  padding: 1.5rem;
+}
+
+.stat-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-trend {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.stat-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+/* Patrón de fondo sutil */
+.stat-bg-pattern {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  opacity: 0.05;
+  background: radial-gradient(circle, currentColor 2px, transparent 2px);
+  background-size: 15px 15px;
+  pointer-events: none;
+}
+
+/* Colores específicos para cada tipo de tarjeta */
+.stat-card-total .stat-bg-pattern {
+  color: #0d6efd;
+}
+
+.stat-card-warning .stat-bg-pattern {
+  color: #ffc107;
+}
+
+.stat-card-info .stat-bg-pattern {
+  color: #0dcaf0;
+}
+
+.stat-card-success .stat-bg-pattern {
+  color: #198754;
+}
+
+.stat-card-danger .stat-bg-pattern {
+  color: #dc3545;
+}
+
+.stat-card-secondary .stat-bg-pattern {
+  color: #6c757d;
+}
+
+/* Animación para el spinner */
+.stat-card .fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+/* Progress bar stacked personalizada */
+.progress-stacked {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-stacked .progress-bar {
+  transition: width 0.6s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stat-number {
+    font-size: 1.75rem;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .stat-card .card-body {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .stat-trend {
+    font-size: 0.7rem;
+  }
+}
+
+/* Animaciones de entrada */
+@keyframes slideInUp {
+  from {
+    transform: translate3d(0, 40px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.stat-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:nth-child(5) { animation-delay: 0.5s; }
+.stat-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Estilos adicionales que complementan los existentes */
+.badge.bg-warning {
+  color: #000 !important;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.modal.d-block {
+  background-color: rgba(0,0,0,0.5) !important;
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+}

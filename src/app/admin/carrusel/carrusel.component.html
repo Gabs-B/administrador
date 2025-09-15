@@ -159,34 +159,37 @@
 
             <!-- Acciones -->
             <div class="card-footer bg-light p-2">
-              <div class="d-flex justify-content-center gap-1">
-                <button 
-                  class="btn-action-circle"
-                  [class]="'btn btn-light text-primary'"
-                  title="Editar" 
-                  (click)="mostrarFormularioEditar(item)"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-                
-                <button 
-                  class="btn-action-circle btn"
-                  [class]="item.estado === 'activo' ? 'btn-light text-warning' : 'btn-light text-success'"
-                  [title]="item.estado === 'activo' ? 'Desactivar' : 'Activar'"
-                  (click)="confirmarCambiarEstado(item)"
-                >
-                  <i class="fas" [class]="item.estado === 'activo' ? 'fa-eye-slash' : 'fa-eye'"></i>
-                </button>
+            <div class="d-flex justify-content-center gap-1">
+              <!-- Editar -->
+              <button 
+                class="btn btn-outline-primary btn-sm"
+                title="Editar" 
+                (click)="mostrarFormularioEditar(item)"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              
+              <!-- Cambiar Estado (Activar/Desactivar) -->
+              <button 
+                class="btn btn-sm"
+                [ngClass]="item.estado === 'activo' ? 'btn-outline-warning' : 'btn-outline-success'"
+                [title]="item.estado === 'activo' ? 'Desactivar' : 'Activar'"
+                (click)="confirmarCambiarEstado(item)"
+              >
+                <i class="fas" [ngClass]="item.estado === 'activo' ? 'fa-ban' : 'fa-check'"></i>
+              </button>
 
-                <button 
-                  class="btn-action-circle btn btn-light text-danger" 
-                  title="Eliminar" 
-                  (click)="confirmarEliminar(item)"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+              <!-- Eliminar -->
+              <button 
+                class="btn btn-outline-danger btn-sm" 
+                title="Eliminar" 
+                (click)="confirmarEliminar(item)"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
+</div>
+
           </div>
         </div>
       </div>
@@ -253,6 +256,7 @@
 </div>
 
 <!-- Modal de formulario -->
+ <div *ngIf="mostrarFormulario" class="modal-backdrop fade show"></div>
 <div *ngIf="mostrarFormulario" class="modal d-block" tabindex="-1" (click)="cerrarFormulario()">
   <div class="modal-dialog modal-lg modal-appear" (click)="$event.stopPropagation()">
     <div class="modal-content">

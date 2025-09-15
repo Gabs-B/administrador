@@ -149,36 +149,36 @@
 
                   <!-- Acciones -->
                   <td class="text-center">
-                    <div class="btn-group btn-group-sm" role="group">
-                      <!-- Editar -->
-                      <button 
-                        class="btn btn-outline-primary" 
-                        title="Editar" 
-                        (click)="mostrarFormularioEditar(categoria)"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </button>
+  <div class="d-flex justify-content-center gap-1">
+    <!-- Editar -->
+    <button 
+      class="btn btn-outline-primary btn-sm" 
+      title="Editar" 
+      (click)="mostrarFormularioEditar(categoria)"
+    >
+      <i class="fas fa-edit"></i>
+    </button>
 
-                      <!-- Desactivar -->
-                      <button 
-                        *ngIf="categoria.estado === 'activo'"
-                        class="btn btn-outline-danger" 
-                        title="Desactivar"
-                        (click)="confirmarEliminar(categoria)"
-                      >
-                        <i class="fas fa-ban"></i>
-                      </button>
+    <!-- Desactivar -->
+    <button 
+      *ngIf="categoria.estado === 'activo'"
+      class="btn btn-outline-warning btn-sm" 
+      title="Desactivar"
+      (click)="confirmarEliminar(categoria)"
+    >
+      <i class="fas fa-ban"></i>
+    </button>
 
-                      <!-- Activar -->
-                      <button 
-                        *ngIf="categoria.estado === 'inactivo'"
-                        class="btn btn-outline-success" 
-                        title="Activar"
-                        (click)="confirmarActivar(categoria)"
-                      >
-                        <i class="fas fa-check"></i>
-                      </button>
-                    </div>
+    <!-- Activar -->
+    <button 
+      *ngIf="categoria.estado === 'inactivo'"
+      class="btn btn-outline-success btn-sm" 
+      title="Activar"
+      (click)="confirmarActivar(categoria)"
+    >
+      <i class="fas fa-check"></i>
+    </button>
+  </div>
                   </td>
                 </tr>
 

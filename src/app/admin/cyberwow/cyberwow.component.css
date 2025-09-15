@@ -9,21 +9,19 @@
 }
 
 /* Enhanced primary button */
-.btn-primary-custom {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+/* .btn-primary-custom {
   border: none;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-}
-
+} */
+/* 
 .btn-primary-custom:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #5a6fd8, #6a4a96);
-}
+} */c
 
 /* Custom dropdown */
 .dropdown-menu-custom {

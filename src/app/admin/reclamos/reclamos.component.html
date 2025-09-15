@@ -7,80 +7,219 @@
     </div>
 
     <!-- Estadísticas -->
-    <div class="row mb-4" *ngIf="estadisticas">
-        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
-            <div class="card border-primary border-start border-4 h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.total }}</div>
-                            <div class="small text-muted">Total</div>
+    <!-- Estadísticas Mejoradas -->
+<div class="row mb-4" *ngIf="estadisticas">
+    <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+        <div class="card stat-card stat-card-total h-100 border-0 shadow-sm">
+            <div class="card-body position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-2">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-number">{{ estadisticas.total | number }}</div>
+                        <div class="stat-label">Total de Casos</div>
+                        <div class="stat-trend text-muted">
+                            <small><i class="fas fa-info-circle me-1"></i>Todos los registros</small>
                         </div>
                     </div>
                 </div>
+                <div class="stat-bg-pattern"></div>
             </div>
         </div>
-        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
-            <div class="card border-warning border-start border-4 h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.pendientes }}</div>
-                            <div class="small text-muted">Pendientes</div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+        <div class="card stat-card stat-card-warning h-100 border-0 shadow-sm">
+            <div class="card-body position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning mb-2">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number">{{ estadisticas.pendientes | number }}</div>
+                        <div class="stat-label">Pendientes</div>
+                        <div class="stat-trend" [class]="getPorcentajePendientes() > 50 ? 'text-warning' : 'text-muted'">
+                            <small>
+                                <i class="fas fa-percentage me-1"></i>
+                                {{ getPorcentajePendientes() }}% del total
+                            </small>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
-            <div class="card border-info border-start border-4 h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.en_proceso }}</div>
-                            <div class="small text-muted">En Proceso</div>
-                        </div>
+                    <div class="stat-badge bg-warning bg-opacity-20 text-warning" *ngIf="estadisticas.pendientes > 0">
+                        <i class="fas fa-exclamation"></i>
                     </div>
                 </div>
+                <div class="stat-bg-pattern"></div>
             </div>
         </div>
-        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
-            <div class="card border-success border-start border-4 h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.resueltas }}</div>
-                            <div class="small text-muted">Resueltas</div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+        <div class="card stat-card stat-card-info h-100 border-0 shadow-sm">
+            <div class="card-body position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-icon bg-info bg-opacity-10 text-info mb-2">
+                            <i class="fas fa-cog fa-spin"></i>
+                        </div>
+                        <div class="stat-number">{{ estadisticas.en_proceso | number }}</div>
+                        <div class="stat-label">En Proceso</div>
+                        <div class="stat-trend text-info">
+                            <small>
+                                <i class="fas fa-arrow-right me-1"></i>
+                                {{ getPorcentajeEnProceso() }}% activos
+                            </small>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
-            <div class="card border-danger border-start border-4 h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.reclamos }}</div>
-                            <div class="small text-muted">Reclamos</div>
-                        </div>
+                    <div class="stat-badge bg-info bg-opacity-20 text-info" *ngIf="estadisticas.en_proceso > 0">
+                        <div class="spinner-border spinner-border-sm"></div>
                     </div>
                 </div>
+                <div class="stat-bg-pattern"></div>
             </div>
         </div>
-        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
-            <div class="card border-secondary border-start border-4 h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="fs-2 fw-bold text-dark">{{ estadisticas.quejas }}</div>
-                            <div class="small text-muted">Quejas</div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+        <div class="card stat-card stat-card-success h-100 border-0 shadow-sm">
+            <div class="card-body position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-icon bg-success bg-opacity-10 text-success mb-2">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number">{{ estadisticas.resueltas | number }}</div>
+                        <div class="stat-label">Resueltas</div>
+                        <div class="stat-trend text-success">
+                            <small>
+                                <i class="fas fa-chart-line me-1"></i>
+                                {{ getPorcentajeResueltas() }}% completadas
+                            </small>
+                        </div>
+                    </div>
+                    <div class="stat-badge bg-success bg-opacity-20 text-success" *ngIf="estadisticas.resueltas > 0">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <div class="stat-bg-pattern"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+        <div class="card stat-card stat-card-danger h-100 border-0 shadow-sm">
+            <div class="card-body position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger mb-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-number">{{ estadisticas.reclamos | number }}</div>
+                        <div class="stat-label">Reclamos</div>
+                        <div class="stat-trend text-danger">
+                            <small>
+                                <i class="fas fa-fire me-1"></i>
+                                {{ getPorcentajeReclamos() }}% críticos
+                            </small>
+                        </div>
+                    </div>
+                    <div class="stat-badge bg-danger bg-opacity-20 text-danger" *ngIf="estadisticas.reclamos > 0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <div class="stat-bg-pattern"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+        <div class="card stat-card stat-card-secondary h-100 border-0 shadow-sm">
+            <div class="card-body position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-icon bg-secondary bg-opacity-10 text-secondary mb-2">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="stat-number">{{ estadisticas.quejas | number }}</div>
+                        <div class="stat-label">Quejas</div>
+                        <div class="stat-trend text-secondary">
+                            <small>
+                                <i class="fas fa-comment me-1"></i>
+                                {{ getPorcentajeQuejas() }}% del total
+                            </small>
+                        </div>
+                    </div>
+                    <div class="stat-badge bg-secondary bg-opacity-20 text-secondary" *ngIf="estadisticas.quejas > 0">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                </div>
+                <div class="stat-bg-pattern"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen visual adicional -->
+<div class="row mb-4" *ngIf="estadisticas && estadisticas.total > 0">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>
+                        Distribución de Estados
+                    </h6>
+                    <small class="text-muted">{{ getUltimaActualizacion() }}</small>
+                </div>
+                
+                <div class="progress-stacked mb-3" style="height: 20px;">
+                    <div class="progress-bar bg-warning" 
+                         role="progressbar" 
+                         [style.width.%]="getPorcentajePendientes()"
+                         [attr.aria-valuenow]="getPorcentajePendientes()"
+                         aria-valuemin="0" 
+                         aria-valuemax="100"
+                         [title]="'Pendientes: ' + getPorcentajePendientes() + '%'">
+                    </div>
+                    <div class="progress-bar bg-info" 
+                         role="progressbar" 
+                         [style.width.%]="getPorcentajeEnProceso()"
+                         [attr.aria-valuenow]="getPorcentajeEnProceso()"
+                         [title]="'En Proceso: ' + getPorcentajeEnProceso() + '%'">
+                    </div>
+                    <div class="progress-bar bg-success" 
+                         role="progressbar" 
+                         [style.width.%]="getPorcentajeResueltas()"
+                         [attr.aria-valuenow]="getPorcentajeResueltas()"
+                         [title]="'Resueltas: ' + getPorcentajeResueltas() + '%'">
+                    </div>
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="me-2 bg-warning rounded" style="width: 12px; height: 12px;"></div>
+                            <small class="text-muted">Pendientes ({{ getPorcentajePendientes() }}%)</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="me-2 bg-info rounded" style="width: 12px; height: 12px;"></div>
+                            <small class="text-muted">En Proceso ({{ getPorcentajeEnProceso() }}%)</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="me-2 bg-success rounded" style="width: 12px; height: 12px;"></div>
+                            <small class="text-muted">Resueltas ({{ getPorcentajeResueltas() }}%)</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Filtros -->
     <div class="card mb-4">
@@ -142,12 +281,12 @@
                 <div class="col-md-1 d-flex align-items-end">
                     <div class="d-flex gap-2">
                         <button class="btn btn-primary" (click)="aplicarFiltros()" [disabled]="cargando">
-                            <span *ngIf="!cargando">🔍</span>
+                            <span *ngIf="!cargando"></span>
                             <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
                             {{ cargando ? 'Cargando...' : 'Buscar' }}
                         </button>
                         <button class="btn btn-outline-secondary" (click)="limpiarFiltros()" [disabled]="cargando">
-                            🗑️ Limpiar
+                             Limpiar
                         </button>
                     </div>
                 </div>
@@ -246,11 +385,16 @@
 
                         <!-- Acciones -->
                         <td class="text-center">
-                            <button class="btn btn-outline-primary btn-sm" 
-                                    (click)="verDetalle(reclamo)"
-                                    title="Ver detalle">
-                                <i class="fas fa-eye"></i> Ver
+                        <div class="d-flex justify-content-center gap-1">
+                            <!-- Ver Detalle -->
+                            <button 
+                            class="btn btn-outline-info btn-sm" 
+                            (click)="verDetalle(reclamo)"
+                            title="Ver detalle"
+                            >
+                            <i class="fas fa-eye"></i>
                             </button>
+                        </div>
                         </td>
                     </tr>
 
@@ -315,8 +459,12 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable" (click)="$event.stopPropagation()">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        🔍 Detalle del Reclamo {{ reclamoSeleccionado.numero_reclamo }}
+                    <h5 class="modal-title d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        Detalle del Reclamo {{ reclamoSeleccionado.numero_reclamo }}
                     </h5>
                     <button type="button" class="btn-close" (click)="cerrarDetalle()"></button>
                 </div>
@@ -327,7 +475,13 @@
                         <div class="col-lg-6">
                             <div class="card h-100">
                                 <div class="card-header">
-                                    <h6 class="card-title mb-0">👤 Información del Cliente</h6>
+                                    <h6 class="card-title mb-0 d-flex align-items-center gap-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        Información del Cliente
+                                    </h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -358,7 +512,13 @@
                         <div class="col-lg-6">
                             <div class="card h-100">
                                 <div class="card-header">
-                                    <h6 class="card-title mb-0">📋 Información del Reclamo</h6>
+                                    <h6 class="card-title mb-0 d-flex align-items-center gap-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                        </svg>
+                                        Información del Reclamo
+                                    </h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -403,7 +563,14 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h6 class="card-title mb-0">🛍️ Bien o Servicio</h6>
+                                    <h6 class="card-title mb-0 d-flex align-items-center gap-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                            <path d="M3 6h18"></path>
+                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                        </svg>
+                                        Bien o Servicio
+                                    </h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -434,7 +601,16 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h6 class="card-title mb-0">📝 Detalle del {{ reclamoSeleccionado.tipo_reclamo | titlecase }}</h6>
+                                    <h6 class="card-title mb-0 d-flex align-items-center gap-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14,2 14,8 20,8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10,9 9,9 8,9"></polyline>
+                                        </svg>
+                                        Detalle del {{ reclamoSeleccionado.tipo_reclamo | titlecase }}
+                                    </h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="border p-3 bg-light rounded">
@@ -448,7 +624,15 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h6 class="card-title mb-0">📅 Fechas</h6>
+                                    <h6 class="card-title mb-0 d-flex align-items-center gap-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        Fechas
+                                    </h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -480,8 +664,10 @@
                             <option value="en_proceso">En Proceso</option>
                             <option value="resuelto">Resuelto</option>
                         </select>
-                        <span *ngIf="actualizandoEstado" class="text-muted">
-                            <div class="spinner-border spinner-border-sm me-1"></div>
+                        <span *ngIf="actualizandoEstado" class="text-muted d-flex align-items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+                                <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+                            </svg>
                             Actualizando...
                         </span>
                     </div>

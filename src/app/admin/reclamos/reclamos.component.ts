@@ -277,4 +277,33 @@ private actualizarEstadisticas(): void {
   getNombreCompleto(reclamo: Reclamacion): string {
     return `${reclamo.nombres} ${reclamo.apellidos}`;
   }
+  // Agregar estos métodos en tu componente
+getPorcentajePendientes(): number {
+  if (!this.estadisticas || this.estadisticas.total === 0) return 0;
+  return Math.round((this.estadisticas.pendientes / this.estadisticas.total) * 100);
+}
+
+getPorcentajeEnProceso(): number {
+  if (!this.estadisticas || this.estadisticas.total === 0) return 0;
+  return Math.round((this.estadisticas.en_proceso / this.estadisticas.total) * 100);
+}
+
+getPorcentajeResueltas(): number {
+  if (!this.estadisticas || this.estadisticas.total === 0) return 0;
+  return Math.round((this.estadisticas.resueltas / this.estadisticas.total) * 100);
+}
+
+getPorcentajeReclamos(): number {
+  if (!this.estadisticas || this.estadisticas.total === 0) return 0;
+  return Math.round((this.estadisticas.reclamos / this.estadisticas.total) * 100);
+}
+
+getPorcentajeQuejas(): number {
+  if (!this.estadisticas || this.estadisticas.total === 0) return 0;
+  return Math.round((this.estadisticas.quejas / this.estadisticas.total) * 100);
+}
+
+getUltimaActualizacion(): string {
+  return `Actualizado: ${new Date().toLocaleTimeString()}`;
+}
 }
