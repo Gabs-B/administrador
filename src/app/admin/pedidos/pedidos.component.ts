@@ -20,7 +20,7 @@ interface PaginacionInfo {
   styleUrls: ['./pedidos.component.css']
 })
 export class PedidosComponent implements OnInit {
-backendUrl = envs.backendUrl; 
+API_URL = envs.API_URL; 
   
 
   // Estados principales
@@ -195,20 +195,20 @@ backendUrl = envs.backendUrl;
 
   // =================== MÉTODOS DE UTILIDAD ===================
 
-  getEstadoClase(estado: string): string {
-    switch (estado) {
-      case 'pendiente':
-        return 'estado-pendiente';
-      case 'pagado':
-        return 'estado-pagado';
-      case 'enviado':
-        return 'estado-enviado';
-      case 'cancelado':
-        return 'estado-cancelado';
-      default:
-        return 'estado-default';
-    }
+getEstadoClase(estado: string): string {
+  switch (estado.toLowerCase()) {
+    case 'pendiente':
+      return 'bg-warning-subtle text-warning';
+    case 'pagado':
+      return 'bg-success-subtle text-success';
+    case 'enviado':
+      return 'bg-info-subtle text-info';
+    case 'cancelado':
+      return 'bg-danger-subtle text-danger';
+    default:
+      return 'bg-secondary text-white';
   }
+}
 
   getEstadoTexto(estado: string): string {
     switch (estado) {
@@ -440,7 +440,7 @@ handleImgError(event: Event): void {
 
 getImagenProducto(producto: Producto): string {
   return producto?.imagen_principal
-    ? `${this.backendUrl}/storage/${producto.imagen_principal}`
+    ? `${this.API_URL}/storage/${producto.imagen_principal}`
     : '/assets/images/no-image.png';
 }
 

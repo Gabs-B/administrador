@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 
@@ -10,6 +10,7 @@ import { AuthService } from '../../auth/auth.service';
 export class AdminLayoutComponent implements OnInit {
   adminUser: any = null;
   sidebarCollapsed = false;
+  isMobile = false;
 
   constructor(
     private authService: AuthService,
@@ -24,10 +25,37 @@ export class AdminLayoutComponent implements OnInit {
     }
 
     this.adminUser = this.authService.getCurrentUser();
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    this.isMobile = window.innerWidth <= 1024;
+    // Si es móvil, colapsar el sidebar por defecto
+    if (this.isMobile) {
+      this.sidebarCollapsed = true;
+    }
   }
 
   toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  closeSidebar(): void {
+    if (this.isMobile) {
+      this.sidebarCollapsed = true;
+    }
+  }
+
+  onMenuClick(): void {
+    // En dispositivos móviles, cerrar el menú al hacer clic en un enlace
+    if (this.isMobile) {
+      this.sidebarCollapsed = true;
+    }
   }
 
   logout(): void {

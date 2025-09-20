@@ -1,29 +1,24 @@
-<!-- admin-layout.component.html -->
 <div class="admin-layout">
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-left">
-      <button class="sidebar-toggle" (click)="toggleSidebar()">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
+  <!-- Navbar con Bootstrap -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <button class="sidebar-toggle btn btn-dark" (click)="toggleSidebar()">
+        <span class="navbar-toggler-icon"></span>
       </button>
-      <h1 class="navbar-title">Panel Administrativo</h1>
-    </div>
-    
-    <div class="navbar-right">
-      <div class="user-menu">
-        <div class="user-info" *ngIf="adminUser">
-          <div class="user-avatar">
-            {{ adminUser.email.charAt(0).toUpperCase() }}
+      <h1 class="navbar-title ms-3 mb-0">Panel Administrativo</h1>
+      
+      <div class="navbar-right ms-auto">
+        <div class="user-menu d-flex align-items-center">
+          <div class="user-info" *ngIf="adminUser">
+            <div class="user-avatar me-2">
+              {{ adminUser.email.charAt(0).toUpperCase() }}
+            </div>
+            <span class="user-email d-none d-md-inline">{{ adminUser.email }}</span>
           </div>
-          <span class="user-email">{{ adminUser.email }}</span>
+          <button class="logout-btn btn btn-outline-light btn-sm ms-2" (click)="logout()" title="Cerrar sesión">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
         </div>
-        <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-          </svg>
-        </button>
       </div>
     </div>
   </nav>
@@ -31,101 +26,82 @@
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <div class="sidebar-content">
-      <ul class="sidebar-menu">
+      <ul class="sidebar-menu list-unstyled">
         <li class="menu-item">
-          <a routerLink="/admin/dashboard" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-            </svg>
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-tachometer-alt"></i>
             <span class="menu-text">Dashboard</span>
           </a>
         </li>
         
         <li class="menu-item">
-          <a routerLink="/admin/productos" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
+          <a routerLink="/admin/productos" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-box"></i>
             <span class="menu-text">Productos</span>
           </a>
         </li>
         
         <li class="menu-item">
-          <a routerLink="/admin/categorias" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>
-            </svg>
+          <a routerLink="/admin/categorias" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-layer-group"></i>
             <span class="menu-text">Categorías</span>
           </a>
         </li>
+        
         <li class="menu-item">
-          <a routerLink="/admin/pedidos" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 6h-2V4c0-1.1-.9-2-2-2H7C5.9 2 5 2.9 5 4v2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM7 4h10v2H7V4zm14 16H3V8h18v12zM5 10h14v2H5v-2z"/>
-            </svg>
+          <a routerLink="/admin/pedidos" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-shopping-cart"></i>
             <span class="menu-text">Pedidos</span>
           </a>
         </li>
 
         <li class="menu-item">
-          <a routerLink="/admin/clientes" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
-                      1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 
-                      1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
+          <a routerLink="/admin/clientes" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-users"></i>
             <span class="menu-text">Clientes</span>
           </a>
         </li>
         
         <li class="menu-item">
-          <a routerLink="/admin/carrusel" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 
-                      0-2 .9-2 2v14c0 1.1.9 2 
-                      2 2h14c1.1 0 2-.9 
-                      2-2zM5 5h14v9l-3.5-3.5-4.5 
-                      6L9 13l-4 6V5z"/>
-            </svg>
+          <a routerLink="/admin/carrusel" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-images"></i>
             <span class="menu-text">Carrusel</span>
           </a>
         </li>
+        
         <li class="menu-item">
-          <a routerLink="/admin/cyberwow" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M4 6h16v12H4V6zm2 2v8h12V8H6zm3 10h6v2H9v-2z"/>
-            </svg>
+          <a routerLink="/admin/cyberwow" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-bolt"></i>
             <span class="menu-text">Cyberwow</span>
           </a>
         </li>
+        
         <li class="menu-item">
-          <a routerLink="/admin/liquidacion" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-2h14v2H7v-2zm0-12h14v2H7V4zm0 4h14v2H7V8zm0 4h14v2H7v-2zM17 18c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2z"/>
-            </svg>
+          <a routerLink="/admin/liquidacion" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="menu-icon fas fa-tags"></i>
             <span class="menu-text">Liquidación</span>
           </a>
         </li>
+        
         <li class="menu-item">
-          <a routerLink="/admin/reclamos" routerLinkActive="active" class="menu-link">
-            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H6v-2h12v2zm-4-4H6V6h8v2z"/>
-            </svg>
+          <a routerLink="/admin/reclamos" routerLinkActive="active" class="menu-link" (click)="onMenuClick()">
+            <i class="fas fa-exclamation-triangle"></i>
             <span class="menu-text">Reclamos</span>
           </a>
         </li>
-        
-
-
-
-
-
       </ul>
     </div>
   </aside>
 
+  <!-- Overlay para móviles -->
+  <div class="sidebar-overlay" 
+       [class.active]="!sidebarCollapsed && isMobile" 
+       (click)="closeSidebar()"></div>
+
   <!-- Main Content -->
   <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
-    <router-outlet></router-outlet>
+    <div class="container-fluid p-3">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>

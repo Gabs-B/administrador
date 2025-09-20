@@ -1,9 +1,11 @@
 <div class="container-fluid cyberwow-container p-4 bg-light min-vh-100">
   <!-- Header -->
-  <div class="cyberwow-header d-flex justify-content-between align-items-center mb-4 pb-3">
-    <h1 class="h2 text-dark fw-bold mb-0">Gestión CyberWow</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
+        <h1 class="h2 text-dark fw-bold mb-1">
+          <i class="menu-icon fas fa-bolt text-primary"></i>
+          Gestión CyberWow
+        </h1>
     <div class="d-flex gap-3">
-      <!-- Additional header actions can go here -->
     </div>
   </div>
 
@@ -125,19 +127,19 @@
   </div>
 
   <!-- Error -->
-  <div *ngIf="error && !cargando" class="text-center py-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="text-danger mb-3">
-          <i class="fas fa-exclamation-triangle fa-2x"></i>
+   <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
+        <div class="card-body text-center py-5">
+            <div class="text-danger mb-4">
+                <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
+                <h5>Oops! Algo salió mal</h5>
+                <p class="mb-0">{{ error }}</p>
+            </div>
+            <button class="btn btn-primary" (click)="cargarBanners()">
+                <i class="fas fa-refresh me-1"></i>
+                Reintentar
+            </button>
         </div>
-        <p class="text-danger fw-medium mb-3">{{ error }}</p>
-        <button class="btn btn-secondary" (click)="cargarBanners()">
-          <i class="fas fa-sync-alt me-2"></i>Reintentar
-        </button>
-      </div>
     </div>
-  </div>
 
   <!-- Grid de banners -->
   <div *ngIf="!cargando && !error">

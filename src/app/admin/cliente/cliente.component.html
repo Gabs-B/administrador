@@ -1,8 +1,11 @@
 <div class="container-fluid py-4 bg-light">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-        <h1 class="h2 mb-0 text-dark fw-bold">Gestión de Clientes</h1>
-    </div>
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
+            <h1 class="h2 mb-1 text-dark fw-bold">
+            <i class="fas fa-users text-primary"></i>
+                Gestión de Clientes
+            </h1>    
+        </div>
 
     <!-- Filtros -->
     <div class="card mb-4 shadow-sm">
@@ -11,8 +14,10 @@
                 
                 <!-- Búsqueda -->
                 <div class="col-md-4">
-                    <label class="form-label small fw-medium">Buscar:</label>
-                    <input
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-search text-muted me-1"></i>
+                        Buscar:
+                    </label>                    <input
                         type="text"
                         class="form-control"
                         placeholder="Buscar por nombre, DNI o email..."
@@ -34,10 +39,12 @@
                 <!-- Botones de filtro -->
                 <div class="col-md-auto ms-auto">
                     <div class="d-flex gap-2">
-                        <button class="btn btn-secondary" (click)="aplicarFiltros()">
+                         <button class="btn btn-primary flex-fill flex-md-grow-0" (click)="aplicarFiltros()">
+                            <i class="fas fa-filter me-1"></i>
                             Buscar
                         </button>
-                        <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+                        <button class="btn btn-outline-secondary flex-fill flex-md-grow-0" (click)="limpiarFiltros()">
+                            <i class="fas fa-eraser me-1"></i>
                             Limpiar
                         </button>
                     </div>
@@ -47,21 +54,24 @@
     </div>
 
     <!-- Loading -->
-    <div *ngIf="cargando" class="card shadow-sm">
+        <div *ngIf="cargando" class="card shadow-sm border-0">
         <div class="card-body text-center py-5">
-            <div class="loading-spinner mx-auto mb-3"></div>
-            <span class="text-muted">Cargando clientes...</span>
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <h5 class="text-primary mb-2">Cargando clientes...</h5>
+            <p class="text-muted small mb-0">Esto puede tardar unos segundos</p>
         </div>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error && !cargando" class="card shadow-sm">
+   <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
         <div class="card-body text-center py-5">
-            <div class="text-danger mb-3">
-                <span class="fs-2">⚠️</span>
-                <div class="mt-2">{{ error }}</div>
+            <div class="text-danger mb-4">
+                <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
+                <h5>Oops! Algo salió mal</h5>
+                <p class="mb-0">{{ error }}</p>
             </div>
-            <button class="btn btn-secondary" (click)="cargarClientes()">
+            <button class="btn btn-primary" (click)="cargarClientes()">
+                <i class="fas fa-refresh me-1"></i>
                 Reintentar
             </button>
         </div>
@@ -71,34 +81,49 @@
     <div *ngIf="!cargando && !error" class="card shadow-sm">
         
         <!-- Info de resultados -->
-        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <span class="text-muted small">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-chart-bar"></i>
+                <span class="fw-medium">
                 Mostrando {{ clientes.length }} de {{ totalClientes }} clientes
-            </span>
-            <div class="small fw-medium text-muted" *ngIf="paginacion">
-                Página {{ paginacion.current_page }} de {{ paginacion.last_page }}
+                </span>
             </div>
         </div>
 
         <!-- Tabla -->
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+    <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <th scope="col" style="min-width: 200px;">Cliente</th>
-                        <th scope="col" style="width: 120px;">DNI</th>
-                        <th scope="col" style="min-width: 220px;">Contacto</th>
-                        <th scope="col" style="width: 120px;">Tipo</th>
-                        <th scope="col" style="width: 160px;">Fecha de Registro</th>
+                        <th scope="col" style="width: 180px;">
+                            <i class="fas fa-user me-1"></i>
+                            Cliente
+                        </th>
+                        <th scope="col" style="width: 80px;">
+                            <i class="fas fa-id-card me-1"></i>
+                            DNI
+                        </th>
+                        <th scope="col" style="width: 80px;">
+                            <i class="fas fa-address-book me-1"></i>
+                            Contacto
+                        </th>
+                        <th scope="col" style="width: 10px;" class="text-center">
+                            <i class="fas fa-user-tag me-1"></i>
+                            Tipo
+                        </th>
+                        <th scope="col" style="width: 160px;" class="text-center">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Fecha de Registro
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let cliente of clientes">
+                    <tr *ngFor="let cliente of clientes" class="cliente-row">
                         
                         <!-- Cliente (Nombre) -->
                         <td>
                             <div>
-                                <div class="fw-semibold text-dark small">{{ cliente.nombre }}</div>
+                                <div class="fw-bold text-dark mb-1">{{ cliente.nombre }}</div>
                                 <!-- Uncomment if needed: -->
                                 <!-- <small class="badge bg-light text-muted" *ngIf="cliente.user_id">#{{ cliente.user_id }}</small> -->
                             </div>
@@ -106,9 +131,10 @@
 
                         <!-- DNI -->
                         <td>
-                            <code class="dni-text bg-light px-2 py-1 rounded small">
+                            <span class="badge bg-light text-dark border sku-badge">
+                                <i class="fas fa-id-card me-1"></i>
                                 {{ cliente.dni }}
-                            </code>
+                            </span>
                         </td>
 
                         <!-- Contacto -->
@@ -126,18 +152,28 @@
                         </td>
 
                         <!-- Tipo -->
-                        <td>
-                            <span class="badge"
-                                  [class]="'badge-' + (cliente.tipo === 'registrado' ? 'success' : cliente.tipo === 'invitado' ? 'warning' : 'secondary')"
-                                  [class.tipo-registrado]="cliente.tipo === 'registrado'"
-                                  [class.tipo-invitado]="cliente.tipo === 'invitado'"
-                                  [class.tipo-default]="cliente.tipo !== 'registrado' && cliente.tipo !== 'invitado'">
-                                {{ cliente.tipo }}
-                            </span>
+                        <td class="text-center">
+                        <span class="badge fs-6 px-3 py-2"
+                                [class]="'text-bg-' + (cliente.tipo === 'registrado' 
+                                                        ? 'success' 
+                                                        : cliente.tipo === 'invitado' 
+                                                        ? 'warning' 
+                                                        : 'secondary')"
+                                [title]="cliente.tipo">
+                            <i [class]="cliente.tipo === 'registrado' 
+                                        ? 'fas fa-user-check' 
+                                        : cliente.tipo === 'invitado' 
+                                            ? 'fas fa-user-clock' 
+                                            : 'fas fa-user'" 
+                            class="me-1"></i>
+                            {{ cliente.tipo }}
+                        </span>
                         </td>
 
+
+
                         <!-- Fecha de registro -->
-                        <td>
+                        <td class="text-center">
                             <small class="fecha-text text-muted">
                                 {{ cliente.created_at | date:'dd/MM/yyyy HH:mm' }}
                             </small>
@@ -147,15 +183,19 @@
                     <!-- Mensaje cuando no hay clientes -->
                     <tr *ngIf="clientes.length === 0">
                         <td colspan="5" class="text-center py-5">
-                            <div>
-                                <div class="display-1 opacity-50 mb-3">👥</div>
-                                <h5 class="text-muted">No hay clientes</h5>
-                                <p class="text-muted small mb-3">
-                                    No se encontraron clientes con los filtros aplicados.
+                            <div class="empty-state">
+                                <h4 class="text-muted mb-3">No hay clientes disponibles</h4>
+                                <p class="text-muted mb-4">
+                                    No se encontraron clientes que coincidan con los filtros aplicados.
+                                    <br>
+                                    <small>Intenta ajustar tus criterios de búsqueda o crear un nuevo cliente.</small>
                                 </p>
-                                <button class="btn btn-primary" (click)="limpiarFiltros()">
-                                    Ver todos los clientes
-                                </button>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Ver todos los clientes
+                                    </button>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -164,15 +204,25 @@
         </div>
 
         <!-- Paginación -->
-        <div *ngIf="paginacion && paginacion.last_page > 1" class="card-footer bg-white">
-            <nav aria-label="Paginación de clientes">
-                <ul class="pagination justify-content-center mb-0">
+        <div *ngIf="paginacion && paginacion.last_page > 1" class="card-footer bg-light border-0">
+            <nav aria-label="Paginación de clientes" class="d-flex justify-content-center">
+                <ul class="pagination mb-0">
                     
+                    <!-- Primera página -->
+                    <li class="page-item" [class.disabled]="paginacion.current_page === 1">
+                        <button class="page-link" 
+                                [disabled]="paginacion.current_page === 1"
+                                (click)="cambiarPagina(1)">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                    </li>
+
                     <!-- Anterior -->
                     <li class="page-item" [class.disabled]="paginacion.current_page === 1">
                         <button class="page-link" 
                                 [disabled]="paginacion.current_page === 1"
                                 (click)="cambiarPagina(paginacion.current_page - 1)">
+                            <i class="fas fa-angle-left"></i>
                             Anterior
                         </button>
                     </li>
@@ -182,12 +232,12 @@
                         <li *ngIf="pagina !== -1" 
                             class="page-item" 
                             [class.active]="pagina === paginacion.current_page">
-                            <button class="page-link" (click)="cambiarPagina(pagina)">
+                            <button class="page-link fw-bold" (click)="cambiarPagina(pagina)">
                                 {{ pagina }}
                             </button>
                         </li>
                         <li *ngIf="pagina === -1" class="page-item disabled">
-                            <span class="page-link puntos-separacion">...</span>
+                            <span class="page-link">...</span>
                         </li>
                     </ng-container>
                     
@@ -197,10 +247,21 @@
                                 [disabled]="paginacion.current_page === paginacion.last_page"
                                 (click)="cambiarPagina(paginacion.current_page + 1)">
                             Siguiente
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                    </li>
+                    
+                    <!-- Última página -->
+                    <li class="page-item" [class.disabled]="paginacion.current_page === paginacion.last_page">
+                        <button class="page-link" 
+                                [disabled]="paginacion.current_page === paginacion.last_page"
+                                (click)="cambiarPagina(paginacion.last_page)">
+                            <i class="fas fa-angle-double-right"></i>
                         </button>
                     </li>
                 </ul>
             </nav>
         </div>
+
     </div>
 </div>

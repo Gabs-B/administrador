@@ -14,13 +14,14 @@
   right: 0;
   height: 64px;
   background: #1f2937;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  display: flex
+;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    z-index: 1000;
+    box-shadow: 0 2px 4px #0000001a;
 }
 
 .navbar-left {
@@ -190,10 +191,34 @@
   margin-left: 0;
 }
 
+/* Overlay para móviles */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 899;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .sidebar {
     transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    width: 280px; /* Un poco más ancho en móviles para mejor usabilidad */
+  }
+  
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
   }
   
   .main-content {
@@ -206,16 +231,16 @@
 }
 
 @media (max-width: 640px) {
-  .navbar {
-    padding: 0 1rem;
-  }
-  
   .navbar-title {
     font-size: 1.125rem;
   }
   
   .user-info {
     gap: 0.5rem;
+  }
+  
+  .sidebar {
+    width: 70%; /* Ocupa todo el ancho en móviles muy pequeños */
   }
 }
 

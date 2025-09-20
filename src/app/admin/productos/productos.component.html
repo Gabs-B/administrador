@@ -1,62 +1,84 @@
-<div class="container-fluid py-4 bg-light productos-container">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-        <h1 class="h2 mb-0 text-dark fw-bold">Gestión de Productos</h1>
-        <button class="btn btn-primary d-flex align-items-center gap-2" (click)="mostrarFormularioCrear()">
-            <span>+</span>
+<div class="container-fluid py-4 productos-container">
+    <!-- Header con gradiente sutil -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
+        <div>
+            <h1 class="h2 mb-1 text-dark fw-bold">
+            <i class="menu-icon fas fa-box text-primary"></i>
+                Gestión de Productos
+            </h1>
+        </div>
+        <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" (click)="mostrarFormularioCrear()">
+            <i class="fas fa-plus"></i>
             Nuevo Producto
         </button>
     </div>
 
-    <!-- Filtros -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <div class="row g-3 align-items-end">
+    <!-- Filtros con mejor diseño -->
+    <div class="card mb-4 shadow-sm border-0 filtros-card">
+        <div class="card-body p-4">
+            <div class="row g-4 align-items-end">
                 
                 <!-- Búsqueda -->
-                <div class="col-md-3">
-                    <label class="form-label small fw-medium">Buscar:</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Buscar por nombre..."
-                        [(ngModel)]="filtros.buscar"
-                        (keyup.enter)="aplicarFiltros()"
-                    />
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-search text-muted me-1"></i>
+                        Buscar productos:
+                    </label>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control border-2"
+                            placeholder="Ingresa nombre del producto..."
+                            [(ngModel)]="filtros.buscar"
+                            (keyup.enter)="aplicarFiltros()"
+                        />
+                        <button class="btn btn-outline-secondary" type="button" (click)="aplicarFiltros()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Estado -->
-                <div class="col-md-2">
-                    <label class="form-label small fw-medium">Estado:</label>
-                    <select class="form-select" [(ngModel)]="filtros.estado">
-                        <option value="todos">Todos</option>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-toggle-on text-muted me-1"></i>
+                        Estado:
+                    </label>
+                    <select class="form-select border-2" [(ngModel)]="filtros.estado">
+                        <option value="todos"> Todos</option>
+                        <option value="activo"> Activo</option>
+                        <option value="inactivo"> Inactivo</option>
                     </select>
                 </div>
 
-                <!-- Sin Stock -->
-                <div class="col-md-2">
-                    <div class="form-check">
+                <!-- Sin Stock con mejor diseño -->
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label small fw-semibold text-dark d-block mb-2">
+                        <i class="fas fa-warehouse text-muted me-1"></i>
+                        Filtros:
+                    </label>
+                    <div class="form-check form-switch">
                         <input
                             type="checkbox"
-                            class="form-check-input"
+                            class="form-check-input fs-5"
                             id="sinStock"
                             [(ngModel)]="filtros.sin_stock"
                         />
-                        <label class="form-check-label small" for="sinStock">
-                            Sin stock
+                        <label class="form-check-label small fw-medium" for="sinStock">
+                            Sin stock únicamente
                         </label>
                     </div>
                 </div>
 
                 <!-- Botones de filtro -->
-                <div class="col-md-auto ms-auto">
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-secondary" (click)="aplicarFiltros()">
-                            Buscar
+                <div class="col-lg-4 col-md-12">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <button class="btn btn-primary flex-fill flex-md-grow-0" (click)="aplicarFiltros()">
+                            <i class="fas fa-filter me-1"></i>
+                            Aplicar Filtros
                         </button>
-                        <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+                        <button class="btn btn-outline-secondary flex-fill flex-md-grow-0" (click)="limpiarFiltros()">
+                            <i class="fas fa-eraser me-1"></i>
                             Limpiar
                         </button>
                     </div>
@@ -65,41 +87,47 @@
         </div>
     </div>
 
-    <!-- Loading -->
-    <div *ngIf="cargando" class="card shadow-sm">
+    <!-- Loading mejorado -->
+    <div *ngIf="cargando" class="card shadow-sm border-0">
         <div class="card-body text-center py-5">
-            <div class="loading-spinner mx-auto mb-3"></div>
-            <span class="text-muted">Cargando productos...</span>
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <h5 class="text-primary mb-2">Cargando productos...</h5>
+            <p class="text-muted small mb-0">Esto puede tardar unos segundos</p>
         </div>
     </div>
 
-    <!-- Error -->
-    <div *ngIf="error && !cargando" class="card shadow-sm">
+    <!-- Error mejorado -->
+    <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
         <div class="card-body text-center py-5">
-            <div class="text-danger mb-3">
-                <span class="fs-2">⚠️</span>
-                <div class="mt-2">{{ error }}</div>
+            <div class="text-danger mb-4">
+                <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
+                <h5>Oops! Algo salió mal</h5>
+                <p class="mb-0">{{ error }}</p>
             </div>
-            <button class="btn btn-secondary" (click)="cargarProductos()">
+            <button class="btn btn-primary" (click)="cargarProductos()">
+                <i class="fas fa-refresh me-1"></i>
                 Reintentar
             </button>
         </div>
     </div>
 
-    <!-- Tabla de productos -->
-    <div *ngIf="!cargando && !error" class="card shadow-sm">
+    <!-- Tabla de productos mejorada -->
+    <div *ngIf="!cargando && !error" class="card shadow-sm border-0 tabla-productos">
         
-        <!-- Info de resultados -->
-        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <span class="text-muted small">
-                Mostrando {{ productos.length }} de {{ totalProductos }} productos
-            </span>
+        <!-- Info de resultados mejorada -->
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-chart-bar"></i>
+                <span class="fw-medium">
+                    Mostrando {{ productos.length }} de {{ totalProductos }} productos
+                </span>
+            </div>
             
             <!-- Productos por página -->
             <div class="d-flex align-items-center gap-2 small">
-                <label class="mb-0">Mostrar:</label>
+                <label class="mb-0 fw-medium">Mostrar:</label>
                 <select 
-                    class="form-select form-select-sm"
+                    class="form-select form-select-sm bg-white text-dark border-0"
                     style="width: auto;"
                     [value]="productosPorPagina"
                     #perPageSelect
@@ -109,146 +137,179 @@
                     <option value="20">20</option>
                     <option value="50">50</option>
                 </select>
-                <span class="mb-0">por página</span>
+                <span class="mb-0 fw-medium">por página</span>
             </div>
         </div>
 
-        <!-- Tabla -->
+        <!-- Tabla responsive -->
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <th scope="col" style="width: 80px;">Imagen</th>
-                        <th scope="col" style="min-width: 200px;">Nombre</th>
-                        <th scope="col" style="width: 120px;">SKU</th>
-                        <th scope="col" style="width: 150px;">Categoría</th>
-                        <th scope="col" style="width: 120px;">Precio</th>
-                        <th scope="col" style="width: 80px;">Stock</th>
-                        <th scope="col" style="width: 100px;">Estado</th>
-                        <th scope="col" style="width: 120px;" class="text-center">Acciones</th>
+                        <th scope="col" style="width: 90px;" class="text-center">
+                            <i class="fas fa-image"></i>
+                        </th>
+                        <th scope="col" style="min-width: 200px;">
+                            <i class="fas fa-tag me-1"></i>
+                            Producto
+                        </th>
+                        <th scope="col" style="width: 130px;">
+                            <i class="fas fa-barcode me-1"></i>
+                            SKU
+                        </th>
+                        <th scope="col" style="width: 150px;">
+                            <i class="fas fa-folder me-1"></i>
+                            Categoría
+                        </th>
+                        <th scope="col" style="width: 120px;">
+                            <i class="fas fa-dollar-sign me-1"></i>
+                            Precio
+                        </th>
+                        <th scope="col" style="width: 100px;" class="text-center">
+                            <i class="fas fa-boxes me-1"></i>
+                            Stock
+                        </th>
+                        <th scope="col" style="width: 110px;" class="text-center">
+                            <i class="fas fa-toggle-on me-1"></i>
+                            Estado
+                        </th>
+                        <th scope="col" style="width: 140px;" class="text-center">
+                            <i class="fas fa-cogs"></i>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let producto of productos">
+                    <tr *ngFor="let producto of productos" class="producto-row">
                         
-                        <!-- Imagen -->
-                        <td>
+                        <!-- Imagen mejorada -->
+                        <td class="text-center">
                             <div class="position-relative d-inline-block">
-                                <img 
-                                    *ngIf="producto.imagen_principal_url"
-                                    [src]="producto.imagen_principal_url"
-                                    [alt]="producto.nombre"
-                                    class="producto-imagen rounded"
-                                    onerror="this.style.display='none'"
-                                />
-                                <div *ngIf="!producto.imagen_principal_url" class="imagen-placeholder rounded">
-                                    📦
+                                <div class="producto-imagen-container">
+                                    <img 
+                                        *ngIf="producto.imagen_principal_url"
+                                        [src]="producto.imagen_principal_url"
+                                        [alt]="producto.nombre"
+                                        class="producto-imagen rounded-3 shadow-sm"
+                                        onerror="this.style.display='none'"
+                                    />
+                                    <div *ngIf="!producto.imagen_principal_url" class="imagen-placeholder rounded-3 shadow-sm">
+                                        <i class="fas fa-box-open fs-4 text-muted"></i>
+                                    </div>
                                 </div>
                                 <span *ngIf="producto.total_imagenes && producto.total_imagenes > 1" 
-                                      class="badge bg-primary badge-imagenes">
+                                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
                                     +{{ producto.total_imagenes - 1 }}
                                 </span>
                             </div>
                         </td>
 
-                        <!-- Nombre -->
+                        <!-- Nombre mejorado -->
                         <td>
                             <div>
-                                <div class="fw-semibold text-dark">{{ producto.nombre }}</div>
-                                <small class="text-muted">
-                                    {{ producto.descripcion | slice:0:50 }}{{ producto.descripcion.length > 50 ? '...' : '' }}
+                                <div class="fw-bold text-dark mb-1">{{ producto.nombre }}</div>
+                                <small class="text-muted lh-sm">
+                                    {{ producto.descripcion | slice:0:60 }}{{ producto.descripcion.length > 60 ? '...' : '' }}
                                 </small>
                             </div>
                         </td>
 
-                        <!-- SKU -->
+                        <!-- SKU mejorado -->
                         <td>
-                            <code class="sku-text bg-light px-2 py-1 rounded small">
-                                {{ producto.sku || '-' }}
-                            </code>
+                            <span class="badge bg-light text-dark border sku-badge">
+                                <i class="fas fa-barcode me-1"></i>
+                                {{ producto.sku || 'Sin SKU' }}
+                            </span>
                         </td>
 
                         <!-- Categoría -->
                         <td>
-                            <span class="small">
+                            <span class="badge bg-secondary bg-opacity-25 text-dark">
+                                <i class="fas fa-folder me-1"></i>
                                 {{ producto.categoria?.nombre || 'Sin categoría' }}
                             </span>
                         </td>
 
-                        <!-- Precio -->
+                        <!-- Precio mejorado -->
                         <td>
-                            <span class="fw-semibold text-success small">
+                            <span class="fw-bold text-success fs-6">
                                 {{ formatearPrecio(producto.precio) }}
                             </span>
                         </td>
 
-                        <!-- Stock -->
+                        <!-- Stock mejorado -->
                         <td class="text-center">
-                            <span class="badge"
+                            <span class="badge fs-6 px-3 py-2"
                                   [class]="'badge-' + (producto.stock === 0 ? 'danger' : producto.stock <= 10 ? 'warning' : 'success')"
-                                  [class.stock-bajo]="producto.stock <= 10 && producto.stock > 0"
-                                  [class.sin-stock]="producto.stock === 0">
+                                  [title]="producto.stock === 0 ? 'Sin stock' : producto.stock <= 10 ? 'Stock bajo' : 'Stock normal'">
+                                <i class="fas fa-boxes me-1"></i>
                                 {{ producto.stock }}
                             </span>
                         </td>
 
-                        <!-- Estado -->
-                        <td>
-                            <span class="badge"
-                                  [class]="'badge-' + (producto.estado === 'activo' ? 'success' : 'danger')"
-                                  [class.estado-activo]="producto.estado === 'activo'"
-                                  [class.estado-inactivo]="producto.estado === 'inactivo'">
+                        <!-- Estado mejorado -->
+                        <td class="text-center">
+                            <span class="badge fs-6 px-3 py-2"
+                                  [class]="'badge-' + (producto.estado === 'activo' ? 'success' : 'danger')">
+                                <i [class]="producto.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="me-1"></i>
                                 {{ producto.estado }}
                             </span>
                         </td>
 
-                        <!-- Acciones -->
+                        <!-- Acciones mejoradas -->
                         <td class="text-center">
-                        <div class="d-flex justify-content-center gap-1">
-                            <!-- Editar -->
-                            <button 
-                            class="btn btn-outline-primary btn-sm" 
-                            title="Editar" 
-                            (click)="mostrarFormularioEditar(producto)"
-                            >
-                            <i class="fas fa-edit"></i>
-                            </button>
+                            <div class="btn-group" role="group">
+                                <!-- Editar -->
+                                <button 
+                                    class="btn btn-primary btn-sm" 
+                                    title="Editar producto" 
+                                    (click)="mostrarFormularioEditar(producto)"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                </button>
 
-                            <!-- Desactivar -->
-                            <button 
-                            *ngIf="producto.estado === 'activo'"
-                            class="btn btn-outline-warning btn-sm" 
-                            title="Desactivar"
-                            (click)="confirmarEliminar(producto)"
-                            >
-                            <i class="fas fa-ban"></i>
-                            </button>
+                                <!-- Desactivar -->
+                                <button 
+                                    *ngIf="producto.estado === 'activo'"
+                                    class="btn btn-warning btn-sm" 
+                                    title="Desactivar producto"
+                                    (click)="confirmarEliminar(producto)"
+                                >
+                                    <i class="fas fa-ban"></i>
+                                </button>
 
-                            <!-- Activar -->
-                            <button 
-                            *ngIf="producto.estado === 'inactivo'"
-                            class="btn btn-outline-success btn-sm" 
-                            title="Activar"
-                            (click)="confirmarActivar(producto)"
-                            >
-                            <i class="fas fa-check"></i>
-                            </button>
-                        </div>
+                                <!-- Activar -->
+                                <button 
+                                    *ngIf="producto.estado === 'inactivo'"
+                                    class="btn btn-success btn-sm" 
+                                    title="Activar producto"
+                                    (click)="confirmarActivar(producto)"
+                                >
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
 
-                    <!-- Mensaje cuando no hay productos -->
+                    <!-- Mensaje cuando no hay productos mejorado -->
                     <tr *ngIf="productos.length === 0">
                         <td colspan="8" class="text-center py-5">
-                            <div>
-                                <div class="display-1 opacity-50 mb-3">📦</div>
-                                <h5 class="text-muted">No hay productos</h5>
-                                <p class="text-muted small mb-3">
-                                    No se encontraron productos con los filtros aplicados.
+                            <div class="empty-state">
+                                <h4 class="text-muted mb-3">No hay productos disponibles</h4>
+                                <p class="text-muted mb-4">
+                                    No se encontraron productos que coincidan con los filtros aplicados.
+                                    <br>
+                                    <small>Intenta ajustar tus criterios de búsqueda o crear un nuevo producto.</small>
                                 </p>
-                                <button class="btn btn-primary" (click)="limpiarFiltros()">
-                                    Ver todos los productos
-                                </button>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Ver todos los productos
+                                    </button>
+                                    <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Crear producto
+                                    </button>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -256,16 +317,26 @@
             </table>
         </div>
 
-        <!-- Paginación -->
-        <div *ngIf="totalPaginas > 1" class="card-footer bg-white">
-            <nav aria-label="Paginación de productos">
-                <ul class="pagination justify-content-center mb-0">
+        <!-- Paginación mejorada -->
+        <div *ngIf="totalPaginas > 1" class="card-footer bg-light border-0">
+            <nav aria-label="Paginación de productos" class="d-flex justify-content-center">
+                <ul class="pagination mb-0">
+                    
+                    <!-- Primera página -->
+                    <li class="page-item" [class.disabled]="paginaActual === 1">
+                        <button class="page-link" 
+                                [disabled]="paginaActual === 1"
+                                (click)="cambiarPagina(1)">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                    </li>
                     
                     <!-- Anterior -->
                     <li class="page-item" [class.disabled]="paginaActual === 1">
                         <button class="page-link" 
                                 [disabled]="paginaActual === 1"
                                 (click)="cambiarPagina(paginaActual - 1)">
+                            <i class="fas fa-angle-left"></i>
                             Anterior
                         </button>
                     </li>
@@ -275,12 +346,12 @@
                         <li *ngIf="pagina !== -1" 
                             class="page-item" 
                             [class.active]="pagina === paginaActual">
-                            <button class="page-link" (click)="cambiarPagina(pagina)">
+                            <button class="page-link fw-bold" (click)="cambiarPagina(pagina)">
                                 {{ pagina }}
                             </button>
                         </li>
                         <li *ngIf="pagina === -1" class="page-item disabled">
-                            <span class="page-link puntos-separacion">...</span>
+                            <span class="page-link">...</span>
                         </li>
                     </ng-container>
                     
@@ -290,6 +361,16 @@
                                 [disabled]="paginaActual === totalPaginas"
                                 (click)="cambiarPagina(paginaActual + 1)">
                             Siguiente
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                    </li>
+                    
+                    <!-- Última página -->
+                    <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+                        <button class="page-link" 
+                                [disabled]="paginaActual === totalPaginas"
+                                (click)="cambiarPagina(totalPaginas)">
+                            <i class="fas fa-angle-double-right"></i>
                         </button>
                     </li>
                 </ul>
@@ -307,58 +388,71 @@
 >
 </app-producto-form>
 
-<!-- Modal de confirmación -->
+<!-- Modal de confirmación mejorado -->
 <div *ngIf="mostrarConfirmacion" 
      class="modal fade show d-block modal-overlay" 
-     style="background-color: rgba(0,0,0,0.5);"
+     style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
      (click)="cerrarConfirmacion()">
     
     <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg">
             
             <!-- Header -->
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar acción</h5>
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-question-circle text-warning me-2"></i>
+                    Confirmar acción
+                </h5>
                 <button type="button" 
-                        class="btn-close" 
+                        class="btn-close btn-close-white bg-secondary rounded-circle p-2" 
                         (click)="cerrarConfirmacion()"
                         [disabled]="procesandoAccion">
                 </button>
             </div>
 
             <!-- Body -->
-            <div class="modal-body text-center">
-                <div class="mb-3">
-                    <span *ngIf="accionConfirmacion === 'eliminar'" class="display-4">⚠️</span>
-                    <span *ngIf="accionConfirmacion === 'activar'" class="display-4">❓</span>
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <div *ngIf="accionConfirmacion === 'eliminar'" 
+                         class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fas fa-exclamation-triangle fs-1 text-warning"></i>
+                    </div>
+                    <div *ngIf="accionConfirmacion === 'activar'" 
+                         class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fas fa-question-circle fs-1 text-primary"></i>
+                    </div>
                 </div>
-                <p class="mb-0">{{ mensajeConfirmacion }}</p>
+                <h6 class="mb-3">{{ mensajeConfirmacion }}</h6>
+                <p class="text-muted small mb-0">Esta acción se puede revertir posteriormente</p>
             </div>
 
             <!-- Footer -->
-            <div class="modal-footer">
+            <div class="modal-footer border-0 pt-0">
                 <button type="button" 
-                        class="btn btn-secondary" 
+                        class="btn btn-light flex-fill" 
                         (click)="cerrarConfirmacion()"
                         [disabled]="procesandoAccion">
+                    <i class="fas fa-times me-1"></i>
                     Cancelar
                 </button>
                 <button type="button" 
-                        class="btn"
-                        [class.btn-danger]="accionConfirmacion === 'eliminar'"
+                        class="btn flex-fill"
+                        [class.btn-warning]="accionConfirmacion === 'eliminar'"
                         [class.btn-success]="accionConfirmacion === 'activar'"
                         (click)="ejecutarAccion()"
                         [disabled]="procesandoAccion">
                     
-                    <span *ngIf="procesandoAccion" class="d-flex align-items-center">
+                    <span *ngIf="procesandoAccion" class="d-flex align-items-center justify-content-center">
                         <div class="loading-spinner-small me-2"></div>
+                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivando...</span>
+                        <span *ngIf="accionConfirmacion === 'activar'">Activando...</span>
                     </span>
                     
-                    <span *ngIf="accionConfirmacion === 'eliminar'">
-                        {{ procesandoAccion ? 'Desactivando...' : 'Desactivar' }}
-                    </span>
-                    <span *ngIf="accionConfirmacion === 'activar'">
-                        {{ procesandoAccion ? 'Activando...' : 'Activar' }}
+                    <span *ngIf="!procesandoAccion">
+                        <i *ngIf="accionConfirmacion === 'eliminar'" class="fas fa-ban me-1"></i>
+                        <i *ngIf="accionConfirmacion === 'activar'" class="fas fa-check me-1"></i>
+                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivar</span>
+                        <span *ngIf="accionConfirmacion === 'activar'">Activar</span>
                     </span>
                 </button>
             </div>
