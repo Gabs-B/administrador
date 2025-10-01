@@ -186,7 +186,7 @@ export class ProductoFormComponent implements OnInit {
 
     // Validar cantidad total (existentes + nuevas)
     const totalImagenes = this.imagenesExistentes.length - this.imagenesAEliminar.length + archivos.length;
-    if (totalImagenes > 10) {
+    if (totalImagenes > 14) {
       this.mostrarMensaje('No puedes tener más de 10 imágenes por producto', 'error');
       return;
     }
