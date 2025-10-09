@@ -69,21 +69,30 @@ export class ProductoFormComponent implements OnInit {
     }
   }
 
-  /**
-   * Cargar categorías disponibles
-   */
+/**
+ * Cargar solo subcategorías disponibles para productos
+ */
   cargarCategorias(): void {
     this.cargandoCategorias = true;
-    this.categoriasService.getCategorias({ estado: 'activo' }).subscribe({
+    
+    this.categoriasService.getSubcategoriasProducto().subscribe({
       next: (response) => {
         if (response.success && response.data) {
+          // Usar directamente el nombre de la subcategoría sin formato especial
           this.categorias = response.data;
+          
+          console.log('Subcategorías cargadas:', this.categorias);
         } else {
-          console.error('Error al cargar categorías:', response.message);
+          console.error('Error al cargar subcategorías:', response.message);
+          this.mostrarMensaje(
+            response.message || 'Error al cargar subcategorías disponibles', 
+            'error'
+          );
         }
       },
       error: (error) => {
-        console.error('Error al cargar categorías:', error);
+        console.error('Error al cargar subcategorías:', error);
+        this.mostrarMensaje('Error de conexión al cargar subcategorías', 'error');
       },
       complete: () => {
         this.cargandoCategorias = false;

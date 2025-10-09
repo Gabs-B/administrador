@@ -140,12 +140,69 @@
    Modal overlay
 ========================== */
 .modal-overlay {
-    animation: fadeIn 0.1s ease-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
 }
 .modal-overlay .modal-content {
     will-change: transform, opacity;
 }
+.modal[style*="z-index: 1050"] {
+    backdrop-filter: blur(2px);
+}
 
+.modal-xl {
+    max-width: 1200px;
+}
+/* ==========================
+   Gestión de Z-Index para Modales - CORREGIDO
+========================== */
+.modal-overlay-formulario {
+  z-index: 1050;
+}
+
+.modal-overlay-subcategoria {
+  z-index: 1060;
+}
+
+.modal-overlay-confirmacion {
+  z-index: 1070;
+}
+
+/* Asegurar que los modales se muestren correctamente */
+.modal.show {
+  display: block !important;
+  background-color: rgba(0,0,0,0.5);
+}
+
+/* Overlay específico para modales de confirmación */
+.modal-overlay-confirmacion {
+  background-color: rgba(0,0,0,0.6) !important;
+  backdrop-filter: blur(3px);
+}
+
+/* Prevenir scroll del body cuando hay modales abiertos */
+body.modal-open {
+  overflow: hidden;
+  padding-right: 0px !important;
+}
+
+/* Asegurar que todos los overlays tengan la misma base */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal-dialog {
+  animation: slideUp 0.3s ease-out;
+}
 
 
 @keyframes fadeIn {

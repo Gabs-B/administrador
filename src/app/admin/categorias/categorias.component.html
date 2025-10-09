@@ -1,488 +1,630 @@
-<div class="container-fluid py-4 categorias-container">
-    <!-- Header con gradiente sutil -->
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
-        <div>
-            <h1 class="h2 mb-1 text-dark fw-bold">
-            <i class="menu-icon fas fa-layer-group text-primary"></i>
-                Gestión de Categorías
-            </h1>
-        </div>
-        <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" (click)="mostrarFormularioCrear()">
-            <i class="fas fa-plus"></i>
-            Nueva Categoría
-        </button>
-    </div>
-
-    <!-- Filtros con mejor diseño -->
-    <div class="card mb-4 shadow-sm border-0 filtros-card">
-        <div class="card-body p-4">
-            <div class="row g-4 align-items-end">
-                
-                <!-- Búsqueda -->
-                <div class="col-lg-6 col-md-8">
-                    <label class="form-label small fw-semibold text-dark">
-                        <i class="fas fa-search text-muted me-1"></i>
-                        Buscar categorías:
-                    </label>
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            class="form-control border-2"
-                            placeholder="Ingresa nombre de la categoría..."
-                            [(ngModel)]="filtros.buscar"
-                            (keyup.enter)="aplicarFiltros()"
-                        />
-                        <button class="btn btn-outline-secondary" type="button" (click)="aplicarFiltros()">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Estado -->
-                <div class="col-lg-3 col-md-4">
-                    <label class="form-label small fw-semibold text-dark">
-                        <i class="fas fa-toggle-on text-muted me-1"></i>
-                        Estado:
-                    </label>
-                    <select class="form-select border-2" [(ngModel)]="filtros.estado">
-                        <option value="todos">Todos</option>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
-                    </select>
-                </div>
-
-                <!-- Botones de filtro -->
-                <div class="col-lg-3 col-md-12">
-                    <div class="d-flex gap-2 justify-content-md-end">
-                        <button class="btn btn-primary flex-fill flex-md-grow-0" (click)="aplicarFiltros()">
-                            <i class="fas fa-filter me-1"></i>
-                            Buscar
-                        </button>
-                        <button class="btn btn-outline-secondary flex-fill flex-md-grow-0" (click)="limpiarFiltros()">
-                            <i class="fas fa-eraser me-1"></i>
-                            Limpiar
-                        </button>
-                    </div>
-                </div>
+    <div class="container-fluid py-4 categorias-container">
+        <!-- Header con gradiente sutil -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
+            <div>
+                <h1 class="h2 mb-1 text-dark fw-bold">
+                <i class="menu-icon fas fa-layer-group text-primary"></i>
+                    Gestión de Categorías
+                </h1>
             </div>
-        </div>
-    </div>
-
-    <!-- Loading mejorado -->
-    <div *ngIf="cargando" class="card shadow-sm border-0">
-        <div class="card-body text-center py-5">
-            <div class="loading-spinner mx-auto mb-4"></div>
-            <h5 class="text-primary mb-2">Cargando categorías...</h5>
-            <p class="text-muted small mb-0">Esto puede tardar unos segundos</p>
-        </div>
-    </div>
-
-    <!-- Error mejorado -->
-    <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
-        <div class="card-body text-center py-5">
-            <div class="text-danger mb-4">
-                <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
-                <h5>Oops! Algo salió mal</h5>
-                <p class="mb-0">{{ error }}</p>
-            </div>
-            <button class="btn btn-primary" (click)="cargarCategorias()">
-                <i class="fas fa-refresh me-1"></i>
-                Reintentar
+            <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" (click)="mostrarFormularioCrear()">
+                <i class="fas fa-plus"></i>
+                Nueva Categoría
             </button>
         </div>
-    </div>
 
-    <!-- Tabla de categorías mejorada -->
-    <div *ngIf="!cargando && !error" class="card shadow-sm border-0 tabla-categorias">
-        
-        <!-- Info de resultados mejorada -->
-        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-chart-bar"></i>
-                <span class="fw-medium">
-                    Mostrando {{ categorias.length }} categorías
-                </span>
-            </div>
-        </div>
-
-        <!-- Tabla responsive -->
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col" style="width: 90px;" class="text-center">
-                            <i class="fas fa-image"></i>
-                        </th>
-                        <th scope="col" style="min-width: 80px;">
-                            <i class="fas fa-tag me-1"></i>
-                            Categoría
-                        </th>
-                        <th scope="col" style="width: 80px;" class="text-center">
-                            <i class="fas fa-toggle-on me-1"></i>
-                            Estado
-                        </th>
-                        <th scope="col" style="width: 200px;" class="text-center">
-                            <i class="fas fa-calendar me-1"></i>
-                            Fecha de Creación
-                        </th>
-                        <th scope="col" style="width: 140px;" class="text-center">
-                            <i class="fas fa-cogs"></i>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let categoria of categorias" class="categoria-row">
-                        
-                        <!-- Imagen mejorada -->
-                        <td class="text-center">
-                            <div class="position-relative d-inline-block">
-                                <div class="categoria-imagen-container">
-                                    <img 
-                                        *ngIf="categoria.imagen_url"
-                                        [src]="categoria.imagen_url"
-                                        [alt]="categoria.nombre"
-                                        class="categoria-imagen rounded-3 shadow-sm"
-                                        onerror="this.style.display='none'"
-                                    />
-                                    <div *ngIf="!categoria.imagen_url" class="imagen-placeholder rounded-3 shadow-sm">
-                                        <i class="fas fa-folder-open fs-4 text-muted"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <!-- Nombre mejorado -->
-                        <td>
-                            <div>
-                                <div class="fw-bold text-dark mb-1">{{ categoria.nombre }}</div>
-                            </div>
-                        </td>
-
-                        <!-- Estado mejorado -->
-                        <td class="text-center">
-                            <span class="badge fs-6 px-3 py-2"
-                                  [class]="'badge-' + (categoria.estado === 'activo' ? 'success' : 'danger')">
-                                <i [class]="categoria.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="me-1"></i>
-                                {{ categoria.estado }}
-                            </span>
-                        </td>
-
-                        <!-- Fecha de creación mejorada -->
-                        <td class="text-center">
-                            <div class="text-muted small font-monospace">
-                                <div>{{ categoria.created_at | date:'dd/MM/yyyy' }}</div>
-                                <div class="text-muted opacity-75">{{ categoria.created_at | date:'HH:mm' }}</div>
-                            </div>
-                        </td>
-
-                        <!-- Acciones mejoradas -->
-                        <td class="text-center">
-                            <div class="btn-group" role="group">
-                                <!-- Editar -->
-                                <button 
-                                    class="btn btn-primary btn-sm" 
-                                    title="Editar categoría" 
-                                    (click)="mostrarFormularioEditar(categoria)"
-                                >
-                                    <i class="fas fa-edit"></i>
-                                </button>
-
-                                <!-- Desactivar -->
-                                <button 
-                                    *ngIf="categoria.estado === 'activo'"
-                                    class="btn btn-warning btn-sm" 
-                                    title="Desactivar categoría"
-                                    (click)="confirmarEliminar(categoria)"
-                                >
-                                    <i class="fas fa-ban"></i>
-                                </button>
-
-                                <!-- Activar -->
-                                <button 
-                                    *ngIf="categoria.estado === 'inactivo'"
-                                    class="btn btn-success btn-sm" 
-                                    title="Activar categoría"
-                                    (click)="confirmarActivar(categoria)"
-                                >
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Mensaje cuando no hay categorías mejorado -->
-                    <tr *ngIf="categorias.length === 0">
-                        <td colspan="5" class="text-center py-5">
-                            <div class="empty-state">
-                                <h4 class="text-muted mb-3">No hay categorías disponibles</h4>
-                                <p class="text-muted mb-4">
-                                    No se encontraron categorías que coincidan con los filtros aplicados.
-                                    <br>
-                                    <small>Intenta ajustar tus criterios de búsqueda o crear una nueva categoría.</small>
-                                </p>
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
-                                        <i class="fas fa-eye me-1"></i>
-                                        Ver todas las categorías
-                                    </button>
-                                    <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
-                                        <i class="fas fa-plus me-1"></i>
-                                        Crear categoría
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de formulario mejorado -->
-<div *ngIf="mostrarFormulario" 
-     class="modal fade show d-block modal-overlay" 
-     style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
-     (click)="cerrarFormulario()">
-  
-    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
-        <div class="modal-content border-0 shadow-lg">
-            
-            <!-- Header -->
-            <div class="modal-header bg-gradient-primary text-white border-0">
-                <h1 class="modal-title fs-5 fw-bold">
-                    <i class="fas fa-tag me-2"></i>
-                    {{ getTitulo() }}
-                </h1>
-                <button type="button" 
-                        class="btn-close btn-close-white" 
-                        (click)="cerrarFormulario()"
-                        [disabled]="enviando">
-                </button>
-            </div>
-
-            <!-- Body -->
-            <div class="modal-body p-4">
-                
-                <!-- Mensaje de respuesta -->
-                <div *ngIf="mensaje" 
-                     class="alert border-0 shadow-sm mb-4" 
-                     [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" 
-                     role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fs-5 me-2" 
-                           [class]="tipoMensaje === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'">
-                        </i>
-                        {{ mensaje }}
-                    </div>
-                </div>
-
-                <!-- Formulario -->
-                <form (ngSubmit)="guardar()" #categoriaForm="ngForm">
+        <!-- Filtros con mejor diseño -->
+        <div class="card mb-4 shadow-sm border-0 filtros-card">
+            <div class="card-body p-4">
+                <div class="row g-4 align-items-end">
                     
-                    <!-- Nombre -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <label class="form-label fw-semibold" for="nombre">
-                                <i class="fas fa-tag text-primary me-1"></i>
-                                Nombre de la categoría 
-                                <span class="text-danger">*</span>
-                            </label>
+                    <!-- Búsqueda -->
+                    <div class="col-lg-6 col-md-8">
+                        <label class="form-label small fw-semibold text-dark">
+                            <i class="fas fa-search text-muted me-1"></i>
+                            Buscar categorías:
+                        </label>
+                        <div class="input-group">
                             <input
                                 type="text"
-                                id="nombre"
-                                class="form-control form-control-lg border-2"
-                                [class.is-invalid]="errores.nombre"
-                                [(ngModel)]="formulario.nombre"
-                                name="nombre"
-                                placeholder="Ingresa el nombre de la categoría"
-                                required
-                                maxlength="150"
+                                class="form-control border-2"
+                                placeholder="Ingresa nombre de la categoría..."
+                                [(ngModel)]="filtros.buscar"
+                                (keyup.enter)="aplicarFiltros()"
                             />
-                            <div *ngIf="errores.nombre" class="invalid-feedback">
-                                <i class="fas fa-exclamation-circle me-1"></i>
-                                {{ errores.nombre }}
-                            </div>
+                            <button class="btn btn-outline-secondary" type="button" (click)="aplicarFiltros()">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Estado -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold" for="estado">
-                                <i class="fas fa-toggle-on text-primary me-1"></i>
+                    <div class="col-lg-3 col-md-4">
+                        <label class="form-label small fw-semibold text-dark">
+                            <i class="fas fa-toggle-on text-muted me-1"></i>
+                            Estado:
+                        </label>
+                        <select class="form-select border-2" [(ngModel)]="filtros.estado">
+                            <option value="todos">Todos</option>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Botones de filtro -->
+                    <div class="col-lg-3 col-md-12">
+                        <div class="d-flex gap-2 justify-content-md-end">
+                            <button class="btn btn-primary flex-fill flex-md-grow-0" (click)="aplicarFiltros()">
+                                <i class="fas fa-filter me-1"></i>
+                                Buscar
+                            </button>
+                            <button class="btn btn-outline-secondary flex-fill flex-md-grow-0" (click)="limpiarFiltros()">
+                                <i class="fas fa-eraser me-1"></i>
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading mejorado -->
+        <div *ngIf="cargando" class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <h5 class="text-primary mb-2">Cargando categorías...</h5>
+                <p class="text-muted small mb-0">Esto puede tardar unos segundos</p>
+            </div>
+        </div>
+
+        <!-- Error mejorado -->
+        <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
+            <div class="card-body text-center py-5">
+                <div class="text-danger mb-4">
+                    <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
+                    <h5>Oops! Algo salió mal</h5>
+                    <p class="mb-0">{{ error }}</p>
+                </div>
+                <button class="btn btn-primary" (click)="cargarCategorias()">
+                    <i class="fas fa-refresh me-1"></i>
+                    Reintentar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de categorías mejorada -->
+        <div *ngIf="!cargando && !error" class="card shadow-sm border-0 tabla-categorias">
+            
+            <!-- Info de resultados mejorada -->
+            <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="fw-medium">
+                        Mostrando {{ categorias.length }} categorías
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla responsive -->
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" style="width: 90px;" class="text-center">
+                                <i class="fas fa-image"></i>
+                            </th>
+                            <th scope="col" style="min-width: 80px;">
+                                <i class="fas fa-tag me-1"></i>
+                                Categoría
+                            </th>
+                            <th scope="col" style="width: 80px;" class="text-center">
+                                <i class="fas fa-toggle-on me-1"></i>
                                 Estado
-                            </label>
-                            <select
-                                id="estado"
-                                class="form-select form-select-lg border-2"
-                                [(ngModel)]="formulario.estado"
-                                name="estado"
-                            >
-                                <option value="activo">
-                                    <i class="fas fa-check"></i> Activo
-                                </option>
-                                <option value="inactivo">
-                                    <i class="fas fa-times"></i> Inactivo
-                                </option>
-                            </select>
+                            </th>
+                            <th scope="col" style="width: 200px;" class="text-center">
+                                <i class="fas fa-calendar me-1"></i>
+                                Fecha de Creación
+                            </th>
+                            <th scope="col" style="width: 140px;" class="text-center">
+                                <i class="fas fa-cogs"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let categoria of categorias" class="categoria-row">
+                            
+                            <!-- Imagen mejorada -->
+                            <td class="text-center">
+                                <div class="position-relative d-inline-block">
+                                    <div class="categoria-imagen-container">
+                                        <img 
+                                            *ngIf="categoria.imagen_url"
+                                            [src]="categoria.imagen_url"
+                                            [alt]="categoria.nombre"
+                                            class="categoria-imagen rounded-3 shadow-sm"
+                                            onerror="this.style.display='none'"
+                                        />
+                                        <div *ngIf="!categoria.imagen_url" class="imagen-placeholder rounded-3 shadow-sm">
+                                            <i class="fas fa-folder-open fs-4 text-muted"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Nombre mejorado -->
+                            <td>
+                                <div>
+                                    <div class="fw-bold text-dark mb-1">{{ categoria.nombre }}</div>
+                                </div>
+                            </td>
+
+                            <!-- Estado mejorado -->
+                            <td class="text-center">
+                                <span class="badge fs-6 px-3 py-2"
+                                    [class]="'badge-' + (categoria.estado === 'activo' ? 'success' : 'danger')">
+                                    <i [class]="categoria.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="me-1"></i>
+                                    {{ categoria.estado }}
+                                </span>
+                            </td>
+
+                            <!-- Fecha de creación mejorada -->
+                            <td class="text-center">
+                                <div class="text-muted small font-monospace">
+                                    <div>{{ categoria.created_at | date:'dd/MM/yyyy' }}</div>
+                                    <div class="text-muted opacity-75">{{ categoria.created_at | date:'HH:mm' }}</div>
+                                </div>
+                            </td>
+
+                            <!-- Acciones mejoradas -->
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <!-- Editar -->
+                                    <button 
+                                        class="btn btn-primary btn-sm" 
+                                        title="Editar categoría" 
+                                        (click)="mostrarFormularioEditar(categoria)"
+                                    >
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <!-- Desactivar -->
+                                    <button 
+                                        *ngIf="categoria.estado === 'activo'"
+                                        class="btn btn-warning btn-sm" 
+                                        title="Desactivar categoría"
+                                        (click)="confirmarEliminar(categoria)"
+                                    >
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+
+                                    <!-- Activar -->
+                                    <button 
+                                        *ngIf="categoria.estado === 'inactivo'"
+                                        class="btn btn-success btn-sm" 
+                                        title="Activar categoría"
+                                        (click)="confirmarActivar(categoria)"
+                                    >
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Mensaje cuando no hay categorías mejorado -->
+                        <tr *ngIf="categorias.length === 0">
+                            <td colspan="5" class="text-center py-5">
+                                <div class="empty-state">
+                                    <h4 class="text-muted mb-3">No hay categorías disponibles</h4>
+                                    <p class="text-muted mb-4">
+                                        No se encontraron categorías que coincidan con los filtros aplicados.
+                                        <br>
+                                        <small>Intenta ajustar tus criterios de búsqueda o crear una nueva categoría.</small>
+                                    </p>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Ver todas las categorías
+                                        </button>
+                                        <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+                                            <i class="fas fa-plus me-1"></i>
+                                            Crear categoría
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="mostrarConfirmacion" 
+        class="modal fade show d-block modal-overlay modal-overlay-confirmacion" 
+        style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
+        (click)="onModalConfirmacionBackdropClick($event)">
+        
+        <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+            <div class="modal-content border-0 shadow-lg">
+                
+                <!-- Header -->
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-question-circle text-warning me-2"></i>
+                        Confirmar acción
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            (click)="cerrarConfirmacion()"
+                            [disabled]="procesandoAccion">
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body text-center py-4">
+                    <div class="mb-4">
+                        <div *ngIf="accionConfirmacion === 'eliminar'" 
+                            class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="fas fa-exclamation-triangle fs-1 text-warning"></i>
+                        </div>
+                        <div *ngIf="accionConfirmacion === 'activar'" 
+                            class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="fas fa-question-circle fs-1 text-success"></i>
+                        </div>
+                    </div>
+                    <h6 class="mb-3">{{ mensajeConfirmacion }}</h6>
+                    <p class="text-muted small mb-0">Esta acción se puede revertir posteriormente</p>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" 
+                            class="btn btn-light flex-fill" 
+                            (click)="cerrarConfirmacion()"
+                            [disabled]="procesandoAccion">
+                        <i class="fas fa-times me-1"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" 
+                            class="btn flex-fill"
+                            [class.btn-warning]="accionConfirmacion === 'eliminar'"
+                            [class.btn-success]="accionConfirmacion === 'activar'"
+                            (click)="ejecutarAccion()"
+                            [disabled]="procesandoAccion">
+                        
+                        <span *ngIf="procesandoAccion" class="d-flex align-items-center justify-content-center">
+                            <div class="loading-spinner-small me-2"></div>
+                            <span *ngIf="accionConfirmacion === 'eliminar'">Desactivando...</span>
+                            <span *ngIf="accionConfirmacion === 'activar'">Activando...</span>
+                        </span>
+                        
+                        <span *ngIf="!procesandoAccion">
+                            <i *ngIf="accionConfirmacion === 'eliminar'" class="fas fa-ban me-1"></i>
+                            <i *ngIf="accionConfirmacion === 'activar'" class="fas fa-check me-1"></i>
+                            <span *ngIf="accionConfirmacion === 'eliminar'">Desactivar</span>
+                            <span *ngIf="accionConfirmacion === 'activar'">Activar</span>
+                        </span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de formulario mejorado -->
+    <div *ngIf="mostrarFormulario" 
+        class="modal fade show d-block modal-overlay modal-overlay-formulario" 
+        style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
+        (click)="onModalBackdropClick($event)">
+    
+        <div class="modal-dialog modal-xl" (click)="$event.stopPropagation()">
+            <div class="modal-content border-0 shadow-lg">
+                
+                <!-- Header -->
+                <div class="modal-header bg-gradient-primary text-white border-0">
+                    <h1 class="modal-title fs-5 fw-bold">
+                        <i class="fas fa-tag me-2"></i>
+                        {{ getTitulo() }}
+                    </h1>
+                    <button type="button" 
+                            class="btn-close btn-close-white" 
+                            (click)="cerrarFormulario()"
+                            [disabled]="enviando">
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-4">
+                    
+                    <!-- Mensaje de respuesta -->
+                    <div *ngIf="mensaje" 
+                        class="alert border-0 shadow-sm mb-4" 
+                        [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" 
+                        role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fs-5 me-2" 
+                            [class]="tipoMensaje === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'">
+                            </i>
+                            {{ mensaje }}
                         </div>
                     </div>
 
-                    <!-- Imagen -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-image text-primary me-1"></i>
-                                Imagen de la categoría
-                            </label>
-                            
-                            <!-- Preview de imagen actual o nueva -->
-                            <div *ngIf="tieneImagenParaMostrar()" class="position-relative d-inline-block mb-3">
-                                <img 
-                                    [src]="previewImagen" 
-                                    alt="Preview"
-                                    class="preview-img border shadow-sm"
-                                />
+                    <div class="row">
+                        <!-- Columna izquierda: Datos de categoría padre -->
+                        <div class="col-lg-6">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-folder text-primary me-2"></i>
+                                Categoría Principal
+                            </h5>
+
+                            <form (ngSubmit)="guardar()" #categoriaForm="ngForm">
+                        
+                                <!-- Nombre -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold" for="nombre">
+                                        <i class="fas fa-tag text-primary me-1"></i>
+                                        Nombre de la categoría 
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nombre"
+                                        class="form-control form-control-lg border-2"
+                                        [class.is-invalid]="errores.nombre"
+                                        [(ngModel)]="formulario.nombre"
+                                        name="nombre"
+                                        placeholder="Ingresa el nombre"
+                                        required
+                                        maxlength="150"
+                                    />
+                                    <div *ngIf="errores.nombre" class="invalid-feedback">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        {{ errores.nombre }}
+                                    </div>
+                                </div>
+
+                                <!-- Estado -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold" for="estado">
+                                        <i class="fas fa-toggle-on text-primary me-1"></i>
+                                        Estado
+                                    </label>
+                                    <select
+                                        id="estado"
+                                        class="form-select form-select-lg border-2"
+                                        [(ngModel)]="formulario.estado"
+                                        name="estado"
+                                    >
+                                        <option value="activo">Activo</option>
+                                        <option value="inactivo">Inactivo</option>
+                                    </select>
+                                </div>
+
+                                <!-- Imagen -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-image text-primary me-1"></i>
+                                        Imagen de la categoría
+                                    </label>
+                                    
+                                    <!-- Preview -->
+                                    <div *ngIf="tieneImagenParaMostrar()" class="position-relative d-inline-block mb-3">
+                                        <img 
+                                            [src]="previewImagen" 
+                                            alt="Preview"
+                                            class="preview-img border shadow-sm"
+                                        />
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
+                                            (click)="eliminarImagen()"
+                                            title="Eliminar imagen"
+                                        >
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Input de archivo -->
+                                    <div class="mb-3">
+                                        <input
+                                            type="file"
+                                            id="imagen"
+                                            class="file-input"
+                                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                                            (change)="onImagenSeleccionada($event)"
+                                            #fileInput
+                                        />
+                                        <label for="imagen" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm" 
+                                            style="width: fit-content;">
+                                            <i class="fas fa-upload"></i>
+                                            <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
+                                            <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
+                                        </label>
+                                    </div>
+
+                                    <div *ngIf="errores.imagen" class="text-danger small">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        {{ errores.imagen }}
+                                    </div>
+                                    
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        JPG, PNG, WebP. Max: 2MB
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+
+                        <!-- Columna derecha: Subcategorías -->
+                        <div class="col-lg-6" *ngIf="categoriaEditando">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0">
+                                    <i class="fas fa-sitemap text-primary me-2"></i>
+                                    Subcategorías
+                                </h5>
                                 <button 
                                     type="button" 
-                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
-                                    (click)="eliminarImagen()"
-                                    title="Eliminar imagen"
-                                >
-                                    <i class="fas fa-trash"></i>
+                                    class="btn btn-sm btn-success"
+                                    (click)="agregarSubcategoria()">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Agregar
                                 </button>
                             </div>
 
-                            <!-- Input de archivo -->
-                            <div class="mb-3">
-                                <input
-                                    type="file"
-                                    id="imagen"
-                                    class="file-input"
-                                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                                    (change)="onImagenSeleccionada($event)"
-                                    #fileInput
-                                />
-                                <label for="imagen" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm" 
-                                       style="width: fit-content;">
-                                    <i class="fas fa-upload"></i>
-                                    <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
-                                    <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
-                                </label>
+                            <!-- Lista de subcategorías -->
+                        <div class="col-lg-6">
+                            <!-- SI ES EDICIÓN: Mostrar subcategorías -->
+                            <div *ngIf="categoriaEditando">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-bold mb-0">
+                                        <i class="fas fa-sitemap text-primary me-2"></i>
+                                        Subcategorías
+                                    </h5>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-success"
+                                        (click)="agregarSubcategoria()">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Agregar
+                                    </button>
+                                </div>
+
+                                <!-- Lista de subcategorías -->
+                                <div class="card border-0 shadow-sm" style="max-height: 500px; overflow-y: auto;">
+                                    <div class="list-group list-group-flush">
+                                        <div *ngFor="let sub of subcategoriasEditables" 
+                                            class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-semibold">{{ sub.nombre }}</div>
+                                                <span class="badge badge-sm"
+                                                    [class.badge-success]="sub.estado === 'activo'"
+                                                    [class.badge-danger]="sub.estado === 'inactivo'">
+                                                    {{ sub.estado }}
+                                                </span>
+                                            </div>
+                                            <div class="btn-group btn-group-sm">
+                                                <button 
+                                                    class="btn btn-outline-primary"
+                                                    (click)="editarSubcategoria(sub)"
+                                                    title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button 
+                                                    *ngIf="sub.estado === 'activo'"
+                                                    class="btn btn-outline-warning"
+                                                    (click)="cambiarEstadoSubcategoria(sub, 'inactivo')"
+                                                    title="Desactivar"
+                                                    [disabled]="subcategoriaModificada[sub.id]">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                                <button 
+                                                    *ngIf="sub.estado === 'inactivo'"
+                                                    class="btn btn-outline-success"
+                                                    (click)="cambiarEstadoSubcategoria(sub, 'activo')"
+                                                    title="Activar"
+                                                    [disabled]="subcategoriaModificada[sub.id]">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div *ngIf="subcategoriasEditables.length === 0" 
+                                            class="list-group-item text-center text-muted py-4">
+                                            <i class="fas fa-inbox fs-2 mb-2 d-block"></i>
+                                            No hay subcategorías
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div *ngIf="errores.imagen" class="text-danger small">
-                                <i class="fas fa-exclamation-circle me-1"></i>
-                                {{ errores.imagen }}
-                            </div>
-                            
-                            <div class="form-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 2MB
+                            <!-- SI ES CREACIÓN: Mostrar mensaje informativo -->
+                            <div *ngIf="!categoriaEditando" class="card border-0 bg-light">
+                                <div class="card-body text-center py-5">
+                                    <i class="fas fa-info-circle fs-1 text-primary mb-3 d-block"></i>
+                                    <h5 class="text-dark mb-3">Gestión de Subcategorías</h5>
+                                    <p class="text-muted mb-0">
+                                        Primero debes <strong>guardar la categoría padre</strong>.
+                                        <br>
+                                        Después podrás agregar subcategorías desde el modo edición.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                </form>
-            </div>
+                </div>
 
-            <!-- Footer -->
-            <div class="modal-footer bg-light border-0">
-                <button 
-                    type="button" 
-                    class="btn btn-light flex-fill" 
-                    (click)="cerrarFormulario()"
-                    [disabled]="enviando"
-                >
-                    <i class="fas fa-times me-1"></i>
-                    Cancelar
-                </button>
-                <button 
-                    type="button" 
-                    class="btn btn-primary d-flex align-items-center justify-content-center gap-2 flex-fill" 
-                    (click)="guardar()"
-                    [disabled]="enviando || !categoriaForm.valid"
-                >
-                    <div *ngIf="enviando" class="loading-spinner-small"></div>
-                    <i *ngIf="!enviando" class="fas fa-save"></i>
-                    {{ getTextoBotonGuardar() }}
-                </button>
-            </div>
+                <!-- Footer -->
+                <div class="modal-footer bg-light border-0">
+                    <button 
+                        type="button" 
+                        class="btn btn-light" 
+                        (click)="cerrarFormulario()"
+                        [disabled]="enviando">
+                        <i class="fas fa-times me-1"></i>
+                        Cancelar
+                    </button>
+                    <button 
+                        type="button" 
+                        class="btn btn-primary d-flex align-items-center justify-content-center gap-2" 
+                        (click)="guardar()"
+                        [disabled]="enviando || !categoriaForm.valid">
+                        <div *ngIf="enviando" class="loading-spinner-small"></div>
+                        <i *ngIf="!enviando" class="fas fa-save"></i>
+                        {{ getTextoBotonGuardar() }}
+                    </button>
+                </div>
 
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Modal de confirmación mejorado -->
-<div *ngIf="mostrarConfirmacion" 
-     class="modal fade show d-block modal-overlay" 
-  style="background-color: rgba(0,0,0,0.5);"
-     (click)="cerrarConfirmacion()">
-    
-    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
-        <div class="modal-content border-0 shadow-lg">
-            
-            <!-- Header -->
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">
-                    <i class="fas fa-question-circle text-warning me-2"></i>
-                    Confirmar acción
-                </h5>
-                <button type="button" 
-                        class="btn-close btn-close-white bg-secondary rounded-circle p-2" 
-                        (click)="cerrarConfirmacion()"
-                        [disabled]="procesandoAccion">
-                </button>
-            </div>
-
-            <!-- Body -->
-            <div class="modal-body text-center py-4">
-                <div class="mb-4">
-                    <div *ngIf="accionConfirmacion === 'eliminar'" 
-                         class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
-                        <i class="fas fa-exclamation-triangle fs-1 text-warning"></i>
+    <!-- Modal para agregar/editar subcategoría -->
+    <div *ngIf="mostrarFormSubcategoria" 
+        class="modal fade show d-block modal-overlay modal-overlay-subcategoria" 
+        style="background-color: rgba(0,0,0,0.5);"
+        (click)="cerrarFormSubcategoria()">
+        <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-tag me-2"></i>
+                        {{ editandoSubcategoria ? 'Editar' : 'Nueva' }} Subcategoría
+                    </h5>
+                    <button type="button" class="btn-close" (click)="cerrarFormSubcategoria()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Nombre <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control"
+                            [(ngModel)]="subcategoriaFormulario.nombre"
+                            placeholder="Nombre de la subcategoría"
+                            maxlength="150">
                     </div>
-                    <div *ngIf="accionConfirmacion === 'activar'" 
-                         class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
-                        <i class="fas fa-question-circle fs-1 text-primary"></i>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Estado</label>
+                        <select class="form-select" [(ngModel)]="subcategoriaFormulario.estado">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
                     </div>
                 </div>
-                <h6 class="mb-3">{{ mensajeConfirmacion }}</h6>
-                <p class="text-muted small mb-0">Esta acción se puede revertir posteriormente</p>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="cerrarFormSubcategoria()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" (click)="guardarSubcategoria()">
+                        <i class="fas fa-save me-1"></i>
+                        Guardar
+                    </button>
+                </div>
             </div>
-
-            <!-- Footer -->
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" 
-                        class="btn btn-light flex-fill" 
-                        (click)="cerrarConfirmacion()"
-                        [disabled]="procesandoAccion">
-                    <i class="fas fa-times me-1"></i>
-                    Cancelar
-                </button>
-                <button type="button" 
-                        class="btn flex-fill"
-                        [class.btn-warning]="accionConfirmacion === 'eliminar'"
-                        [class.btn-success]="accionConfirmacion === 'activar'"
-                        (click)="ejecutarAccion()"
-                        [disabled]="procesandoAccion">
-                    
-                    <span *ngIf="procesandoAccion" class="d-flex align-items-center justify-content-center">
-                        <div class="loading-spinner-small me-2"></div>
-                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivando...</span>
-                        <span *ngIf="accionConfirmacion === 'activar'">Activando...</span>
-                    </span>
-                    
-                    <span *ngIf="!procesandoAccion">
-                        <i *ngIf="accionConfirmacion === 'eliminar'" class="fas fa-ban me-1"></i>
-                        <i *ngIf="accionConfirmacion === 'activar'" class="fas fa-check me-1"></i>
-                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivar</span>
-                        <span *ngIf="accionConfirmacion === 'activar'">Activar</span>
-                    </span>
-                </button>
-            </div>
-
         </div>
     </div>
-</div>
+
+    <!-- Modal de Confirmación -->
