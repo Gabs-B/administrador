@@ -207,7 +207,7 @@ export class ProductoFormComponent implements OnInit {
         return;
       }
 
-    if (archivo.size > 5120 * 1024) {  
+    if (archivo.size > 10240 * 1024) {  
       this.mostrarMensaje(`${archivo.name} supera los 5MB permitidos`, 'error');
       return;
     }

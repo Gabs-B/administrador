@@ -168,18 +168,18 @@ export class ReclamosComponent implements OnInit {
   // =================== MÉTODOS DE ACTUALIZACIÓN ===================
 
   // Método corregido en el componente
-// Método corregido - más simple y efectivo
+// Método corregido - Cierra el modal después de actualizar
 actualizarEstado(reclamo: Reclamacion, nuevoEstado: string): void {
   const estadoAnterior = reclamo.estado;
   
   if (estadoAnterior === nuevoEstado) return;
 
   this.actualizandoEstado = true;
-  console.log('Actualizando estado de', reclamo.id, 'a', nuevoEstado); // Debug
+  console.log('Actualizando estado de', reclamo.id, 'a', nuevoEstado);
 
   this.reclamosService.actualizarEstado(reclamo.id, nuevoEstado).subscribe({
     next: (response) => {
-      console.log('Respuesta del servidor:', response); // Debug
+      console.log('Respuesta del servidor:', response);
       
       if (response.success) {
         if (this.reclamoSeleccionado && this.reclamoSeleccionado.id === reclamo.id) {
@@ -187,21 +187,26 @@ actualizarEstado(reclamo: Reclamacion, nuevoEstado: string): void {
         }
 
         this.actualizarEstadisticas();
-        
         console.log('Estado actualizado correctamente');
+        
+        // CIERRA EL MODAL DESPUÉS DE ACTUALIZAR EXITOSAMENTE
+        this.actualizandoEstado = false;
+        setTimeout(() => {
+          this.cerrarDetalle();
+        }, 500); // Pequeño delay para que el usuario vea la actualización
+        
       } else {
         reclamo.estado = estadoAnterior as any;
         if (this.reclamoSeleccionado && this.reclamoSeleccionado.id === reclamo.id) {
           this.reclamoSeleccionado.estado = estadoAnterior as any;
         }
         this.error = response.message || 'Error al actualizar estado';
+        this.actualizandoEstado = false;
       }
-      this.actualizandoEstado = false;
     },
     error: (err) => {
-      console.error('Error en petición:', err); // Debug
+      console.error('Error en petición:', err);
       
-      // Revertir el estado
       reclamo.estado = estadoAnterior as any;
       if (this.reclamoSeleccionado && this.reclamoSeleccionado.id === reclamo.id) {
         this.reclamoSeleccionado.estado = estadoAnterior as any;
