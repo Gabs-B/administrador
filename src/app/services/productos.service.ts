@@ -30,8 +30,15 @@ export interface Producto {
   descuento?: number;          
   beneficios?: string;        
   modo_uso?: string;           
-  detalle?: string;            
+  detalle?: string;   
+  faq_quienes_toman?: string;
+  faq_por_que_elegir?: string;
+  faq_tiempo_uso?: string;
+  faq_efectos_secundarios?: string;
+  faq_consumo_alcohol?: string;         
   stock: number;
+  es_pack: boolean;
+  etiqueta_id?: number;   
   estado: 'activo' | 'inactivo';
   created_at: string;
   updated_at: string;
@@ -52,6 +59,12 @@ export interface Producto {
   tienda?: {                  
     id: number;
     nombre: string;
+  };
+  etiqueta?: {
+    id: number;
+    nombre: string;
+    estado: string;
+    imagen: string;
   };
 }
 
@@ -158,23 +171,18 @@ export class ProductosService {
   /**
    * Actualizar producto existente
    */
-/**
- * Actualizar producto existente - CORREGIDO para solo datos básicos
- */
-actualizarProducto(id: number, formData: FormData): Observable<{ success: boolean; data?: Producto; message?: string; errors?: any; }> {
-  // Usar PUT real, no POST con _method
-  // Convertir FormData a objeto para PUT request
-  const data: any = {};
-  formData.forEach((value, key) => {
-    data[key] = value;
-  });
 
+  /**
+   * Actualizar producto existente - ENVIAR COMO JSON
+   */
+actualizarProducto(id: number, datos: any): Observable<{ success: boolean; data?: Producto; message?: string; errors?: any; }> {
+  // Eliminar completamente la conversión a FormData
   return this.http.put<{ success: boolean; data?: Producto; message?: string; errors?: any; }>(
     `${envs.API_URL}/admin/productos/${id}`, 
-    data, 
+    datos, // Enviar directamente el objeto
     {
       headers: {
-        'Content-Type': 'application/json'  
+        'Content-Type': 'application/json'
       }
     }
   ).pipe(

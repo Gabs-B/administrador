@@ -128,6 +128,52 @@
               </select>
             </div>
           </div>
+
+          <!-- Pack-->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="es_pack" 
+                      [(ngModel)]="formulario.es_pack" name="es_pack">
+                <label class="form-check-label fw-semibold" for="es_pack">
+                  ¿Es un pack?
+                </label>
+              </div>
+              <div class="form-text">Marcar si este producto es un pack o conjunto de productos</div>
+            </div>
+          </div>
+          <!-- Etiqueta -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Etiqueta</label>
+              
+              <!-- Mensajes de estado -->
+              <div *ngIf="cargandoEtiquetas" class="alert alert-info py-2 mb-2">
+                <small>⏳ Cargando etiquetas activas...</small>
+              </div>
+              
+              <div *ngIf="!cargandoEtiquetas && etiquetasActivas.length === 0" class="alert alert-warning py-2 mb-2">
+                <small>⚠️ No hay etiquetas activas disponibles</small>
+              </div>
+              
+              <select class="form-select" [(ngModel)]="formulario.etiqueta_id" name="etiqueta_id"
+                      [class.is-invalid]="errores.etiqueta_id"
+                      [disabled]="cargandoEtiquetas">
+                <option [ngValue]="null" selected>-- Sin etiqueta --</option>
+                <option *ngFor="let etiqueta of etiquetasActivas" [value]="etiqueta.id">
+                  {{ etiqueta.nombre }}
+                </option>
+              </select>
+              
+              <div *ngIf="errores.etiqueta_id" class="invalid-feedback">
+                {{ errores.etiqueta_id }}
+              </div>
+              
+              <div class="form-text" *ngIf="etiquetasActivas.length > 0">
+                {{ etiquetasActivas.length }} etiquetas activas disponibles
+              </div>
+            </div>
+          </div>
           
           <!-- Descripción -->
           <div class="mb-3">
@@ -174,6 +220,74 @@
                       placeholder="Instrucciones de uso del producto"></textarea>
             <div *ngIf="errores.modo_uso" class="invalid-feedback">
               {{ errores.modo_uso }}
+            </div>
+          </div>
+
+          <div class="card border-primary mb-4">
+          <div class="card-header bg-primary text-white">
+            <h6 class="mb-0">Preguntas Frecuentes (FAQ)</h6>
+          </div>
+          <div class="card-body">
+    
+              <!-- ¿Quiénes pueden tomar? -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">¿Quiénes pueden tomar este producto?</label>
+                <textarea class="form-control" rows="3"
+                          [(ngModel)]="formulario.faq_quienes_toman" name="faq_quienes_toman"
+                          [class.is-invalid]="errores.faq_quienes_toman"
+                          placeholder="Ej: Personas mayores de 18 años, no recomendado para embarazadas..."></textarea>
+                <div *ngIf="errores.faq_quienes_toman" class="invalid-feedback">
+                  {{ errores.faq_quienes_toman }}
+                </div>
+              </div>
+              
+              <!-- ¿Por qué elegir? -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">¿Por qué elegir este producto?</label>
+                <textarea class="form-control" rows="3"
+                          [(ngModel)]="formulario.faq_por_que_elegir" name="faq_por_que_elegir"
+                          [class.is-invalid]="errores.faq_por_que_elegir"
+                          placeholder="Ventajas y diferenciadores del producto..."></textarea>
+                <div *ngIf="errores.faq_por_que_elegir" class="invalid-feedback">
+                  {{ errores.faq_por_que_elegir }}
+                </div>
+              </div>
+              
+              <!-- Tiempo de uso -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">¿Cuánto tiempo se debe usar?</label>
+                <textarea class="form-control" rows="3"
+                          [(ngModel)]="formulario.faq_tiempo_uso" name="faq_tiempo_uso"
+                          [class.is-invalid]="errores.faq_tiempo_uso"
+                          placeholder="Duración recomendada del tratamiento..."></textarea>
+                <div *ngIf="errores.faq_tiempo_uso" class="invalid-feedback">
+                  {{ errores.faq_tiempo_uso }}
+                </div>
+              </div>
+              
+              <!-- Efectos secundarios -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">¿Tiene efectos secundarios?</label>
+                <textarea class="form-control" rows="3"
+                          [(ngModel)]="formulario.faq_efectos_secundarios" name="faq_efectos_secundarios"
+                          [class.is-invalid]="errores.faq_efectos_secundarios"
+                          placeholder="Posibles efectos secundarios o contraindicaciones..."></textarea>
+                <div *ngIf="errores.faq_efectos_secundarios" class="invalid-feedback">
+                  {{ errores.faq_efectos_secundarios }}
+                </div>
+              </div>
+              
+              <!-- Consumo de alcohol -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">¿Se puede consumir alcohol mientras se usa?</label>
+                <textarea class="form-control" rows="3"
+                          [(ngModel)]="formulario.faq_consumo_alcohol" name="faq_consumo_alcohol"
+                          [class.is-invalid]="errores.faq_consumo_alcohol"
+                          placeholder="Interacciones con alcohol..."></textarea>
+                <div *ngIf="errores.faq_consumo_alcohol" class="invalid-feedback">
+                  {{ errores.faq_consumo_alcohol }}
+                </div>
+              </div>
             </div>
           </div>
           

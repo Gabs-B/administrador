@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ProductosService, Producto, ProductoImagen } from '../../../services/productos.service';
 import { CategoriasService, Categoria } from '../../../services/categorias.service';
 import { TiendasService, Tienda } from '../../../services/tienda.service';
-
+import { EtiquetaService, Etiqueta, EtiquetaResponse } from '../../../services/etiqueta.service';
 @Component({
   selector: 'app-producto-form',
   templateUrl: './producto-form.component.html',
@@ -26,8 +26,15 @@ export class ProductoFormComponent implements OnInit {
     beneficios: '',
     modo_uso: '',
     detalle: '',
+    faq_quienes_toman: '',
+    faq_por_que_elegir: '',
+    faq_tiempo_uso: '',
+    faq_efectos_secundarios: '',
+    faq_consumo_alcohol: '',
     stock: 0,
-    estado: 'activo' as 'activo' | 'inactivo'
+    estado: 'activo' as 'activo' | 'inactivo',
+      es_pack: false, 
+      etiqueta_id: null as number | null 
   };
 
   // Estados del componente
@@ -41,6 +48,8 @@ export class ProductoFormComponent implements OnInit {
   tiendas: Tienda[] = [];
   cargandoCategorias = false;
   cargandoTiendas = false;
+  etiquetasActivas: Etiqueta[] = [];
+  cargandoEtiquetas = false;
 
   // ========== GESTIÓN DE IMÁGENES MÚLTIPLES ==========
   imagenesSeleccionadas: File[] = [];
@@ -52,12 +61,15 @@ export class ProductoFormComponent implements OnInit {
   constructor(
     private productosService: ProductosService,
     private categoriasService: CategoriasService,
-    private tiendasService: TiendasService
+    private tiendasService: TiendasService,
+    private etiquetaService: EtiquetaService
+
   ) {}
 
   ngOnInit(): void {
     this.cargarCategorias();
     this.cargarTiendas();
+    this.cargarEtiquetasActivas(); 
   }
 
   ngOnChanges(): void {
@@ -69,9 +81,56 @@ export class ProductoFormComponent implements OnInit {
     }
   }
 
+cargarEtiquetasActivas(): void {
+  this.cargandoEtiquetas = true;
+  this.etiquetaService.obtenerEtiquetasActivas().subscribe({
+    next: (response: EtiquetaResponse) => {
+/*       console.log('🔍 Respuesta completa de etiquetas:', response);
+ */      
+      if (response.success && response.data) {
+        // Manejar diferentes estructuras de respuesta
+        const data = response.data as any;
+        
+        if (data.etiquetas && Array.isArray(data.etiquetas)) {
+          this.etiquetasActivas = data.etiquetas;
+        } else if (Array.isArray(data)) {
+          this.etiquetasActivas = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          this.etiquetasActivas = data.data;
+        } else {
+          console.warn('⚠️ Estructura de respuesta no reconocida:', data);
+          this.etiquetasActivas = [];
+        }
+        
+/*         console.log('✅ Etiquetas cargadas:', this.etiquetasActivas);
+ */        
+        // Verificar si la etiqueta actual del producto existe en la lista
+        if (this.producto && this.producto.etiqueta_id) {
+          const etiquetaExiste = this.etiquetasActivas.find(e => e.id === this.producto!.etiqueta_id);
+          if (!etiquetaExiste) {
+            console.warn('⚠️ La etiqueta actual del producto no está en la lista de activas');
+            // Opcional: resetear el etiqueta_id si no existe
+            this.formulario.etiqueta_id = null;
+          }
+        }
+      } else {
+        console.error('❌ Error en respuesta:', response.message);
+        this.etiquetasActivas = [];
+      }
+    },
+    error: (error) => {
+      console.error('💥 Error HTTP al cargar etiquetas:', error);
+      this.etiquetasActivas = [];
+    },
+    complete: () => {
+      this.cargandoEtiquetas = false;
+    }
+  });
+}
 /**
  * Cargar solo subcategorías disponibles para productos
  */
+
   cargarCategorias(): void {
     this.cargandoCategorias = true;
     
@@ -81,8 +140,8 @@ export class ProductoFormComponent implements OnInit {
           // Usar directamente el nombre de la subcategoría sin formato especial
           this.categorias = response.data;
           
-          console.log('Subcategorías cargadas:', this.categorias);
-        } else {
+/*           console.log('Subcategorías cargadas:', this.categorias);
+ */        } else {
           console.error('Error al cargar subcategorías:', response.message);
           this.mostrarMensaje(
             response.message || 'Error al cargar subcategorías disponibles', 
@@ -138,9 +197,17 @@ export class ProductoFormComponent implements OnInit {
         beneficios: this.producto.beneficios || '',
         modo_uso: this.producto.modo_uso || '',
         detalle: this.producto.detalle || '',
+        faq_quienes_toman: this.producto.faq_quienes_toman || '',
+        faq_por_que_elegir: this.producto.faq_por_que_elegir || '',
+        faq_tiempo_uso: this.producto.faq_tiempo_uso || '',
+        faq_efectos_secundarios: this.producto.faq_efectos_secundarios || '',
+        faq_consumo_alcohol: this.producto.faq_consumo_alcohol || '',
         stock: this.producto.stock || 0,
-        estado: this.producto.estado || 'activo'
+        estado: this.producto.estado || 'activo',
+        es_pack: this.producto.es_pack || false, 
+        etiqueta_id: this.producto.etiqueta_id || null         
       };
+    console.log('📦 Datos del producto cargados:', this.formulario); // DEBUG
 
       // Cargar imágenes existentes
     this.imagenesExistentes = this.producto.imagenes ? [...this.producto.imagenes] : [];
@@ -164,12 +231,20 @@ export class ProductoFormComponent implements OnInit {
       detalle: '',
       modo_uso: '',
       beneficios: '',
+      faq_quienes_toman: '',
+      faq_por_que_elegir: '',
+      faq_tiempo_uso: '',
+      faq_efectos_secundarios: '',
+      faq_consumo_alcohol: '',
       categoria_id: null,
       tienda_id: null,
       precio: 0,
       descuento: 0,
       stock: 0,
-      estado: 'activo'
+      estado: 'activo',
+      es_pack: false,
+      etiqueta_id: null
+
     };
     
     this.errores = {};
@@ -354,6 +429,8 @@ private crearProductoNuevo(): void {
   formData.append('descuento', this.formulario.descuento.toString());
   formData.append('stock', this.formulario.stock.toString());
   formData.append('estado', this.formulario.estado);
+  formData.append('es_pack', this.formulario.es_pack ? '1' : '0');
+
 
   // Campos opcionales
   if (this.formulario.sku) {
@@ -365,6 +442,9 @@ private crearProductoNuevo(): void {
   if (this.formulario.tienda_id) {
     formData.append('tienda_id', this.formulario.tienda_id.toString());
   }
+  if (this.formulario.etiqueta_id) {
+    formData.append('etiqueta_id', this.formulario.etiqueta_id.toString());
+  }
   if (this.formulario.beneficios) {
     formData.append('beneficios', this.formulario.beneficios);
   }
@@ -373,6 +453,21 @@ private crearProductoNuevo(): void {
   }
   if (this.formulario.detalle) {
     formData.append('detalle', this.formulario.detalle);
+  }
+   if (this.formulario.faq_quienes_toman) {
+    formData.append('faq_quienes_toman', this.formulario.faq_quienes_toman);
+  }
+  if (this.formulario.faq_por_que_elegir) {
+    formData.append('faq_por_que_elegir', this.formulario.faq_por_que_elegir);
+  }
+  if (this.formulario.faq_tiempo_uso) {
+    formData.append('faq_tiempo_uso', this.formulario.faq_tiempo_uso);
+  }
+  if (this.formulario.faq_efectos_secundarios) {
+    formData.append('faq_efectos_secundarios', this.formulario.faq_efectos_secundarios);
+  }
+  if (this.formulario.faq_consumo_alcohol) {
+    formData.append('faq_consumo_alcohol', this.formulario.faq_consumo_alcohol);
   }
 
   // Agregar imágenes nuevas
@@ -413,8 +508,14 @@ private actualizarProductoExistente(): void {
     precio: this.formulario.precio,
     descuento: this.formulario.descuento,
     stock: this.formulario.stock,
-    estado: this.formulario.estado
+    estado: this.formulario.estado,
+    es_pack: this.formulario.es_pack, // Ya es booleano, no convertir
   };
+
+  // Solo enviar etiqueta_id si tiene un valor válido
+  if (this.formulario.etiqueta_id) {
+    datosBasicos.etiqueta_id = this.formulario.etiqueta_id;
+  }
 
   // Campos opcionales
   if (this.formulario.sku) {
@@ -435,14 +536,29 @@ private actualizarProductoExistente(): void {
   if (this.formulario.detalle) {
     datosBasicos.detalle = this.formulario.detalle;
   }
+    if (this.formulario.faq_quienes_toman) {
+    datosBasicos.faq_quienes_toman = this.formulario.faq_quienes_toman;
+  }
+  if (this.formulario.faq_por_que_elegir) {
+    datosBasicos.faq_por_que_elegir = this.formulario.faq_por_que_elegir;
+  }
+  if (this.formulario.faq_tiempo_uso) {
+    datosBasicos.faq_tiempo_uso = this.formulario.faq_tiempo_uso;
+  }
+  if (this.formulario.faq_efectos_secundarios) {
+    datosBasicos.faq_efectos_secundarios = this.formulario.faq_efectos_secundarios;
+  }
+  if (this.formulario.faq_consumo_alcohol) {
+    datosBasicos.faq_consumo_alcohol = this.formulario.faq_consumo_alcohol;
+  }
 
-  // Crear FormData solo con datos básicos
-  const formData = new FormData();
-  Object.keys(datosBasicos).forEach(key => {
-    formData.append(key, datosBasicos[key]);
-  });
+  // DEBUG: Verificar datos antes de enviar
+/*   console.log('📤 Datos a enviar:', datosBasicos);
+  console.log('🔍 Tipo de es_pack:', typeof datosBasicos.es_pack);
+  console.log('🏷️ Etiqueta ID:', datosBasicos.etiqueta_id); */
 
-  this.productosService.actualizarProducto(this.producto!.id, formData).subscribe({
+  // Enviar como JSON, no como FormData
+  this.productosService.actualizarProducto(this.producto!.id, datosBasicos).subscribe({
     next: (response) => {
       if (response.success && response.data) {
         this.mostrarMensaje('Producto actualizado correctamente', 'success');

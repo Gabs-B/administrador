@@ -1,0 +1,479 @@
+<div class="container-fluid py-4 etiquetas-container">
+    <!-- Header con gradiente sutil -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
+        <div>
+            <h1 class="h2 mb-1 text-dark fw-bold">
+                <i class="menu-icon fas fa-layer-group text-primary"></i>
+                Gestión de Etiquetas
+            </h1>
+        </div>
+        <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" (click)="mostrarFormularioCrear()">
+            <i class="fas fa-plus"></i>
+            Nueva Etiqueta
+        </button>
+    </div>
+
+    <!-- Filtros con mejor diseño -->
+    <div class="card mb-4 shadow-sm border-0 filtros-card">
+        <div class="card-body p-4">
+            <div class="row g-4 align-items-end">
+                
+                <!-- Búsqueda -->
+                <div class="col-lg-6 col-md-8">
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-search text-muted me-1"></i>
+                        Buscar etiquetas:
+                    </label>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control border-2"
+                            placeholder="Ingresa nombre de la etiqueta..."
+                            [(ngModel)]="filtros.buscar"
+                            (keyup.enter)="aplicarFiltros()"
+                        />
+                        <button class="btn btn-outline-secondary" type="button" (click)="aplicarFiltros()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="col-lg-3 col-md-4">
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-toggle-on text-muted me-1"></i>
+                        Estado:
+                    </label>
+                    <select class="form-select border-2" [(ngModel)]="filtros.estado">
+                        <option value="todos">Todos</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <!-- Botones de filtro -->
+                <div class="col-lg-3 col-md-12">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <button class="btn btn-primary flex-fill flex-md-grow-0" (click)="aplicarFiltros()">
+                            <i class="fas fa-filter me-1"></i>
+                            Buscar
+                        </button>
+                        <button class="btn btn-outline-secondary flex-fill flex-md-grow-0" (click)="limpiarFiltros()">
+                            <i class="fas fa-eraser me-1"></i>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading mejorado -->
+    <div *ngIf="cargando" class="card shadow-sm border-0">
+        <div class="card-body text-center py-5">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <h5 class="text-primary mb-2">Cargando etiquetas...</h5>
+            <p class="text-muted small mb-0">Esto puede tardar unos segundos</p>
+        </div>
+    </div>
+
+    <!-- Error mejorado -->
+    <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
+        <div class="card-body text-center py-5">
+            <div class="text-danger mb-4">
+                <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
+                <h5>Oops! Algo salió mal</h5>
+                <p class="mb-0">{{ error }}</p>
+            </div>
+            <button class="btn btn-primary" (click)="cargarEtiquetas()">
+                <i class="fas fa-refresh me-1"></i>
+                Reintentar
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de etiquetas mejorada -->
+    <div *ngIf="!cargando && !error" class="card shadow-sm border-0 tabla-etiquetas">
+        
+        <!-- Info de resultados mejorada -->
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-chart-bar"></i>
+                <span class="fw-medium">
+                    Mostrando {{ etiquetas.length }} etiquetas
+                </span>
+            </div>
+        </div>
+
+        <!-- Tabla responsive -->
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" style="width: 90px;" class="text-center">
+                            <i class="fas fa-image"></i>
+                        </th>
+                        <th scope="col" style="min-width: 80px;">
+                            <i class="fas fa-tag me-1"></i>
+                            Etiqueta
+                        </th>
+                        <th scope="col" style="width: 80px;" class="text-center">
+                            <i class="fas fa-toggle-on me-1"></i>
+                            Estado
+                        </th>
+                        <th scope="col" style="width: 200px;" class="text-center">
+                            <i class="fas fa-calendar me-1"></i>
+                            Fecha de Creación
+                        </th>
+                        <th scope="col" style="width: 140px;" class="text-center">
+                            <i class="fas fa-cogs"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let etiqueta of etiquetas" class="etiqueta-row">
+                        
+                        <!-- Imagen mejorada -->
+                        <td class="text-center">
+                            <div class="position-relative d-inline-block">
+                                <div class="etiqueta-imagen-container">
+                                    <img 
+                                        *ngIf="etiqueta.imagen_url"
+                                        [src]="etiqueta.imagen_url"
+                                        [alt]="etiqueta.nombre"
+                                        class="etiqueta-imagen rounded-3 shadow-sm"
+                                        onerror="this.style.display='none'"
+                                    />
+                                    <div *ngIf="!etiqueta.imagen_url" class="imagen-placeholder rounded-3 shadow-sm">
+                                        <i class="fas fa-folder-open fs-4 text-muted"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Nombre mejorado -->
+                        <td>
+                            <div>
+                                <div class="fw-bold text-dark mb-1">{{ etiqueta.nombre }}</div>
+                                <small class="text-muted" *ngIf="etiqueta.productos_count !== undefined">
+                                    {{ etiqueta.productos_count }} productos
+                                </small>
+                            </div>
+                        </td>
+
+                        <!-- Estado mejorado -->
+                        <td class="text-center">
+                            <span class="badge fs-6 px-3 py-2"
+                                [class]="'badge-' + (etiqueta.estado === 'activo' ? 'success' : 'danger')">
+                                <i [class]="etiqueta.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="me-1"></i>
+                                {{ etiqueta.estado }}
+                            </span>
+                        </td>
+
+                        <!-- Fecha de creación mejorada -->
+                        <td class="text-center">
+                            <div class="text-muted small font-monospace">
+                                <div>{{ etiqueta.created_at | date:'dd/MM/yyyy' }}</div>
+                                <div class="text-muted opacity-75">{{ etiqueta.created_at | date:'HH:mm' }}</div>
+                            </div>
+                        </td>
+
+                        <!-- Acciones mejoradas -->
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <!-- Editar -->
+                                <button 
+                                    class="btn btn-primary btn-sm" 
+                                    title="Editar etiqueta" 
+                                    (click)="mostrarFormularioEditar(etiqueta)"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <!-- Desactivar -->
+                                <button 
+                                    *ngIf="etiqueta.estado === 'activo'"
+                                    class="btn btn-warning btn-sm" 
+                                    title="Desactivar etiqueta"
+                                    (click)="confirmarEliminar(etiqueta)"
+                                >
+                                    <i class="fas fa-ban"></i>
+                                </button>
+
+                                <!-- Activar -->
+                                <button 
+                                    *ngIf="etiqueta.estado === 'inactivo'"
+                                    class="btn btn-success btn-sm" 
+                                    title="Activar etiqueta"
+                                    (click)="confirmarActivar(etiqueta)"
+                                >
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Mensaje cuando no hay etiquetas mejorado -->
+                    <tr *ngIf="etiquetas.length === 0">
+                        <td colspan="6" class="text-center py-5">
+                            <div class="empty-state">
+                                <h4 class="text-muted mb-3">No hay etiquetas disponibles</h4>
+                                <p class="text-muted mb-4">
+                                    No se encontraron etiquetas que coincidan con los filtros aplicados.
+                                    <br>
+                                    <small>Intenta ajustar tus criterios de búsqueda o crear una nueva etiqueta.</small>
+                                </p>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Ver todas las etiquetas
+                                    </button>
+                                    <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Crear etiqueta
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div *ngIf="mostrarConfirmacion" 
+    class="modal fade show d-block modal-overlay modal-overlay-confirmacion" 
+    style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
+    (click)="onModalConfirmacionBackdropClick($event)">
+    
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <!-- Header -->
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-question-circle text-warning me-2"></i>
+                    Confirmar acción
+                </h5>
+                <button type="button" 
+                        class="btn-close" 
+                        (click)="cerrarConfirmacion()"
+                        [disabled]="procesandoAccion">
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <div *ngIf="accionConfirmacion === 'eliminar'" 
+                        class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fas fa-exclamation-triangle fs-1 text-warning"></i>
+                    </div>
+                    <div *ngIf="accionConfirmacion === 'activar'" 
+                        class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fas fa-question-circle fs-1 text-success"></i>
+                    </div>
+                </div>
+                <h6 class="mb-3">{{ mensajeConfirmacion }}</h6>
+                <p class="text-muted small mb-0">Esta acción se puede revertir posteriormente</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" 
+                        class="btn btn-light flex-fill" 
+                        (click)="cerrarConfirmacion()"
+                        [disabled]="procesandoAccion">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <button type="button" 
+                        class="btn flex-fill"
+                        [class.btn-warning]="accionConfirmacion === 'eliminar'"
+                        [class.btn-success]="accionConfirmacion === 'activar'"
+                        (click)="ejecutarAccion()"
+                        [disabled]="procesandoAccion">
+                    
+                    <span *ngIf="procesandoAccion" class="d-flex align-items-center justify-content-center">
+                        <div class="loading-spinner-small me-2"></div>
+                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivando...</span>
+                        <span *ngIf="accionConfirmacion === 'activar'">Activando...</span>
+                    </span>
+                    
+                    <span *ngIf="!procesandoAccion">
+                        <i *ngIf="accionConfirmacion === 'eliminar'" class="fas fa-ban me-1"></i>
+                        <i *ngIf="accionConfirmacion === 'activar'" class="fas fa-check me-1"></i>
+                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivar</span>
+                        <span *ngIf="accionConfirmacion === 'activar'">Activar</span>
+                    </span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de formulario mejorado -->
+<div *ngIf="mostrarFormulario" 
+    class="modal fade show d-block modal-overlay modal-overlay-formulario" 
+    style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
+    (click)="onModalBackdropClick($event)">
+
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <!-- Header -->
+            <div class="modal-header bg-gradient-primary text-white border-0">
+                <h1 class="modal-title fs-5 fw-bold">
+                    <i class="fas fa-tag me-2"></i>
+                    {{ getTitulo() }}
+                </h1>
+                <button type="button" 
+                        class="btn-close btn-close-white" 
+                        (click)="cerrarFormulario()"
+                        [disabled]="enviando">
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+                
+                <!-- Mensaje de respuesta -->
+                <div *ngIf="mensaje" 
+                    class="alert border-0 shadow-sm mb-4" 
+                    [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" 
+                    role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fs-5 me-2" 
+                        [class]="tipoMensaje === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'">
+                        </i>
+                        {{ mensaje }}
+                    </div>
+                </div>
+
+                <form (ngSubmit)="guardar()" #etiquetaForm="ngForm">
+            
+                    <!-- Nombre -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" for="nombre">
+                            <i class="fas fa-tag text-primary me-1"></i>
+                            Nombre de la etiqueta 
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="nombre"
+                            class="form-control form-control-lg border-2"
+                            [class.is-invalid]="errores.nombre"
+                            [(ngModel)]="formulario.nombre"
+                            name="nombre"
+                            placeholder="Ingresa el nombre"
+                            required
+                            maxlength="100"
+                        />
+                        <div *ngIf="errores.nombre" class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            {{ errores.nombre }}
+                        </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" for="estado">
+                            <i class="fas fa-toggle-on text-primary me-1"></i>
+                            Estado
+                        </label>
+                        <select
+                            id="estado"
+                            class="form-select form-select-lg border-2"
+                            [(ngModel)]="formulario.estado"
+                            name="estado"
+                        >
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Imagen -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-image text-primary me-1"></i>
+                            Imagen de la etiqueta
+                            <span *ngIf="!etiquetaEditando" class="text-danger">*</span>
+                        </label>
+                        
+                        <!-- Preview -->
+                        <div *ngIf="tieneImagenParaMostrar()" class="position-relative d-inline-block mb-3">
+                            <img 
+                                [src]="previewImagen" 
+                                alt="Preview"
+                                class="preview-img border shadow-sm"
+                            />
+                            <button 
+                                type="button" 
+                                class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
+                                (click)="eliminarImagen()"
+                                title="Eliminar imagen"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <!-- Input de archivo -->
+                        <div class="mb-3">
+                            <input
+                                type="file"
+                                id="imagen"
+                                class="file-input"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                (change)="onImagenSeleccionada($event)"
+                                #fileInput
+                            />
+                            <label for="imagen" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm" 
+                                style="width: fit-content;">
+                                <i class="fas fa-upload"></i>
+                                <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
+                                <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
+                            </label>
+                        </div>
+
+                        <div *ngIf="errores.imagen" class="text-danger small">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            {{ errores.imagen }}
+                        </div>
+                        
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            JPG, PNG, WebP. Max: 5MB
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-light border-0">
+                <button 
+                    type="button" 
+                    class="btn btn-light" 
+                    (click)="cerrarFormulario()"
+                    [disabled]="enviando">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-primary d-flex align-items-center justify-content-center gap-2" 
+                    (click)="guardar()"
+                    [disabled]="enviando || !etiquetaForm.valid">
+                    <div *ngIf="enviando" class="loading-spinner-small"></div>
+                    <i *ngIf="!enviando" class="fas fa-save"></i>
+                    {{ getTextoBotonGuardar() }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

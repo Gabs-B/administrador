@@ -10,6 +10,8 @@ import { CyberwowComponent } from './cyberwow/cyberwow.component';
 import { LiquidacionComponent } from './liquidacion/liquidacion.component';
 import { ReclamosComponent } from './reclamos/reclamos.component'; 
 import { PedidosComponent } from './pedidos/pedidos.component';
+import { EtiquetasComponent } from './etiquetas/etiquetas.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -55,6 +57,10 @@ const routes: Routes = [
       {
         path: 'pedidos',
         component: PedidosComponent
+      },
+      {
+        path: 'etiquetas',
+        component: EtiquetasComponent
       }
     ]
   }

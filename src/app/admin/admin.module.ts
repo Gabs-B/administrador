@@ -17,6 +17,7 @@ import { CyberwowComponent } from './cyberwow/cyberwow.component';
 import { LiquidacionComponent } from './liquidacion/liquidacion.component';
 import { ReclamosComponent } from './reclamos/reclamos.component';
 import { PedidosComponent } from './pedidos/pedidos.component';
+import { EtiquetasComponent } from './etiquetas/etiquetas.component';
 
 
 // Servicios
@@ -28,6 +29,7 @@ import { CarruselService } from '../services/carrusel.service';
 import { LiquidacionService} from '../services/liquidacion.service';
 import { ReclamosService } from '../services/reclamos.service';
 import { PedidosService } from '../services/pedidos.service';
+import { EtiquetaService } from '../services/etiqueta.service';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,7 @@ import { PedidosService } from '../services/pedidos.service';
     LiquidacionComponent,
     ReclamosComponent,
     PedidosComponent,
+    EtiquetasComponent,
   ],
   imports: [
     CommonModule,
