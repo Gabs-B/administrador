@@ -25,7 +25,8 @@ export class ProductoFormComponent implements OnInit {
     descuento: 0,
     beneficios: '',
     modo_uso: '',
-    detalle: '',
+    ingredientes: '',
+    vida_util: '',
     faq_quienes_toman: '',
     faq_por_que_elegir: '',
     faq_tiempo_uso: '',
@@ -196,7 +197,8 @@ cargarEtiquetasActivas(): void {
         descuento: this.producto.descuento || 0,
         beneficios: this.producto.beneficios || '',
         modo_uso: this.producto.modo_uso || '',
-        detalle: this.producto.detalle || '',
+        ingredientes: this.producto.ingredientes || '',
+        vida_util: this.producto.vida_util || '',
         faq_quienes_toman: this.producto.faq_quienes_toman || '',
         faq_por_que_elegir: this.producto.faq_por_que_elegir || '',
         faq_tiempo_uso: this.producto.faq_tiempo_uso || '',
@@ -228,9 +230,10 @@ cargarEtiquetasActivas(): void {
       nombre: '',
       sku: '',
       descripcion: '',
-      detalle: '',
+      ingredientes: '',
       modo_uso: '',
       beneficios: '',
+      vida_util: '',
       faq_quienes_toman: '',
       faq_por_que_elegir: '',
       faq_tiempo_uso: '',
@@ -451,8 +454,11 @@ private crearProductoNuevo(): void {
   if (this.formulario.modo_uso) {
     formData.append('modo_uso', this.formulario.modo_uso);
   }
-  if (this.formulario.detalle) {
-    formData.append('detalle', this.formulario.detalle);
+  if (this.formulario.ingredientes) {
+    formData.append('ingredientes', this.formulario.ingredientes);
+  }
+  if (this.formulario.vida_util) {
+    formData.append('vida_util', this.formulario.vida_util);
   }
    if (this.formulario.faq_quienes_toman) {
     formData.append('faq_quienes_toman', this.formulario.faq_quienes_toman);
@@ -533,8 +539,11 @@ private actualizarProductoExistente(): void {
   if (this.formulario.modo_uso) {
     datosBasicos.modo_uso = this.formulario.modo_uso;
   }
-  if (this.formulario.detalle) {
-    datosBasicos.detalle = this.formulario.detalle;
+  if (this.formulario.vida_util) {
+    datosBasicos.ingredientes = this.formulario.ingredientes;
+  }
+  if (this.formulario.vida_util) {
+    datosBasicos.vida_util = this.formulario.vida_util;
   }
     if (this.formulario.faq_quienes_toman) {
     datosBasicos.faq_quienes_toman = this.formulario.faq_quienes_toman;

@@ -29,8 +29,9 @@ export interface Producto {
   precio_despues?: number;
   descuento?: number;          
   beneficios?: string;        
-  modo_uso?: string;           
-  detalle?: string;   
+  modo_uso?: string;
+  ingredientes?: string;
+  vida_util?: string;              
   faq_quienes_toman?: string;
   faq_por_que_elegir?: string;
   faq_tiempo_uso?: string;

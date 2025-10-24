@@ -189,13 +189,25 @@
           
           <!-- Detalle -->
           <div class="mb-3">
-            <label class="form-label fw-semibold">Detalle adicional</label>
+            <label class="form-label fw-semibold">Ingredientes</label>
             <textarea class="form-control" rows="3"
-                      [(ngModel)]="formulario.detalle" name="detalle"
-                      [class.is-invalid]="errores.detalle"
-                      placeholder="Detalles adicionales del producto"></textarea>
-            <div *ngIf="errores.detalle" class="invalid-feedback">
-              {{ errores.detalle }}
+                      [(ngModel)]="formulario.ingredientes" name="ingredientes"
+                      [class.is-invalid]="errores.ingredientes"
+                      placeholder="Ingredientes del producto"></textarea>
+            <div *ngIf="errores.ingredientes" class="invalid-feedback">
+              {{ errores.ingredientes }}
+            </div>
+          </div>
+
+          <!-- Vida util -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Vida útil</label>
+            <textarea class="form-control" rows="3"
+                      [(ngModel)]="formulario.vida_util" name="vida_util"
+                      [class.is-invalid]="errores.vida_util"
+                      placeholder="Vida util del producto"></textarea>
+            <div *ngIf="errores.vida_util" class="invalid-feedback">
+              {{ errores.vida_util }}
             </div>
           </div>
           
