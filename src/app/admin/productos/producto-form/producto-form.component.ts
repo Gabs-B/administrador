@@ -539,7 +539,7 @@ private actualizarProductoExistente(): void {
   if (this.formulario.modo_uso) {
     datosBasicos.modo_uso = this.formulario.modo_uso;
   }
-  if (this.formulario.vida_util) {
+  if (this.formulario.ingredientes) {
     datosBasicos.ingredientes = this.formulario.ingredientes;
   }
   if (this.formulario.vida_util) {
