@@ -1,3 +1,3 @@
 export const envs = {
-    API_URL: 'https://peruviansecom.com/api/',
+    API_URL: 'http://localhost:8000/api',
 }
