@@ -1,0 +1,578 @@
+<div class="container-fluid py-4 blog-container">
+    <!-- Header con gradiente sutil -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom border-2 border-primary border-opacity-25">
+        <div>
+            <h1 class="h2 mb-1 text-dark fw-bold">
+                <i class="menu-icon fas fa-blog text-primary"></i>
+                Gestión de Blogs
+            </h1>
+        </div>
+        <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" (click)="mostrarFormularioCrear()">
+            <i class="fas fa-plus"></i>
+            Nuevo Blog
+        </button>
+    </div>
+
+    <!-- Filtros con mejor diseño -->
+    <div class="card mb-4 shadow-sm border-0 filtros-card">
+        <div class="card-body p-4">
+            <div class="row g-4 align-items-end">
+                
+                <!-- Búsqueda -->
+                <div class="col-lg-6 col-md-8">
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-search text-muted me-1"></i>
+                        Buscar blogs:
+                    </label>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control border-2"
+                            placeholder="Ingresa título o slug del blog..."
+                            [(ngModel)]="filtros.buscar"
+                            (keyup.enter)="aplicarFiltros()"
+                        />
+                        <button class="btn btn-outline-secondary" type="button" (click)="aplicarFiltros()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="col-lg-3 col-md-4">
+                    <label class="form-label small fw-semibold text-dark">
+                        <i class="fas fa-toggle-on text-muted me-1"></i>
+                        Estado:
+                    </label>
+                    <select class="form-select border-2" [(ngModel)]="filtros.estado">
+                        <option value="todos">Todos</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <!-- Botones de filtro -->
+                <div class="col-lg-3 col-md-12">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <button class="btn btn-primary flex-fill flex-md-grow-0" (click)="aplicarFiltros()">
+                            <i class="fas fa-filter me-1"></i>
+                            Buscar
+                        </button>
+                        <button class="btn btn-outline-secondary flex-fill flex-md-grow-0" (click)="limpiarFiltros()">
+                            <i class="fas fa-eraser me-1"></i>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading mejorado -->
+    <div *ngIf="cargando" class="card shadow-sm border-0">
+        <div class="card-body text-center py-5">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <h5 class="text-primary mb-2">Cargando blogs...</h5>
+            <p class="text-muted small mb-0">Esto puede tardar unos segundos</p>
+        </div>
+    </div>
+
+    <!-- Error mejorado -->
+    <div *ngIf="error && !cargando" class="card shadow-sm border-0 border-start border-danger border-4">
+        <div class="card-body text-center py-5">
+            <div class="text-danger mb-4">
+                <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block"></i>
+                <h5>Oops! Algo salió mal</h5>
+                <p class="mb-0">{{ error }}</p>
+            </div>
+            <button class="btn btn-primary" (click)="cargarBlogs()">
+                <i class="fas fa-refresh me-1"></i>
+                Reintentar
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de blogs mejorada -->
+    <div *ngIf="!cargando && !error" class="card shadow-sm border-0 tabla-blogs">
+        
+        <!-- Info de resultados mejorada -->
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-chart-bar"></i>
+                <span class="fw-medium">
+                    Mostrando {{ blogs.length }} blogs
+                </span>
+            </div>
+        </div>
+
+        <!-- Tabla responsive -->
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" style="width: 90px;" class="text-center">
+                            <i class="fas fa-image"></i>
+                        </th>
+                        <th scope="col" style="min-width: 200px;">
+                            <i class="fas fa-heading me-1"></i>
+                            Título
+                        </th>
+                        <th scope="col" style="min-width: 150px;">
+                            <i class="fas fa-link me-1"></i>
+                            Slug
+                        </th>
+                        <th scope="col" style="min-width: 150px;">
+                            <i class="fas fa-align-left me-1"></i>
+                            Resumen
+                        </th>
+                        <th scope="col" style="width: 80px;" class="text-center">
+                            <i class="fas fa-toggle-on me-1"></i>
+                            Estado
+                        </th>
+                        <th scope="col" style="width: 200px;" class="text-center">
+                            <i class="fas fa-calendar me-1"></i>
+                            Fecha de Creación
+                        </th>
+                        <th scope="col" style="width: 140px;" class="text-center">
+                            <i class="fas fa-cogs"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let blog of blogs" class="blog-row">
+                        
+                        <!-- Imagen mejorada -->
+                        <td class="text-center">
+                            <div class="position-relative d-inline-block">
+                                <div class="blog-imagen-container">
+                                    <img 
+                                        *ngIf="blog.portada_url"
+                                        [src]="blog.portada_url"
+                                        [alt]="blog.titulo"
+                                        class="blog-imagen rounded-3 shadow-sm"
+                                        onerror="this.style.display='none'"
+                                    />
+                                    <div *ngIf="!blog.portada_url" class="imagen-placeholder rounded-3 shadow-sm">
+                                        <i class="fas fa-file-alt fs-4 text-muted"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Título -->
+                        <td>
+                            <div>
+                                <div class="fw-bold text-dark mb-1">{{ blog.titulo }}</div>
+                                <small class="text-muted" *ngIf="blog.meta_title">
+                                    <i class="fas fa-tag me-1"></i>{{ truncarTexto(blog.meta_title, 30) }}
+                                </small>
+                            </div>
+                        </td>
+
+                        <!-- Slug -->
+                        <td>
+                            <code class="bg-light p-1 rounded small">{{ blog.blog_slug }}</code>
+                        </td>
+
+                        <!-- Resumen -->
+                        <td>
+                            <small class="text-muted">
+                                {{ truncarTexto(blog.resumen, 50) || 'Sin resumen' }}
+                            </small>
+                        </td>
+
+                        <!-- Estado mejorado -->
+                        <td class="text-center">
+                            <span class="badge fs-6 px-3 py-2"
+                                [class]="'badge-' + (blog.estado === 'activo' ? 'success' : 'danger')">
+                                <i [class]="blog.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="me-1"></i>
+                                {{ blog.estado }}
+                            </span>
+                        </td>
+
+                        <!-- Fecha de creación mejorada -->
+                        <td class="text-center">
+                            <div class="text-muted small font-monospace">
+                                <div>{{ blog.creado_en | date:'dd/MM/yyyy' }}</div>
+                                <div class="text-muted opacity-75">{{ blog.creado_en | date:'HH:mm' }}</div>
+                            </div>
+                        </td>
+
+                        <!-- Acciones mejoradas -->
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <!-- Editar -->
+                                <button 
+                                    class="btn btn-primary btn-sm" 
+                                    title="Editar blog" 
+                                    (click)="mostrarFormularioEditar(blog)"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <!-- Toggle Estado -->
+                                <button 
+                                    class="btn btn-sm"
+                                    [class.btn-warning]="blog.estado === 'activo'"
+                                    [class.btn-success]="blog.estado === 'inactivo'"
+                                    [title]="blog.estado === 'activo' ? 'Desactivar blog' : 'Activar blog'"
+                                    (click)="confirmarToggleEstado(blog)"
+                                >
+                                    <i [class]="blog.estado === 'activo' ? 'fas fa-ban' : 'fas fa-check'"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Mensaje cuando no hay blogs mejorado -->
+                    <tr *ngIf="blogs.length === 0">
+                        <td colspan="7" class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="fas fa-blog fs-1 text-muted mb-3 d-block"></i>
+                                <h4 class="text-muted mb-3">No hay blogs disponibles</h4>
+                                <p class="text-muted mb-4">
+                                    No se encontraron blogs que coincidan con los filtros aplicados.
+                                    <br>
+                                    <small>Intenta ajustar tus criterios de búsqueda o crear un nuevo blog.</small>
+                                </p>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Ver todos los blogs
+                                    </button>
+                                    <button class="btn btn-primary" (click)="mostrarFormularioCrear()">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Crear blog
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div *ngIf="mostrarConfirmacion" 
+    class="modal fade show d-block modal-overlay modal-overlay-confirmacion" 
+    style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
+    (click)="onModalConfirmacionBackdropClick($event)">
+    
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <!-- Header -->
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-question-circle text-warning me-2"></i>
+                    Confirmar acción
+                </h5>
+                <button type="button" 
+                        class="btn-close" 
+                        (click)="cerrarConfirmacion()"
+                        [disabled]="procesandoAccion">
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fas fa-exclamation-triangle fs-1 text-warning"></i>
+                    </div>
+                </div>
+                <h6 class="mb-3">{{ mensajeConfirmacion }}</h6>
+                <p class="text-muted small mb-0">Esta acción se puede revertir posteriormente</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" 
+                        class="btn btn-light flex-fill" 
+                        (click)="cerrarConfirmacion()"
+                        [disabled]="procesandoAccion">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <button type="button" 
+                        class="btn btn-warning flex-fill"
+                        (click)="ejecutarAccion()"
+                        [disabled]="procesandoAccion">
+                    
+                    <span *ngIf="procesandoAccion" class="d-flex align-items-center justify-content-center">
+                        <div class="loading-spinner-small me-2"></div>
+                        Procesando...
+                    </span>
+                    
+                    <span *ngIf="!procesandoAccion">
+                        <i class="fas fa-sync me-1"></i>
+                        Cambiar Estado
+                    </span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de formulario mejorado -->
+<div *ngIf="mostrarFormulario" 
+    class="modal fade show d-block modal-overlay modal-overlay-formulario" 
+    style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
+    (click)="onModalBackdropClick($event)">
+
+    <div class="modal-dialog modal-xl" (click)="$event.stopPropagation()">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <!-- Header -->
+            <div class="modal-header bg-gradient-primary text-white border-0">
+                <h1 class="modal-title fs-5 fw-bold">
+                    <i class="fas fa-blog me-2"></i>
+                    {{ getTitulo() }}
+                </h1>
+                <button type="button" 
+                        class="btn-close btn-close-white" 
+                        (click)="cerrarFormulario()"
+                        [disabled]="enviando">
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+                
+                <!-- Mensaje de respuesta -->
+                <div *ngIf="mensaje" 
+                    class="alert border-0 shadow-sm mb-4" 
+                    [class]="'alert-' + (tipoMensaje === 'success' ? 'success' : 'danger')" 
+                    role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fs-5 me-2" 
+                        [class]="tipoMensaje === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'">
+                        </i>
+                        {{ mensaje }}
+                    </div>
+                </div>
+
+                <form (ngSubmit)="guardar()" #blogForm="ngForm">
+                    
+                    <div class="row">
+                        <!-- Columna Izquierda -->
+                        <div class="col-md-6">
+                            
+                            <!-- Título -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" for="titulo">
+                                    <i class="fas fa-heading text-primary me-1"></i>
+                                    Título del blog 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="titulo"
+                                    class="form-control form-control-lg border-2"
+                                    [class.is-invalid]="errores.titulo"
+                                    [(ngModel)]="formulario.titulo"
+                                    name="titulo"
+                                    placeholder="Ingresa el título"
+                                    required
+                                    maxlength="150"
+                                    (blur)="generarSlug()"
+                                />
+                                <div *ngIf="errores.titulo" class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.titulo }}
+                                </div>
+                            </div>
+
+                            <!-- Slug -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" for="blog_slug">
+                                    <i class="fas fa-link text-primary me-1"></i>
+                                    Slug 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input
+                                        type="text"
+                                        id="blog_slug"
+                                        class="form-control border-2"
+                                        [class.is-invalid]="errores.blog_slug"
+                                        [(ngModel)]="formulario.blog_slug"
+                                        name="blog_slug"
+                                        placeholder="slug-del-blog"
+                                        required
+                                        maxlength="200"
+                                    />
+                                    <button class="btn btn-outline-secondary" type="button" (click)="generarSlug()">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                </div>
+                                <div *ngIf="errores.blog_slug" class="invalid-feedback d-block">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.blog_slug }}
+                                </div>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    URL amigable para el blog
+                                </small>
+                            </div>
+
+                            <!-- Meta Title -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" for="meta_title">
+                                    <i class="fas fa-tag text-primary me-1"></i>
+                                    Meta Title (SEO)
+                                </label>
+                                <input
+                                    type="text"
+                                    id="meta_title"
+                                    class="form-control border-2"
+                                    [(ngModel)]="formulario.meta_title"
+                                    name="meta_title"
+                                    placeholder="Título para SEO"
+                                    maxlength="150"
+                                />
+                                <small class="form-text text-muted">
+                                    {{ formulario.meta_title.length || 0 }}/150 caracteres
+                                </small>
+                            </div>
+
+                            <!-- Meta Description -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" for="meta_description">
+                                    <i class="fas fa-file-alt text-primary me-1"></i>
+                                    Meta Description (SEO)
+                                </label>
+                                <textarea
+                                    id="meta_description"
+                                    class="form-control border-2"
+                                    [(ngModel)]="formulario.meta_description"
+                                    name="meta_description"
+                                    rows="3"
+                                    placeholder="Descripción para motores de búsqueda"
+                                    maxlength="250"
+                                ></textarea>
+                                <small class="form-text text-muted">
+                                    {{ formulario.meta_description.length || 0 }}/250 caracteres
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <!-- Columna Derecha -->
+                        <div class="col-md-6">
+
+                            <!-- Imagen de Portada -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image text-primary me-1"></i>
+                                    Imagen de portada
+                                    <span *ngIf="!blogEditando" class="text-danger">*</span>
+                                </label>
+                                
+                                <!-- Preview -->
+                                <div *ngIf="tieneImagenParaMostrar()" class="position-relative d-inline-block mb-3 w-100">
+                                    <img 
+                                        [src]="previewImagen" 
+                                        alt="Preview"
+                                        class="preview-img-large border shadow-sm w-100"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
+                                        (click)="eliminarImagen()"
+                                        title="Eliminar imagen"
+                                    >
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Input de archivo -->
+                                <div class="mb-3">
+                                    <input
+                                        type="file"
+                                        id="portada"
+                                        class="file-input"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                        (change)="onImagenSeleccionada($event)"
+                                        #fileInput
+                                    />
+                                    <label for="portada" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm" 
+                                        style="width: fit-content;">
+                                        <i class="fas fa-upload"></i>
+                                        <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
+                                        <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
+                                    </label>
+                                </div>
+
+                                <div *ngIf="errores.portada" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.portada }}
+                                </div>
+                                
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    JPG, PNG, WebP. Max: 5MB
+                                </div>
+                            </div>
+
+                            <!-- Resumen -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" for="resumen">
+                                    <i class="fas fa-align-left text-primary me-1"></i>
+                                    Resumen
+                                </label>
+                                <textarea
+                                    id="resumen"
+                                    class="form-control border-2"
+                                    [(ngModel)]="formulario.resumen"
+                                    name="resumen"
+                                    rows="5"
+                                    placeholder="Escribe un breve resumen del blog..."
+                                ></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Contenido Flexible (placeholder) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-layer-group text-primary me-1"></i>
+                            Contenido flexible
+                        </label>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            El editor de contenido flexible se puede implementar aquí (builder de bloques)
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-light border-0">
+                <button 
+                    type="button" 
+                    class="btn btn-light" 
+                    (click)="cerrarFormulario()"
+                    [disabled]="enviando">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-primary d-flex align-items-center justify-content-center gap-2" 
+                    (click)="guardar()"
+                    [disabled]="enviando || !blogForm.valid">
+                    <div *ngIf="enviando" class="loading-spinner-small"></div>
+                    <i *ngIf="!enviando" class="fas fa-save"></i>
+                    {{ getTextoBotonGuardar() }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

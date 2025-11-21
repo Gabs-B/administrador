@@ -18,7 +18,7 @@ import { LiquidacionComponent } from './liquidacion/liquidacion.component';
 import { ReclamosComponent } from './reclamos/reclamos.component';
 import { PedidosComponent } from './pedidos/pedidos.component';
 import { EtiquetasComponent } from './etiquetas/etiquetas.component';
-
+import { BlogComponent } from './blog/blog.component';
 
 // Servicios
 import { DashboardService } from '../services/dashboard.service';
@@ -26,10 +26,11 @@ import { ProductosService } from '../services/productos.service';
 import { CategoriasService } from '../services/categorias.service';
 import { ClientesService } from '../services/clientes.service';
 import { CarruselService } from '../services/carrusel.service';
-import { LiquidacionService} from '../services/liquidacion.service';
+import { LiquidacionService } from '../services/liquidacion.service';
 import { ReclamosService } from '../services/reclamos.service';
 import { PedidosService } from '../services/pedidos.service';
 import { EtiquetaService } from '../services/etiqueta.service';
+import { BlogService } from '../services/blog.service';
 
 @NgModule({
   declarations: [
@@ -45,12 +46,13 @@ import { EtiquetaService } from '../services/etiqueta.service';
     ReclamosComponent,
     PedidosComponent,
     EtiquetasComponent,
+    BlogComponent
   ],
   imports: [
     CommonModule,
     HttpClientModule,
     RouterModule,
-    FormsModule, 
+    FormsModule,
     AdminRoutingModule
   ],
   providers: [
@@ -61,7 +63,9 @@ import { EtiquetaService } from '../services/etiqueta.service';
     CarruselService,
     LiquidacionService,
     ReclamosService,
-    PedidosService
+    PedidosService,
+    EtiquetaService,  
+    BlogService
   ]
 })
 export class AdminModule { }

@@ -11,6 +11,8 @@ import { LiquidacionComponent } from './liquidacion/liquidacion.component';
 import { ReclamosComponent } from './reclamos/reclamos.component'; 
 import { PedidosComponent } from './pedidos/pedidos.component';
 import { EtiquetasComponent } from './etiquetas/etiquetas.component';
+import { BlogComponent } from './blog/blog.component';
+
 
 const routes: Routes = [
   {
@@ -61,6 +63,10 @@ const routes: Routes = [
       {
         path: 'etiquetas',
         component: EtiquetasComponent
+      },
+      {
+        path: 'blogs',
+        component: BlogComponent
       }
     ]
   }
