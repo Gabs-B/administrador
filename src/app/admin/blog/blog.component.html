@@ -121,10 +121,6 @@
                             <i class="fas fa-link me-1"></i>
                             Slug
                         </th>
-                        <th scope="col" style="min-width: 150px;">
-                            <i class="fas fa-align-left me-1"></i>
-                            Resumen
-                        </th>
                         <th scope="col" style="width: 80px;" class="text-center">
                             <i class="fas fa-toggle-on me-1"></i>
                             Estado
@@ -174,12 +170,6 @@
                             <code class="bg-light p-1 rounded small">{{ blog.blog_slug }}</code>
                         </td>
 
-                        <!-- Resumen -->
-                        <td>
-                            <small class="text-muted">
-                                {{ truncarTexto(blog.resumen, 50) || 'Sin resumen' }}
-                            </small>
-                        </td>
 
                         <!-- Estado mejorado -->
                         <td class="text-center">
@@ -378,7 +368,6 @@
                                     placeholder="Ingresa el título"
                                     required
                                     maxlength="150"
-                                    (blur)="generarSlug()"
                                 />
                                 <div *ngIf="errores.titulo" class="invalid-feedback">
                                     <i class="fas fa-exclamation-circle me-1"></i>
@@ -517,38 +506,40 @@
                                     JPG, PNG, WebP. Max: 5MB
                                 </div>
                             </div>
-
-                            <!-- Resumen -->
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold" for="resumen">
-                                    <i class="fas fa-align-left text-primary me-1"></i>
-                                    Resumen
-                                </label>
-                                <textarea
-                                    id="resumen"
-                                    class="form-control border-2"
-                                    [(ngModel)]="formulario.resumen"
-                                    name="resumen"
-                                    rows="5"
-                                    placeholder="Escribe un breve resumen del blog..."
-                                ></textarea>
-                            </div>
-
                         </div>
                     </div>
 
-                    <!-- Contenido Flexible (placeholder) -->
+                    <!-- Contenido Flexible JSON -->
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">
-                            <i class="fas fa-layer-group text-primary me-1"></i>
-                            Contenido flexible
+                        <label class="form-label fw-semibold" for="contenido_flexible">
+                            <i class="fas fa-code text-primary me-1"></i>
+                            Contenido flexible (JSON)
                         </label>
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            El editor de contenido flexible se puede implementar aquí (builder de bloques)
+                        <textarea
+                            id="contenido_flexible"
+                            class="form-control border-2 font-monospace"
+                            [class.is-invalid]="errorJson"
+                            [(ngModel)]="formulario.contenido_flexible"
+                            name="contenido_flexible"
+                            rows="10"
+                            placeholder='Ejemplo:
+                            [
+                            {
+                                "tipo": "imagen",
+                                "src": "foto.png"
+                            }
+                            ]'
+                            (blur)="validarJson()"
+                        ></textarea>
+                        <div *ngIf="errorJson" class="invalid-feedback d-block">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            {{ errorJson }}
                         </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Ingresa el JSON directamente. Debe ser un JSON válido.
+                        </small>
                     </div>
-
                 </form>
             </div>
 

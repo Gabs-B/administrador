@@ -33,10 +33,10 @@ export class BlogComponent implements OnInit {
     blog_slug: '',
     meta_title: '',
     meta_description: '',
-    resumen: '',
-    contenido_flexible: null as any,
+    contenido_flexible: '',
     portada: null as File | null
   };
+  errorJson: string = '';
 
   // Modales
   mostrarFormulario: boolean = false;
@@ -124,8 +124,7 @@ export class BlogComponent implements OnInit {
       blog_slug: blog.blog_slug,
       meta_title: blog.meta_title || '',
       meta_description: blog.meta_description || '',
-      resumen: blog.resumen || '',
-      contenido_flexible: blog.contenido_flexible || null,
+      contenido_flexible: blog.contenido_flexible ? JSON.stringify(blog.contenido_flexible, null, 2) : '',
       portada: null
     };
     
@@ -133,6 +132,7 @@ export class BlogComponent implements OnInit {
       this.previewImagen = blog.portada_url;
     }
     
+    this.errorJson = '';
     this.mostrarFormulario = true;
   }
 
@@ -155,8 +155,7 @@ export class BlogComponent implements OnInit {
       blog_slug: '',
       meta_title: '',
       meta_description: '',
-      resumen: '',
-      contenido_flexible: null,
+      contenido_flexible: '',
       portada: null
     };
     this.blogEditando = null;
@@ -181,7 +180,21 @@ export class BlogComponent implements OnInit {
         .replace(/-+/g, '-');
     }
   }
-
+  validarJson(): boolean {
+    this.errorJson = '';
+    
+    if (!this.formulario.contenido_flexible || this.formulario.contenido_flexible.trim() === '') {
+      return true; // Es opcional, vacío es válido
+    }
+    
+    try {
+      JSON.parse(this.formulario.contenido_flexible);
+      return true;
+    } catch (e) {
+      this.errorJson = 'El JSON ingresado no es válido. Verifica la sintaxis.';
+      return false;
+    }
+  }
   /**
    * Manejar selección de imagen
    */
@@ -248,13 +261,18 @@ export class BlogComponent implements OnInit {
       return;
     }
 
+    // Validar JSON
+    if (!this.validarJson()) {
+      this.enviando = false;
+      return;
+    }
+
     if (this.blogEditando) {
       this.actualizarBlog();
     } else {
       this.crearBlog();
     }
   }
-
   /**
    * Crear nuevo blog
    */
@@ -265,13 +283,21 @@ export class BlogComponent implements OnInit {
       return;
     }
 
+    let contenidoFlexible = null;
+    if (this.formulario.contenido_flexible && this.formulario.contenido_flexible.trim() !== '') {
+      try {
+        contenidoFlexible = JSON.parse(this.formulario.contenido_flexible);
+      } catch (e) {
+        contenidoFlexible = null;
+      }
+    }
+
     const crearData: CrearBlogData = {
       titulo: this.formulario.titulo,
       blog_slug: this.formulario.blog_slug,
       meta_title: this.formulario.meta_title,
       meta_description: this.formulario.meta_description,
-      resumen: this.formulario.resumen,
-      contenido_flexible: this.formulario.contenido_flexible,
+      contenido_flexible: contenidoFlexible,
       portada: this.formulario.portada
     };
 
@@ -306,16 +332,24 @@ export class BlogComponent implements OnInit {
    * Actualizar blog existente
    */
   private actualizarBlog(): void {
-    if (!this.blogEditando) return;
+  if (!this.blogEditando) return;
 
-    const actualizarData: ActualizarBlogData = {
-      titulo: this.formulario.titulo,
-      blog_slug: this.formulario.blog_slug,
-      meta_title: this.formulario.meta_title,
-      meta_description: this.formulario.meta_description,
-      resumen: this.formulario.resumen,
-      contenido_flexible: this.formulario.contenido_flexible
-    };
+  let contenidoFlexible = null;
+  if (this.formulario.contenido_flexible && this.formulario.contenido_flexible.trim() !== '') {
+    try {
+      contenidoFlexible = JSON.parse(this.formulario.contenido_flexible);
+    } catch (e) {
+      contenidoFlexible = null;
+    }
+  }
+
+  const actualizarData: ActualizarBlogData = {
+    titulo: this.formulario.titulo,
+    blog_slug: this.formulario.blog_slug,
+    meta_title: this.formulario.meta_title,
+    meta_description: this.formulario.meta_description,
+    contenido_flexible: contenidoFlexible
+  };
 
     if (this.formulario.portada) {
       actualizarData.portada = this.formulario.portada;

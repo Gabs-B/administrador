@@ -12,7 +12,6 @@ export interface Blog {
   meta_description?: string;
   portada?: string;
   portada_url?: string;
-  resumen?: string;
   contenido_flexible?: any;
   estado: 'activo' | 'inactivo';
   creado_en?: string;
@@ -41,7 +40,6 @@ export interface CrearBlogData {
   blog_slug: string;
   meta_title?: string;
   meta_description?: string;
-  resumen?: string;
   contenido_flexible?: any;
   portada: File;
 }
@@ -51,7 +49,6 @@ export interface ActualizarBlogData {
   blog_slug?: string;
   meta_title?: string;
   meta_description?: string;
-  resumen?: string;
   contenido_flexible?: any;
   portada?: File;
   eliminar_portada?: boolean;
@@ -120,10 +117,6 @@ export class BlogService {
       formData.append('meta_description', blogData.meta_description);
     }
 
-    if (blogData.resumen) {
-      formData.append('resumen', blogData.resumen);
-    }
-
     if (blogData.contenido_flexible) {
       formData.append('contenido_flexible', JSON.stringify(blogData.contenido_flexible));
     }
@@ -179,9 +172,6 @@ export class BlogService {
       formData.append('meta_description', blogData.meta_description);
     }
 
-    if (blogData.resumen) {
-      formData.append('resumen', blogData.resumen);
-    }
 
     if (blogData.contenido_flexible) {
       formData.append('contenido_flexible', JSON.stringify(blogData.contenido_flexible));
