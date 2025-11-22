@@ -7,7 +7,10 @@ import { BlogService, Blog, CrearBlogData, ActualizarBlogData, BlogResponse } fr
   styleUrls: ['./blog.component.css']
 })
 export class BlogComponent implements OnInit {
-  @ViewChild('fileInput') fileInput!: ElementRef;
+  @ViewChild('fileInputPortada') fileInputPortada!: ElementRef;
+  @ViewChild('fileInputPortadaSec') fileInputPortadaSec!: ElementRef;
+  @ViewChild('fileInputPortadaTer') fileInputPortadaTer!: ElementRef;
+  @ViewChild('fileInputPortadaCuart') fileInputPortadaCuart!: ElementRef;
 
   // Estados
   cargando: boolean = false;
@@ -34,7 +37,10 @@ export class BlogComponent implements OnInit {
     meta_title: '',
     meta_description: '',
     contenido_flexible: '',
-    portada: null as File | null
+    portada: null as File | null,
+    portada_sec: null as File | null,
+    portada_ter: null as File | null,
+    portada_cuart: null as File | null
   };
   errorJson: string = '';
 
@@ -52,8 +58,11 @@ export class BlogComponent implements OnInit {
   tipoMensaje: 'success' | 'danger' = 'success';
   errores: any = {};
 
-  // Preview imagen
-  previewImagen: string | null = null;
+  // Preview imágenes
+  previewPortada: string | null = null;
+  previewPortadaSec: string | null = null;
+  previewPortadaTer: string | null = null;
+  previewPortadaCuart: string | null = null;
 
   constructor(private blogService: BlogService) {}
 
@@ -61,9 +70,6 @@ export class BlogComponent implements OnInit {
     this.cargarBlogs();
   }
 
-  /**
-   * Cargar lista de blogs
-   */
   cargarBlogs(): void {
     this.cargando = true;
     this.error = null;
@@ -85,17 +91,11 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  /**
-   * Aplicar filtros
-   */
   aplicarFiltros(): void {
     this.filtros.page = 1;
     this.cargarBlogs();
   }
 
-  /**
-   * Limpiar filtros
-   */
   limpiarFiltros(): void {
     this.filtros = {
       estado: 'todos',
@@ -106,17 +106,11 @@ export class BlogComponent implements OnInit {
     this.cargarBlogs();
   }
 
-  /**
-   * Mostrar formulario para crear blog
-   */
   mostrarFormularioCrear(): void {
     this.resetFormulario();
     this.mostrarFormulario = true;
   }
 
-  /**
-   * Mostrar formulario para editar blog
-   */
   mostrarFormularioEditar(blog: Blog): void {
     this.blogEditando = blog;
     this.formulario = {
@@ -125,20 +119,30 @@ export class BlogComponent implements OnInit {
       meta_title: blog.meta_title || '',
       meta_description: blog.meta_description || '',
       contenido_flexible: blog.contenido_flexible ? JSON.stringify(blog.contenido_flexible, null, 2) : '',
-      portada: null
+      portada: null,
+      portada_sec: null,
+      portada_ter: null,
+      portada_cuart: null
     };
     
+    // Cargar previews de imágenes existentes
     if (blog.portada_url) {
-      this.previewImagen = blog.portada_url;
+      this.previewPortada = blog.portada_url;
+    }
+    if (blog.portada_sec_url) {
+      this.previewPortadaSec = blog.portada_sec_url;
+    }
+    if (blog.portada_ter_url) {
+      this.previewPortadaTer = blog.portada_ter_url;
+    }
+    if (blog.portada_cuart_url) {
+      this.previewPortadaCuart = blog.portada_cuart_url;
     }
     
     this.errorJson = '';
     this.mostrarFormulario = true;
   }
 
-  /**
-   * Cerrar formulario
-   */
   cerrarFormulario(): void {
     if (!this.enviando) {
       this.mostrarFormulario = false;
@@ -146,9 +150,6 @@ export class BlogComponent implements OnInit {
     }
   }
 
-  /**
-   * Resetear formulario
-   */
   resetFormulario(): void {
     this.formulario = {
       titulo: '',
@@ -156,18 +157,21 @@ export class BlogComponent implements OnInit {
       meta_title: '',
       meta_description: '',
       contenido_flexible: '',
-      portada: null
+      portada: null,
+      portada_sec: null,
+      portada_ter: null,
+      portada_cuart: null
     };
     this.blogEditando = null;
-    this.previewImagen = null;
+    this.previewPortada = null;
+    this.previewPortadaSec = null;
+    this.previewPortadaTer = null;
+    this.previewPortadaCuart = null;
     this.errores = {};
     this.mensaje = '';
     this.tipoMensaje = 'success';
   }
 
-  /**
-   * Generar slug automáticamente
-   */
   generarSlug(): void {
     if (this.formulario.titulo) {
       this.formulario.blog_slug = this.formulario.titulo
@@ -180,11 +184,12 @@ export class BlogComponent implements OnInit {
         .replace(/-+/g, '-');
     }
   }
+
   validarJson(): boolean {
     this.errorJson = '';
     
     if (!this.formulario.contenido_flexible || this.formulario.contenido_flexible.trim() === '') {
-      return true; // Es opcional, vacío es válido
+      return true;
     }
     
     try {
@@ -195,55 +200,53 @@ export class BlogComponent implements OnInit {
       return false;
     }
   }
-  /**
-   * Manejar selección de imagen
-   */
-  onImagenSeleccionada(event: any): void {
+
+  onImagenSeleccionada(event: any, tipo: 'portada' | 'portada_sec' | 'portada_ter' | 'portada_cuart'): void {
     const file = event.target.files[0];
     if (file) {
       const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!tiposPermitidos.includes(file.type)) {
-        this.errores.portada = 'Formato de imagen no válido. Use JPG, PNG o WebP.';
+        this.errores[tipo] = 'Formato de imagen no válido. Use JPG, PNG o WebP.';
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        this.errores.portada = 'La imagen no debe superar los 5MB.';
+        this.errores[tipo] = 'La imagen no debe superar los 5MB.';
         return;
       }
 
-      this.formulario.portada = file;
-      this.errores.portada = '';
+      this.formulario[tipo] = file;
+      this.errores[tipo] = '';
 
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.previewImagen = e.target.result;
+        if (tipo === 'portada') this.previewPortada = e.target.result;
+        else if (tipo === 'portada_sec') this.previewPortadaSec = e.target.result;
+        else if (tipo === 'portada_ter') this.previewPortadaTer = e.target.result;
+        else if (tipo === 'portada_cuart') this.previewPortadaCuart = e.target.result;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  /**
-   * Verificar si hay imagen para mostrar
-   */
-  tieneImagenParaMostrar(): boolean {
-    return !!this.previewImagen;
-  }
-
-  /**
-   * Eliminar imagen seleccionada
-   */
-  eliminarImagen(): void {
-    this.formulario.portada = null;
-    this.previewImagen = null;
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
+  eliminarImagen(tipo: 'portada' | 'portada_sec' | 'portada_ter' | 'portada_cuart'): void {
+    this.formulario[tipo] = null;
+    
+    if (tipo === 'portada') {
+      this.previewPortada = null;
+      if (this.fileInputPortada) this.fileInputPortada.nativeElement.value = '';
+    } else if (tipo === 'portada_sec') {
+      this.previewPortadaSec = null;
+      if (this.fileInputPortadaSec) this.fileInputPortadaSec.nativeElement.value = '';
+    } else if (tipo === 'portada_ter') {
+      this.previewPortadaTer = null;
+      if (this.fileInputPortadaTer) this.fileInputPortadaTer.nativeElement.value = '';
+    } else if (tipo === 'portada_cuart') {
+      this.previewPortadaCuart = null;
+      if (this.fileInputPortadaCuart) this.fileInputPortadaCuart.nativeElement.value = '';
     }
   }
 
-  /**
-   * Guardar blog (crear o actualizar)
-   */
   guardar(): void {
     this.enviando = true;
     this.mensaje = '';
@@ -261,7 +264,6 @@ export class BlogComponent implements OnInit {
       return;
     }
 
-    // Validar JSON
     if (!this.validarJson()) {
       this.enviando = false;
       return;
@@ -273,12 +275,10 @@ export class BlogComponent implements OnInit {
       this.crearBlog();
     }
   }
-  /**
-   * Crear nuevo blog
-   */
+
   private crearBlog(): void {
     if (!this.formulario.portada) {
-      this.errores.portada = 'La imagen de portada es requerida';
+      this.errores.portada = 'La imagen de portada principal es requerida';
       this.enviando = false;
       return;
     }
@@ -300,6 +300,16 @@ export class BlogComponent implements OnInit {
       contenido_flexible: contenidoFlexible,
       portada: this.formulario.portada
     };
+
+    if (this.formulario.portada_sec) {
+      crearData.portada_sec = this.formulario.portada_sec;
+    }
+    if (this.formulario.portada_ter) {
+      crearData.portada_ter = this.formulario.portada_ter;
+    }
+    if (this.formulario.portada_cuart) {
+      crearData.portada_cuart = this.formulario.portada_cuart;
+    }
 
     this.blogService.crearBlog(crearData).subscribe({
       next: (response) => {
@@ -328,31 +338,37 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  /**
-   * Actualizar blog existente
-   */
   private actualizarBlog(): void {
-  if (!this.blogEditando) return;
+    if (!this.blogEditando) return;
 
-  let contenidoFlexible = null;
-  if (this.formulario.contenido_flexible && this.formulario.contenido_flexible.trim() !== '') {
-    try {
-      contenidoFlexible = JSON.parse(this.formulario.contenido_flexible);
-    } catch (e) {
-      contenidoFlexible = null;
+    let contenidoFlexible = null;
+    if (this.formulario.contenido_flexible && this.formulario.contenido_flexible.trim() !== '') {
+      try {
+        contenidoFlexible = JSON.parse(this.formulario.contenido_flexible);
+      } catch (e) {
+        contenidoFlexible = null;
+      }
     }
-  }
 
-  const actualizarData: ActualizarBlogData = {
-    titulo: this.formulario.titulo,
-    blog_slug: this.formulario.blog_slug,
-    meta_title: this.formulario.meta_title,
-    meta_description: this.formulario.meta_description,
-    contenido_flexible: contenidoFlexible
-  };
+    const actualizarData: ActualizarBlogData = {
+      titulo: this.formulario.titulo,
+      blog_slug: this.formulario.blog_slug,
+      meta_title: this.formulario.meta_title,
+      meta_description: this.formulario.meta_description,
+      contenido_flexible: contenidoFlexible
+    };
 
     if (this.formulario.portada) {
       actualizarData.portada = this.formulario.portada;
+    }
+    if (this.formulario.portada_sec) {
+      actualizarData.portada_sec = this.formulario.portada_sec;
+    }
+    if (this.formulario.portada_ter) {
+      actualizarData.portada_ter = this.formulario.portada_ter;
+    }
+    if (this.formulario.portada_cuart) {
+      actualizarData.portada_cuart = this.formulario.portada_cuart;
     }
 
     this.blogService.actualizarBlog(this.blogEditando.id, actualizarData).subscribe({
@@ -382,9 +398,6 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  /**
-   * Confirmar cambio de estado
-   */
   confirmarToggleEstado(blog: Blog): void {
     this.blogSeleccionado = blog;
     this.accionConfirmacion = 'toggle';
@@ -393,19 +406,12 @@ export class BlogComponent implements OnInit {
     this.mostrarConfirmacion = true;
   }
 
-  /**
-   * Ejecutar acción de confirmación
-   */
   ejecutarAccion(): void {
     if (!this.blogSeleccionado) return;
-
     this.procesandoAccion = true;
     this.toggleEstadoBlog();
   }
 
-  /**
-   * Toggle estado del blog
-   */
   private toggleEstadoBlog(): void {
     if (!this.blogSeleccionado) return;
 
@@ -429,9 +435,6 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  /**
-   * Cerrar modal de confirmación
-   */
   cerrarConfirmacion(): void {
     if (!this.procesandoAccion) {
       this.mostrarConfirmacion = false;
@@ -439,9 +442,6 @@ export class BlogComponent implements OnInit {
     }
   }
 
-  /**
-   * Manejar clic en backdrop del modal
-   */
   onModalBackdropClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target.classList.contains('modal-overlay')) {
@@ -449,9 +449,6 @@ export class BlogComponent implements OnInit {
     }
   }
 
-  /**
-   * Manejar clic en backdrop del modal de confirmación
-   */
   onModalConfirmacionBackdropClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target.classList.contains('modal-overlay-confirmacion')) {
@@ -459,16 +456,10 @@ export class BlogComponent implements OnInit {
     }
   }
 
-  /**
-   * Obtener título del formulario
-   */
   getTitulo(): string {
     return this.blogEditando ? 'Editar Blog' : 'Nuevo Blog';
   }
 
-  /**
-   * Obtener texto del botón guardar
-   */
   getTextoBotonGuardar(): string {
     if (this.enviando) {
       return this.blogEditando ? 'Actualizando...' : 'Creando...';
@@ -476,9 +467,6 @@ export class BlogComponent implements OnInit {
     return this.blogEditando ? 'Actualizar Blog' : 'Crear Blog';
   }
 
-  /**
-   * Truncar texto
-   */
   truncarTexto(texto: string | undefined, limite: number): string {
     if (!texto) return '';
     return texto.length > limite ? texto.substring(0, limite) + '...' : texto;

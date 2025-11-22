@@ -170,7 +170,6 @@
                             <code class="bg-light p-1 rounded small">{{ blog.blog_slug }}</code>
                         </td>
 
-
                         <!-- Estado mejorado -->
                         <td class="text-center">
                             <span class="badge fs-6 px-3 py-2"
@@ -216,7 +215,7 @@
 
                     <!-- Mensaje cuando no hay blogs mejorado -->
                     <tr *ngIf="blogs.length === 0">
-                        <td colspan="7" class="text-center py-5">
+                        <td colspan="6" class="text-center py-5">
                             <div class="empty-state">
                                 <i class="fas fa-blog fs-1 text-muted mb-3 d-block"></i>
                                 <h4 class="text-muted mb-3">No hay blogs disponibles</h4>
@@ -307,11 +306,10 @@
     </div>
 </div>
 
-<!-- Modal de formulario mejorado -->
+<!-- Modal de formulario mejorado con 4 imágenes -->
 <div *ngIf="mostrarFormulario" 
     class="modal fade show d-block modal-overlay modal-overlay-formulario" 
-    style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
-    (click)="onModalBackdropClick($event)">
+    style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);">
 
     <div class="modal-dialog modal-xl" (click)="$event.stopPropagation()">
         <div class="modal-content border-0 shadow-lg">
@@ -450,28 +448,28 @@
 
                         </div>
 
-                        <!-- Columna Derecha -->
+                        <!-- Columna Derecha - Imágenes -->
                         <div class="col-md-6">
 
-                            <!-- Imagen de Portada -->
+                            <!-- Imagen de Portada Principal -->
                             <div class="mb-4">
                                 <label class="form-label fw-semibold">
                                     <i class="fas fa-image text-primary me-1"></i>
-                                    Imagen de portada
+                                    Imagen de portada principal
                                     <span *ngIf="!blogEditando" class="text-danger">*</span>
                                 </label>
                                 
                                 <!-- Preview -->
-                                <div *ngIf="tieneImagenParaMostrar()" class="position-relative d-inline-block mb-3 w-100">
+                                <div *ngIf="previewPortada" class="position-relative d-inline-block mb-3 w-100">
                                     <img 
-                                        [src]="previewImagen" 
-                                        alt="Preview"
-                                        class="preview-img-large border shadow-sm w-100"
+                                        [src]="previewPortada" 
+                                        alt="Preview Portada"
+                                        class="border shadow-sm w-100" style="max-height:100px;object-fit:contain"
                                     />
                                     <button 
                                         type="button" 
                                         class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
-                                        (click)="eliminarImagen()"
+                                        (click)="eliminarImagen('portada')"
                                         title="Eliminar imagen"
                                     >
                                         <i class="fas fa-trash"></i>
@@ -485,26 +483,157 @@
                                         id="portada"
                                         class="file-input"
                                         accept="image/jpeg,image/jpg,image/png,image/webp"
-                                        (change)="onImagenSeleccionada($event)"
-                                        #fileInput
+                                        (change)="onImagenSeleccionada($event, 'portada')"
+                                        #fileInputPortada
                                     />
-                                    <label for="portada" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm" 
-                                        style="width: fit-content;">
+                                    <label for="portada" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm w-100 justify-content-center">
                                         <i class="fas fa-upload"></i>
-                                        <span *ngIf="!tieneImagenParaMostrar()">Seleccionar imagen</span>
-                                        <span *ngIf="tieneImagenParaMostrar()">Cambiar imagen</span>
+                                        <span *ngIf="!previewPortada">Seleccionar portada principal</span>
+                                        <span *ngIf="previewPortada">Cambiar portada principal</span>
                                     </label>
                                 </div>
 
-                                <div *ngIf="errores.portada" class="text-danger small">
+                                <div *ngIf="errores.portada" class="text-danger small mb-2">
                                     <i class="fas fa-exclamation-circle me-1"></i>
                                     {{ errores.portada }}
                                 </div>
+                            </div>
+
+                            <!-- Imagen Secundaria -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image text-info me-1"></i>
+                                    Imagen secundaria (opcional)
+                                </label>
                                 
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    JPG, PNG, WebP. Max: 5MB
+                                <div *ngIf="previewPortadaSec" class="position-relative d-inline-block mb-3 w-100">
+                                    <img 
+                                        [src]="previewPortadaSec" 
+                                        alt="Preview Portada Secundaria"
+                                        class="border shadow-sm w-100" style="max-height:100px;object-fit:contain"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
+                                        (click)="eliminarImagen('portada_sec')"
+                                        title="Eliminar imagen"
+                                    >
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
+
+                                <div class="mb-3">
+                                    <input
+                                        type="file"
+                                        id="portada_sec"
+                                        class="file-input"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                        (change)="onImagenSeleccionada($event, 'portada_sec')"
+                                        #fileInputPortadaSec
+                                    />
+                                    <label for="portada_sec" class="btn btn-outline-info btn-sm d-flex align-items-center gap-2 shadow-sm w-100 justify-content-center">
+                                        <i class="fas fa-upload"></i>
+                                        <span>{{ previewPortadaSec ? 'Cambiar' : 'Seleccionar' }} secundaria</span>
+                                    </label>
+                                </div>
+
+                                <div *ngIf="errores.portada_sec" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.portada_sec }}
+                                </div>
+                            </div>
+
+                            <!-- Imagen Terciaria -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image text-warning me-1"></i>
+                                    Imagen terciaria (opcional)
+                                </label>
+                                
+                                <div *ngIf="previewPortadaTer" class="position-relative d-inline-block mb-3 w-100">
+                                    <img 
+                                        [src]="previewPortadaTer" 
+                                        alt="Preview Portada Terciaria"
+                                        class="border shadow-sm w-100" style="max-height:100px;object-fit:contain"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
+                                        (click)="eliminarImagen('portada_ter')"
+                                        title="Eliminar imagen"
+                                    >
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input
+                                        type="file"
+                                        id="portada_ter"
+                                        class="file-input"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                        (change)="onImagenSeleccionada($event, 'portada_ter')"
+                                        #fileInputPortadaTer
+                                    />
+                                    <label for="portada_ter" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2 shadow-sm w-100 justify-content-center">
+                                        <i class="fas fa-upload"></i>
+                                        <span>{{ previewPortadaTer ? 'Cambiar' : 'Seleccionar' }} terciaria</span>
+                                    </label>
+                                </div>
+
+                                <div *ngIf="errores.portada_ter" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.portada_ter }}
+                                </div>
+                            </div>
+
+                            <!-- Imagen Cuarta -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image text-success me-1"></i>
+                                    Imagen cuarta (opcional)
+                                </label>
+                                
+                                <div *ngIf="previewPortadaCuart" class="position-relative d-inline-block mb-3 w-100">
+                                    <img 
+                                        [src]="previewPortadaCuart" 
+                                        alt="Preview Portada Cuarta"
+                                        class="border shadow-sm w-100" style="max-height:100px;object-fit:contain"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow" 
+                                        (click)="eliminarImagen('portada_cuart')"
+                                        title="Eliminar imagen"
+                                    >
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input
+                                        type="file"
+                                        id="portada_cuart"
+                                        class="file-input"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                        (change)="onImagenSeleccionada($event, 'portada_cuart')"
+                                        #fileInputPortadaCuart
+                                    />
+                                    <label for="portada_cuart" class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 shadow-sm w-100 justify-content-center">
+                                        <i class="fas fa-upload"></i>
+                                        <span>{{ previewPortadaCuart ? 'Cambiar' : 'Seleccionar' }} cuarta</span>
+                                    </label>
+                                </div>
+
+                                <div *ngIf="errores.portada_cuart" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.portada_cuart }}
+                                </div>
+                            </div>
+
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                JPG, PNG, WebP. Max: 5MB por imagen
                             </div>
                         </div>
                     </div>
@@ -523,12 +652,12 @@
                             name="contenido_flexible"
                             rows="10"
                             placeholder='Ejemplo:
-                            [
-                            {
-                                "tipo": "imagen",
-                                "src": "foto.png"
-                            }
-                            ]'
+[
+  {
+    "tipo": "imagen",
+    "src": "foto.png"
+  }
+]'
                             (blur)="validarJson()"
                         ></textarea>
                         <div *ngIf="errorJson" class="invalid-feedback d-block">

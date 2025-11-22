@@ -12,6 +12,12 @@ export interface Blog {
   meta_description?: string;
   portada?: string;
   portada_url?: string;
+  portada_sec?: string;
+  portada_sec_url?: string;
+  portada_ter?: string;
+  portada_ter_url?: string;
+  portada_cuart?: string;
+  portada_cuart_url?: string;
   contenido_flexible?: any;
   estado: 'activo' | 'inactivo';
   creado_en?: string;
@@ -42,6 +48,9 @@ export interface CrearBlogData {
   meta_description?: string;
   contenido_flexible?: any;
   portada: File;
+  portada_sec?: File;
+  portada_ter?: File;
+  portada_cuart?: File;
 }
 
 export interface ActualizarBlogData {
@@ -51,7 +60,13 @@ export interface ActualizarBlogData {
   meta_description?: string;
   contenido_flexible?: any;
   portada?: File;
+  portada_sec?: File;
+  portada_ter?: File;
+  portada_cuart?: File;
   eliminar_portada?: boolean;
+  eliminar_portada_sec?: boolean;
+  eliminar_portada_ter?: boolean;
+  eliminar_portada_cuart?: boolean;
 }
 
 @Injectable({
@@ -63,9 +78,6 @@ export class BlogService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Obtener lista de blogs
-   */
   listarBlogs(params: {
     estado?: string;
     buscar?: string;
@@ -101,9 +113,6 @@ export class BlogService {
     );
   }
 
-  /**
-   * Crear nuevo blog
-   */
   crearBlog(blogData: CrearBlogData): Observable<BlogResponse> {
     const formData = new FormData();
     formData.append('titulo', blogData.titulo);
@@ -122,6 +131,18 @@ export class BlogService {
     }
     
     formData.append('portada', blogData.portada);
+    
+    if (blogData.portada_sec) {
+      formData.append('portada_sec', blogData.portada_sec);
+    }
+    
+    if (blogData.portada_ter) {
+      formData.append('portada_ter', blogData.portada_ter);
+    }
+    
+    if (blogData.portada_cuart) {
+      formData.append('portada_cuart', blogData.portada_cuart);
+    }
 
     return this.http.post<BlogResponse>(this.apiUrl, formData).pipe(
       catchError(error => {
@@ -135,9 +156,6 @@ export class BlogService {
     );
   }
 
-  /**
-   * Obtener blog por ID
-   */
   obtenerBlog(id: number): Observable<BlogResponse> {
     return this.http.get<BlogResponse>(`${this.apiUrl}/${id}`).pipe(
       catchError(error => {
@@ -150,9 +168,6 @@ export class BlogService {
     );
   }
 
-  /**
-   * Actualizar blog existente
-   */
   actualizarBlog(id: number, blogData: ActualizarBlogData): Observable<BlogResponse> {
     const formData = new FormData();
     
@@ -172,7 +187,6 @@ export class BlogService {
       formData.append('meta_description', blogData.meta_description);
     }
 
-
     if (blogData.contenido_flexible) {
       formData.append('contenido_flexible', JSON.stringify(blogData.contenido_flexible));
     }
@@ -181,8 +195,32 @@ export class BlogService {
       formData.append('portada', blogData.portada, blogData.portada.name);
     }
     
+    if (blogData.portada_sec) {
+      formData.append('portada_sec', blogData.portada_sec, blogData.portada_sec.name);
+    }
+    
+    if (blogData.portada_ter) {
+      formData.append('portada_ter', blogData.portada_ter, blogData.portada_ter.name);
+    }
+    
+    if (blogData.portada_cuart) {
+      formData.append('portada_cuart', blogData.portada_cuart, blogData.portada_cuart.name);
+    }
+    
     if (blogData.eliminar_portada !== undefined) {
       formData.append('eliminar_portada', blogData.eliminar_portada.toString());
+    }
+    
+    if (blogData.eliminar_portada_sec !== undefined) {
+      formData.append('eliminar_portada_sec', blogData.eliminar_portada_sec.toString());
+    }
+    
+    if (blogData.eliminar_portada_ter !== undefined) {
+      formData.append('eliminar_portada_ter', blogData.eliminar_portada_ter.toString());
+    }
+    
+    if (blogData.eliminar_portada_cuart !== undefined) {
+      formData.append('eliminar_portada_cuart', blogData.eliminar_portada_cuart.toString());
     }
 
     formData.append('_method', 'PUT');
@@ -199,9 +237,6 @@ export class BlogService {
     );
   }
 
-  /**
-   * Toggle estado del blog (activo/inactivo)
-   */
   toggleEstado(id: number): Observable<BlogResponse> {
     return this.http.put<BlogResponse>(`${this.apiUrl}/${id}/toggle`, {}).pipe(
       catchError(error => {
@@ -214,9 +249,6 @@ export class BlogService {
     );
   }
 
-  /**
-   * Obtener blogs activos
-   */
   obtenerBlogsActivos(): Observable<BlogResponse> {
     return this.listarBlogs({ estado: 'activo', per_page: 100 });
   }

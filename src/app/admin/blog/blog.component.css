@@ -94,7 +94,7 @@
 .blog-imagen {
     width: 60px;
     height: 60px;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform 0.2s ease;
     border: 2px solid #e9ecef;
 }
