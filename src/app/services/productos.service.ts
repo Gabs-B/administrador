@@ -19,6 +19,7 @@ export interface ProductoImagen {
 
 export interface Producto {
   id: number;
+  producto_slug: string;
   nombre: string;
   sku?: string;
   descripcion: string;
@@ -54,6 +55,7 @@ export interface Producto {
     id: number;
     nombre: string;
     estado: string;
+    parent_id?: number;  // ⭐ AGREGAR ESTO
     imagen?: string;
     imagen_url?: string;
   };

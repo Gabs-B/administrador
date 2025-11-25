@@ -8,6 +8,7 @@ import { envs } from '../config/envs';
 export interface Categoria {
   id: number;
   nombre: string;
+  categoria_slug: string;
   parent_id?: number | null;
   estado: 'activo' | 'inactivo';
   imagen?: string;
@@ -134,9 +135,10 @@ export class CategoriasService {
   /**
    * Crear nueva categoría (con soporte para imagen y parent_id)
    */
-  crearCategoria(categoria: { nombre: string; estado?: string; parent_id?: number | null }, imagen?: File): Observable<{ success: boolean; data?: Categoria; message?: string; errors?: any; }> {
+  crearCategoria(categoria: { nombre: string; categoria_slug: string; estado?: string; parent_id?: number | null }, imagen?: File): Observable<{ success: boolean; data?: Categoria; message?: string; errors?: any; }> {
     const formData = new FormData();
     formData.append('nombre', categoria.nombre);
+    formData.append('categoria_slug', categoria.categoria_slug); 
     formData.append('estado', categoria.estado || 'activo');
     
     if (categoria.parent_id) {
@@ -164,7 +166,7 @@ export class CategoriasService {
    */
   actualizarCategoria(
     id: number, 
-    categoria: { nombre?: string; estado?: string; parent_id?: number | null }, 
+  categoria: { nombre?: string; categoria_slug?: string; estado?: string; parent_id?: number | null }, // ⭐ AGREGAR categoria_slug
     imagen?: File, 
     eliminarImagen: boolean = false
   ): Observable<{ success: boolean; data?: Categoria; message?: string; errors?: any; }> {
@@ -176,6 +178,9 @@ export class CategoriasService {
     if (categoria.estado !== undefined) {
       formData.append('estado', categoria.estado);
     }
+    if (categoria.categoria_slug !== undefined) { 
+    formData.append('categoria_slug', categoria.categoria_slug);
+   }
     if (categoria.parent_id !== undefined) {
       if (categoria.parent_id === null) {
         formData.append('parent_id', '');
@@ -253,4 +258,25 @@ export class CategoriasService {
       })
     );
   }
+
+  /**
+ * Obtener subcactegorías de una categoría padre específica
+ */
+getSubcategoriasPorPadre(parentId: number): Observable<CategoriasResponse> {
+  let params = new HttpParams();
+  params = params.set('estructura', 'plana');
+  params = params.set('tipo', 'hijos');
+  params = params.set('estado', 'activo');
+  params = params.set('parent_id', parentId.toString());
+
+  return this.http.get<CategoriasResponse>(`${envs.API_URL}/admin/categorias`, { params }).pipe(
+    catchError(error => {
+      console.error('Error al obtener subcategorías por padre:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Error de conexión'
+      } as CategoriasResponse);
+    })
+  );
+}
 }

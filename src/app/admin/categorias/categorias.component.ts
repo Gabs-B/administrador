@@ -21,6 +21,7 @@ preventCloseOnBackdrop = false;
   categoriaEditando: Categoria | null = null;
   formulario = {
     nombre: '',
+    categoria_slug: '',
     estado: 'activo',
     parent_id: null as number | null
   };
@@ -40,6 +41,7 @@ preventCloseOnBackdrop = false;
 
   subcategoriaFormulario = {
   nombre: '',
+  categoria_slug: '',
   estado: 'activo'
   };
   editandoSubcategoria: Categoria | null = null;
@@ -187,6 +189,7 @@ preventCloseOnBackdrop = false;
     this.setBodyScroll(true);
     this.categoriaEditando = null;
     this.formulario = {
+      categoria_slug: '', 
       nombre: '',
       estado: 'activo',
       parent_id: null
@@ -204,6 +207,7 @@ preventCloseOnBackdrop = false;
     this.categoriaEditando = categoria;
     this.formulario = {
       nombre: categoria.nombre,
+      categoria_slug: categoria.categoria_slug,
       estado: categoria.estado,
       parent_id: null // Siempre null porque solo editamos padres
     };
@@ -225,6 +229,7 @@ preventCloseOnBackdrop = false;
   this.editandoSubcategoria = null;
   this.subcategoriaFormulario = {
     nombre: '',
+    categoria_slug: '',
     estado: 'activo'
   };
   this.mostrarFormSubcategoria = true;
@@ -234,6 +239,7 @@ preventCloseOnBackdrop = false;
     this.editandoSubcategoria = subcategoria;
     this.subcategoriaFormulario = {
       nombre: subcategoria.nombre,
+      categoria_slug: subcategoria.categoria_slug,
       estado: subcategoria.estado
     };
     this.mostrarFormSubcategoria = true;
@@ -245,6 +251,12 @@ preventCloseOnBackdrop = false;
       return;
     }
 
+    // Validación del slug
+    if (!this.subcategoriaFormulario.categoria_slug.trim()) {
+      alert('El slug es requerido');
+      return;
+    }
+
     if (!this.categoriaEditando?.id) {
       alert('Error: No hay categoría padre seleccionada');
       return;
@@ -252,6 +264,7 @@ preventCloseOnBackdrop = false;
 
     const datos = {
       nombre: this.subcategoriaFormulario.nombre.trim(),
+      categoria_slug: this.subcategoriaFormulario.categoria_slug.trim(),
       estado: this.subcategoriaFormulario.estado,
       parent_id: this.categoriaEditando.id
     };
@@ -279,7 +292,13 @@ preventCloseOnBackdrop = false;
             this.mensaje = '';
           }, 3000);
         } else {
-          alert(response.message || 'Error al guardar');
+          // Mostrar errores de validación
+          if (response.errors) {
+            const errores = Object.values(response.errors).flat();
+            alert(errores.join('\n'));
+          } else {
+            alert(response.message || 'Error al guardar');
+          }
         }
       },
       error: (error) => {
@@ -294,6 +313,7 @@ preventCloseOnBackdrop = false;
     this.editandoSubcategoria = null;
     this.subcategoriaFormulario = {
       nombre: '',
+      categoria_slug: '',
       estado: 'activo'
     };
     this.preventCloseOnBackdrop = true; 
@@ -324,6 +344,7 @@ preventCloseOnBackdrop = false;
     this.categoriaEditando = null;
     this.formulario = {
       nombre: '',
+      categoria_slug: '',
       estado: 'activo',
       parent_id: null
     };
@@ -356,11 +377,15 @@ preventCloseOnBackdrop = false;
         this.errores.nombre = 'El nombre no puede exceder 150 caracteres';
         return;
       }
-
+      if (!this.formulario.categoria_slug.trim()) {
+        this.errores.nombre = 'El slug es requerido';
+        return;
+      }
       this.enviando = true;
 
       const datosCategoria = {
         nombre: this.formulario.nombre.trim(),
+        categoria_slug: this.formulario.categoria_slug,
         estado: this.formulario.estado,
         parent_id: this.formulario.parent_id
       };
@@ -426,7 +451,9 @@ preventCloseOnBackdrop = false;
     
     this.categoriasService.actualizarCategoria(
       subcategoria.id,
-      { estado: nuevoEstado }
+      { estado: nuevoEstado,  
+        categoria_slug: subcategoria.categoria_slug
+      }
     ).subscribe({
       next: (response) => {
         if (response.success) {
@@ -632,5 +659,30 @@ ejecutarAccion(): void {
     return padre ? padre.nombre : null;
   }
 
+  generarSlug(): void {
+    if (this.formulario.nombre) {
+      this.formulario.categoria_slug = this.formulario.nombre
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+    console.log(this.formulario.categoria_slug)
 
+  }
+  generarSlugSubcategoria(): void {
+  if (this.subcategoriaFormulario.nombre) {
+    this.subcategoriaFormulario.categoria_slug = this.subcategoriaFormulario.nombre
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  }
+}
 }

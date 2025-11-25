@@ -22,62 +22,139 @@
         <!-- Formulario -->
         <form (ngSubmit)="guardar()" #productoForm="ngForm">
           
-          <!-- Nombre y SKU -->
-          <div class="row g-3 mb-3">
-            <div class="col-md-8">
-              <label class="form-label fw-semibold">Nombre del producto *</label>
-              <input type="text" class="form-control" 
-                     [(ngModel)]="formulario.nombre" name="nombre"
-                     [class.is-invalid]="errores.nombre"
-                     placeholder="Ingresa el nombre del producto" 
-                     maxlength="150" required>
-              <div *ngIf="errores.nombre" class="invalid-feedback">
-                {{ errores.nombre }}
-              </div>
+          <!-- Nombre del producto -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="fas fa-box text-primary me-1"></i>
+              Nombre del producto 
+              <span class="text-danger">*</span>
+            </label>
+            <input type="text" class="form-control form-control-lg border-2" 
+                  [(ngModel)]="formulario.nombre" name="nombre"
+                  [class.is-invalid]="errores.nombre"
+                  placeholder="Ingresa el nombre del producto" 
+                  maxlength="150" required>
+            <div *ngIf="errores.nombre" class="invalid-feedback">
+              <i class="fas fa-exclamation-circle me-1"></i>
+              {{ errores.nombre }}
             </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">SKU (Código)</label>
-              <input type="text" class="form-control"
-                     [(ngModel)]="formulario.sku" name="sku"
-                     [class.is-invalid]="errores.sku"
-                     placeholder="Código único" maxlength="50">
-              <div *ngIf="errores.sku" class="invalid-feedback">
-                {{ errores.sku }}
-              </div>
+          </div>
+
+          <!-- Slug del producto -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="fas fa-link text-primary me-1"></i>
+              Slug del producto 
+              <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <input type="text" class="form-control border-2"
+                    [(ngModel)]="formulario.producto_slug" name="producto_slug"
+                    [class.is-invalid]="errores.producto_slug"
+                    placeholder="slug-del-producto"
+                    maxlength="200" required>
+              <button class="btn btn-outline-secondary" type="button" 
+                      (click)="generarSlug()"
+                      title="Generar slug automático desde el nombre">
+                <i class="fas fa-sync"></i>
+              </button>
             </div>
+            <div *ngIf="errores.producto_slug" class="invalid-feedback d-block">
+              <i class="fas fa-exclamation-circle me-1"></i>
+              {{ errores.producto_slug }}
+            </div>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle me-1"></i>
+              URL amigable para el producto. Se genera automáticamente desde el nombre.
+            </small>
+          </div>
+
+          <!-- SKU -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="fas fa-barcode text-primary me-1"></i>
+              SKU (Código)
+            </label>
+            <input type="text" class="form-control"
+                  [(ngModel)]="formulario.sku" name="sku"
+                  [class.is-invalid]="errores.sku"
+                  placeholder="Código único del producto" 
+                  maxlength="50">
+            <div *ngIf="errores.sku" class="invalid-feedback">
+              {{ errores.sku }}
+            </div>
+            <small class="form-text text-muted">
+              Código único de identificación del producto (opcional)
+            </small>
           </div>
           
           <!-- Categoría y Tienda -->
           <div class="row g-3 mb-3">
+            <!-- Categoría Padre -->
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Categoría</label>
-              <select class="form-select" [(ngModel)]="formulario.categoria_id" name="categoria_id"
-                      [class.is-invalid]="errores.categoria_id">
-                <option value="" disabled selected>-- Selecciona una categoría --</option>
-                <option *ngFor="let categoria of categorias" [value]="categoria.id">
+              <label class="form-label fw-semibold">Categoría Principal</label>
+              <select class="form-select" 
+                      [(ngModel)]="categoriaPadreSeleccionada" 
+                      name="categoria_padre"
+                      (ngModelChange)="onCategoriaPadreChange($event)"
+                      [class.is-invalid]="errores.categoria_padre_id">
+                <option [ngValue]="null" disabled selected>-- Selecciona una categoría --</option>
+                <option *ngFor="let categoria of categoriasPadre" [ngValue]="categoria.id">
                   {{ categoria.nombre }}
                 </option>
               </select>
-              <div *ngIf="cargandoCategorias" class="form-text">Cargando categorías...</div>
+              <div *ngIf="cargandoCategoriasPadre" class="form-text">Cargando categorías...</div>
+              <div *ngIf="errores.categoria_padre_id" class="invalid-feedback">
+                {{ errores.categoria_padre_id }}
+              </div>
+            </div>
+
+            <!-- Subcategoría (aparece cuando se selecciona una categoría padre) -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Subcategoría</label>
+              <select class="form-select" 
+                      [(ngModel)]="formulario.categoria_id" 
+                      name="categoria_id"
+                      [class.is-invalid]="errores.categoria_id"
+                      [disabled]="!categoriaPadreSeleccionada || cargandoSubcategorias">
+                <option [ngValue]="null" disabled selected>
+                  {{ !categoriaPadreSeleccionada 
+                    ? '-- Primero selecciona una categoría --' 
+                    : (subcategorias.length === 0 
+                        ? '-- No hay subcategorías --' 
+                        : '-- Selecciona una subcategoría --') }}
+                </option>
+                <option *ngFor="let sub of subcategorias" [ngValue]="sub.id">
+                  {{ sub.nombre }}
+                </option>
+              </select>
+              <div *ngIf="cargandoSubcategorias" class="form-text">
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                Cargando subcategorías...
+              </div>
               <div *ngIf="errores.categoria_id" class="invalid-feedback">
                 {{ errores.categoria_id }}
               </div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Tienda</label>
-              <select class="form-select" [(ngModel)]="formulario.tienda_id" name="tienda_id"
-                      [class.is-invalid]="errores.tienda_id">
-                <option value="" disabled selected>-- Selecciona una tienda --</option>
-                <option *ngFor="let tienda of tiendas" [value]="tienda.id">
-                  {{ tienda.nombre }}
-                </option>
-              </select>
-              <div *ngIf="cargandoTiendas" class="form-text">Cargando tiendas...</div>
-              <div *ngIf="errores.tienda_id" class="invalid-feedback">
-                {{ errores.tienda_id }}
+          </div>
+
+            <!-- Tienda (mantener en fila separada o ajustar según prefieras) -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Tienda</label>
+                <select class="form-select" [(ngModel)]="formulario.tienda_id" name="tienda_id"
+                        [class.is-invalid]="errores.tienda_id">
+                  <option value="" disabled selected>-- Selecciona una tienda --</option>
+                  <option *ngFor="let tienda of tiendas" [value]="tienda.id">
+                    {{ tienda.nombre }}
+                  </option>
+                </select>
+                <div *ngIf="cargandoTiendas" class="form-text">Cargando tiendas...</div>
+                <div *ngIf="errores.tienda_id" class="invalid-feedback">
+                  {{ errores.tienda_id }}
+                </div>
               </div>
             </div>
-          </div>
           
           <!-- Precio, Descuento y Stock -->
           <div class="row g-3 mb-3">

@@ -17,9 +17,11 @@ export class ProductoFormComponent implements OnInit {
   // Datos del formulario
   formulario = {
     nombre: '',
+    producto_slug: '',
     sku: '',
     descripcion: '',
-    categoria_id: null as number | null,
+    categoria_padre_id: null as number | null,  // ⭐ AGREGAR
+    categoria_id: null as number | null,    
     tienda_id: null as number | null,
     precio: 0,
     descuento: 0,
@@ -45,9 +47,13 @@ export class ProductoFormComponent implements OnInit {
   tipoMensaje: 'success' | 'error' = 'success';
 
   // Datos auxiliares
-  categorias: Categoria[] = [];
+  categoriasPadre: Categoria[] = [];
+  subcategorias: Categoria[] = [];
+  categoriaPadreSeleccionada: number | null = null;
+  cargandoCategoriasPadre = false;
+  cargandoSubcategorias = false;
+
   tiendas: Tienda[] = [];
-  cargandoCategorias = false;
   cargandoTiendas = false;
   etiquetasActivas: Etiqueta[] = [];
   cargandoEtiquetas = false;
@@ -68,7 +74,7 @@ export class ProductoFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cargarCategorias();
+    this.cargarCategoriasPadre();
     this.cargarTiendas();
     this.cargarEtiquetasActivas(); 
   }
@@ -132,33 +138,53 @@ cargarEtiquetasActivas(): void {
  * Cargar solo subcategorías disponibles para productos
  */
 
-  cargarCategorias(): void {
-    this.cargandoCategorias = true;
+  cargarCategoriasPadre(): void {
+    this.cargandoCategoriasPadre = true;
     
-    this.categoriasService.getSubcategoriasProducto().subscribe({
+    this.categoriasService.getCategoriasPadre().subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          // Usar directamente el nombre de la subcategoría sin formato especial
-          this.categorias = response.data;
-          
-/*           console.log('Subcategorías cargadas:', this.categorias);
- */        } else {
-          console.error('Error al cargar subcategorías:', response.message);
-          this.mostrarMensaje(
-            response.message || 'Error al cargar subcategorías disponibles', 
-            'error'
-          );
+          this.categoriasPadre = response.data;
+        } else {
+          console.error('Error al cargar categorías padre:', response.message);
+          this.mostrarMensaje(response.message || 'Error al cargar categorías', 'error');
         }
       },
       error: (error) => {
-        console.error('Error al cargar subcategorías:', error);
-        this.mostrarMensaje('Error de conexión al cargar subcategorías', 'error');
+        console.error('Error al cargar categorías padre:', error);
+        this.mostrarMensaje('Error de conexión al cargar categorías', 'error');
       },
       complete: () => {
-        this.cargandoCategorias = false;
+        this.cargandoCategoriasPadre = false;
       }
     });
   }
+  onCategoriaPadreChange(parentId: number): void {
+  this.categoriaPadreSeleccionada = parentId;
+  this.formulario.categoria_id = null; // Reset subcategoría
+  this.subcategorias = [];
+  
+  if (!parentId) return;
+  
+  this.cargandoSubcategorias = true;
+  
+  this.categoriasService.getSubcategoriasPorPadre(parentId).subscribe({
+    next: (response) => {
+      if (response.success && response.data) {
+        this.subcategorias = response.data;
+      } else {
+        this.mostrarMensaje('No hay subcategorías disponibles', 'error');
+      }
+    },
+    error: (error) => {
+      console.error('Error al cargar subcategorías:', error);
+      this.mostrarMensaje('Error al cargar subcategorías', 'error');
+    },
+    complete: () => {
+      this.cargandoSubcategorias = false;
+    }
+  });
+}
 
   /**
    * Cargar tiendas disponibles
@@ -187,12 +213,17 @@ cargarEtiquetasActivas(): void {
    */
   cargarDatosProducto(): void {
     if (this.producto) {
+          if (this.producto.categoria_id && this.producto.categoria?.parent_id) {
+            this.categoriaPadreSeleccionada = this.producto.categoria.parent_id;
+            this.onCategoriaPadreChange(this.producto.categoria.parent_id);
+          }
       this.formulario = {
         nombre: this.producto.nombre || '',
+        producto_slug: this.producto.producto_slug || '',
         sku: this.producto.sku || '',
         descripcion: this.producto.descripcion || '',
-        categoria_id: this.producto.categoria_id || null,
-        tienda_id: this.producto.tienda_id || null,
+        categoria_padre_id: this.producto.categoria?.parent_id || null,
+        categoria_id: this.producto.categoria_id || null,        tienda_id: this.producto.tienda_id || null,
         precio: this.producto.precio || 0,
         descuento: this.producto.descuento || 0,
         beneficios: this.producto.beneficios || '',
@@ -209,7 +240,6 @@ cargarEtiquetasActivas(): void {
         es_pack: this.producto.es_pack || false, 
         etiqueta_id: this.producto.etiqueta_id || null         
       };
-    console.log('📦 Datos del producto cargados:', this.formulario); // DEBUG
 
       // Cargar imágenes existentes
     this.imagenesExistentes = this.producto.imagenes ? [...this.producto.imagenes] : [];
@@ -228,6 +258,7 @@ cargarEtiquetasActivas(): void {
   resetFormulario(): void {
     this.formulario = {
       nombre: '',
+      producto_slug: '',
       sku: '',
       descripcion: '',
       ingredientes: '',
@@ -239,6 +270,7 @@ cargarEtiquetasActivas(): void {
       faq_tiempo_uso: '',
       faq_efectos_secundarios: '',
       faq_consumo_alcohol: '',
+      categoria_padre_id: null,
       categoria_id: null,
       tienda_id: null,
       precio: 0,
@@ -382,6 +414,10 @@ cargarEtiquetasActivas(): void {
     if (!this.formulario.nombre.trim()) {
       this.errores.nombre = 'El nombre es requerido';
     }
+    
+    if (!this.formulario.producto_slug.trim()) {
+      this.errores.producto_slug = 'El slug es requerido';
+    }
 
     if (!this.formulario.descripcion.trim()) {
       this.errores.descripcion = 'La descripción es requerida';
@@ -427,6 +463,7 @@ private crearProductoNuevo(): void {
   
   // Datos básicos del producto
   formData.append('nombre', this.formulario.nombre);
+  formData.append('producto_slug', this.formulario.producto_slug);
   formData.append('descripcion', this.formulario.descripcion);
   formData.append('precio', this.formulario.precio.toString());
   formData.append('descuento', this.formulario.descuento.toString());
@@ -510,6 +547,7 @@ private actualizarProductoExistente(): void {
   // Preparar datos básicos sin imágenes
   const datosBasicos: any = {
     nombre: this.formulario.nombre,
+    producto_slug: this.formulario.producto_slug,
     descripcion: this.formulario.descripcion,
     precio: this.formulario.precio,
     descuento: this.formulario.descuento,
@@ -827,5 +865,18 @@ tieneImagenPrincipalExistente(): boolean {
     return this.imagenesExistentes.some(img => 
       img.es_principal && !this.imagenesAEliminar.includes(img.id)
     );
+  }
+
+  generarSlug(): void {
+    if (this.formulario.nombre) {
+      this.formulario.producto_slug = this.formulario.nombre
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
   }
 }

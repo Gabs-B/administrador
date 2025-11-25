@@ -315,7 +315,7 @@
     <div *ngIf="mostrarFormulario" 
         class="modal fade show d-block modal-overlay modal-overlay-formulario" 
         style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);"
-        (click)="onModalBackdropClick($event)">
+        >
     
         <div class="modal-dialog modal-xl" (click)="$event.stopPropagation()">
             <div class="modal-content border-0 shadow-lg">
@@ -382,6 +382,39 @@
                                         {{ errores.nombre }}
                                     </div>
                                 </div>
+                                <!-- Slug de la categoría -->
+                                <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-link text-primary me-1"></i>
+                                    Slug de la categoría 
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <div class="input-group">
+                                    <input type="text" class="form-control border-2"
+                                        [(ngModel)]="formulario.categoria_slug" name="categoria_slug"
+                                        [class.is-invalid]="errores.categoria_slug"
+                                        placeholder="slug-de-la-categoria"
+                                        maxlength="200" required>
+
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            (click)="generarSlug()"
+                                            title="Generar slug automático desde el nombre">
+                                    <i class="fas fa-sync"></i>
+                                    </button>
+                                </div>
+
+                                <div *ngIf="errores.categoria_slug" class="invalid-feedback d-block">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {{ errores.categoria_slug }}
+                                </div>
+
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    URL amigable para la categoría. Se genera automáticamente desde el nombre.
+                                </small>
+                                </div>
+
 
                                 <!-- Estado -->
                                 <div class="mb-4">
@@ -455,22 +488,6 @@
 
                             </form>
                         </div>
-
-                        <!-- Columna derecha: Subcategorías -->
-                        <div class="col-lg-6" *ngIf="categoriaEditando">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="fw-bold mb-0">
-                                    <i class="fas fa-sitemap text-primary me-2"></i>
-                                    Subcategorías
-                                </h5>
-                                <button 
-                                    type="button" 
-                                    class="btn btn-sm btn-success"
-                                    (click)="agregarSubcategoria()">
-                                    <i class="fas fa-plus me-1"></i>
-                                    Agregar
-                                </button>
-                            </div>
 
                             <!-- Lista de subcategorías -->
                         <div class="col-lg-6">
@@ -581,50 +598,94 @@
     </div>
 
     <!-- Modal para agregar/editar subcategoría -->
-    <div *ngIf="mostrarFormSubcategoria" 
-        class="modal fade show d-block modal-overlay modal-overlay-subcategoria" 
-        style="background-color: rgba(0,0,0,0.5);"
-        (click)="cerrarFormSubcategoria()">
-        <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-tag me-2"></i>
-                        {{ editandoSubcategoria ? 'Editar' : 'Nueva' }} Subcategoría
-                    </h5>
-                    <button type="button" class="btn-close" (click)="cerrarFormSubcategoria()"></button>
+<!-- Modal para agregar/editar subcategoría -->
+<div *ngIf="mostrarFormSubcategoria" 
+    class="modal fade show d-block modal-overlay modal-overlay-subcategoria" 
+    style="background-color: rgba(0,0,0,0.5);"
+    (click)="cerrarFormSubcategoria()">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-tag me-2"></i>
+                    {{ editandoSubcategoria ? 'Editar' : 'Nueva' }} Subcategoría
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarFormSubcategoria()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Nombre -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="fas fa-tag text-primary me-1"></i>
+                        Nombre <span class="text-danger">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-control"
+                        [(ngModel)]="subcategoriaFormulario.nombre"
+                        placeholder="Nombre de la subcategoría"
+                        maxlength="150">
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">
-                            Nombre <span class="text-danger">*</span>
-                        </label>
+
+                <!-- Slug de la subcategoría -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="fas fa-link text-primary me-1"></i>
+                        Slug de la subcategoría 
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="input-group">
                         <input 
                             type="text" 
                             class="form-control"
-                            [(ngModel)]="subcategoriaFormulario.nombre"
-                            placeholder="Nombre de la subcategoría"
-                            maxlength="150">
+                            [(ngModel)]="subcategoriaFormulario.categoria_slug"
+                            placeholder="slug-de-la-subcategoria"
+                            maxlength="100">
+
+                        <button 
+                            class="btn btn-outline-secondary" 
+                            type="button"
+                            (click)="generarSlugSubcategoria()"
+                            title="Generar slug automático desde el nombre">
+                            <i class="fas fa-sync"></i>
+                        </button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Estado</label>
-                        <select class="form-select" [(ngModel)]="subcategoriaFormulario.estado">
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
-                        </select>
-                    </div>
+
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        URL amigable para la subcategoría. Se genera automáticamente desde el nombre.
+                    </small>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="cerrarFormSubcategoria()">
-                        Cancelar
-                    </button>
-                    <button type="button" class="btn btn-primary" (click)="guardarSubcategoria()">
-                        <i class="fas fa-save me-1"></i>
-                        Guardar
-                    </button>
+
+                <!-- Estado -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="fas fa-toggle-on text-primary me-1"></i>
+                        Estado
+                    </label>
+                    <select class="form-select" [(ngModel)]="subcategoriaFormulario.estado">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarFormSubcategoria()">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-primary" 
+                    (click)="guardarSubcategoria()"
+                    [disabled]="!subcategoriaFormulario.nombre.trim() || !subcategoriaFormulario.categoria_slug.trim()">
+                    <i class="fas fa-save me-1"></i>
+                    Guardar
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal de Confirmación -->

@@ -186,15 +186,6 @@
     backdrop-filter: blur(3px);
 }
 
-.modal.show {
-    display: block !important;
-    background-color: rgba(0,0,0,0.5);
-}
-
-body.modal-open {
-    overflow: hidden;
-    padding-right: 0px !important;
-}
 
 /* ==========================
    Modal XL para formulario
@@ -234,30 +225,16 @@ body.modal-open {
     color: white !important;
 }
 
-.badge-warning {
-    background-color: #ffc107 !important;
-    color: #000 !important;
-}
 
 .badge-danger {
     background-color: #dc3545 !important;
     color: white !important;
 }
 
-.badge-secondary {
-    background-color: #6c757d !important;
-    color: white !important;
-}
 
 /* ==========================
    Formularios
 ========================== */
-.preview-img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-}
 
 .preview-img-large {
     max-height: 300px;
