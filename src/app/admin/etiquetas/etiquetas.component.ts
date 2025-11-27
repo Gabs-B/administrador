@@ -30,6 +30,7 @@ export class EtiquetasComponent implements OnInit {
   // Formularios
   formulario = {
     nombre: '',
+    etiqueta_slug: '',
     estado: 'activo' as 'activo' | 'inactivo',
     imagen: null as File | null
   };
@@ -119,6 +120,7 @@ export class EtiquetasComponent implements OnInit {
     this.etiquetaEditando = etiqueta;
     this.formulario = {
       nombre: etiqueta.nombre,
+      etiqueta_slug: etiqueta.etiqueta_slug,
       estado: etiqueta.estado,
       imagen: null
     };
@@ -146,6 +148,7 @@ export class EtiquetasComponent implements OnInit {
   resetFormulario(): void {
     this.formulario = {
       nombre: '',
+      etiqueta_slug: '',
       estado: 'activo',
       imagen: null
     };
@@ -238,6 +241,7 @@ export class EtiquetasComponent implements OnInit {
 
     const crearData: CrearEtiquetaData = {
       nombre: this.formulario.nombre,
+      etiqueta_slug: this.formulario.etiqueta_slug,
       estado: this.formulario.estado,
       imagen: this.formulario.imagen
     };
@@ -274,6 +278,7 @@ export class EtiquetasComponent implements OnInit {
 
     const actualizarData: ActualizarEtiquetaData = {
       nombre: this.formulario.nombre,
+      etiqueta_slug: this.formulario.etiqueta_slug,
       estado: this.formulario.estado
     };
 
@@ -437,5 +442,18 @@ export class EtiquetasComponent implements OnInit {
       return this.etiquetaEditando ? 'Actualizando...' : 'Creando...';
     }
     return this.etiquetaEditando ? 'Actualizar Etiqueta' : 'Crear Etiqueta';
+  }
+
+    generarSlug(): void {
+    if (this.formulario.nombre) {
+      this.formulario.etiqueta_slug = this.formulario.nombre
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
   }
 }

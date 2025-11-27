@@ -670,8 +670,6 @@ ejecutarAccion(): void {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
     }
-    console.log(this.formulario.categoria_slug)
-
   }
   generarSlugSubcategoria(): void {
   if (this.subcategoriaFormulario.nombre) {

@@ -378,7 +378,37 @@
                             {{ errores.nombre }}
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-link text-primary me-1"></i>
+                            Slug de la Etiqueta 
+                            <span class="text-danger">*</span>
+                        </label>
 
+                        <div class="input-group">
+                            <input type="text" class="form-control border-2"
+                                [(ngModel)]="formulario.etiqueta_slug" name="etiqueta_slug"
+                                [class.is-invalid]="errores.etiqueta_slug"
+                                placeholder="slug-de-la-etiqueta"
+                                maxlength="200" required>
+
+                            <button class="btn btn-outline-secondary" type="button"
+                                    (click)="generarSlug()"
+                                    title="Generar slug automático desde el nombre">
+                            <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+
+                        <div *ngIf="errores.etiqueta_slug" class="invalid-feedback d-block">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            {{ errores.etiqueta_slug }}
+                        </div>
+
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            URL amigable para la categoría. Se genera automáticamente desde el nombre.
+                        </small>
+                    </div>
                     <!-- Estado -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold" for="estado">

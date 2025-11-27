@@ -7,6 +7,7 @@ import { envs } from '../config/envs';
 export interface Etiqueta {
   id: number;
   nombre: string;
+  etiqueta_slug: string;
   estado: 'activo' | 'inactivo';
   imagen?: string;
   imagen_url?: string;
@@ -34,12 +35,14 @@ export interface EtiquetaResponse {
 
 export interface CrearEtiquetaData {
   nombre: string;
+  etiqueta_slug: string;
   estado?: 'activo' | 'inactivo';
   imagen: File;
 }
 
 export interface ActualizarEtiquetaData {
   nombre?: string;
+  etiqueta_slug?: string;
   estado?: 'activo' | 'inactivo';
   imagen?: File;
   eliminar_imagen?: boolean;
@@ -98,7 +101,8 @@ export class EtiquetaService {
   crearEtiqueta(etiquetaData: CrearEtiquetaData): Observable<EtiquetaResponse> {
     const formData = new FormData();
     formData.append('nombre', etiquetaData.nombre);
-       
+    formData.append('etiqueta_slug', etiquetaData.etiqueta_slug);
+
     if (etiquetaData.estado) {
       formData.append('estado', etiquetaData.estado);
     }
@@ -141,8 +145,9 @@ export class EtiquetaService {
     if (etiquetaData.nombre) {
       formData.append('nombre', etiquetaData.nombre);
     }
-    
-    
+    if (etiquetaData.etiqueta_slug) {
+      formData.append('etiqueta_slug', etiquetaData.etiqueta_slug);
+    }
     if (etiquetaData.estado) {
       formData.append('estado', etiquetaData.estado);
     }
