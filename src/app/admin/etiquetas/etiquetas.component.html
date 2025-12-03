@@ -190,24 +190,14 @@
                                     <i class="fas fa-edit"></i>
                                 </button>
 
-                                <!-- Desactivar -->
                                 <button 
-                                    *ngIf="etiqueta.estado === 'activo'"
-                                    class="btn btn-warning btn-sm" 
-                                    title="Desactivar etiqueta"
-                                    (click)="confirmarEliminar(etiqueta)"
+                                    class="btn btn-sm"
+                                    [class.btn-warning]="etiqueta.estado === 'activo'"
+                                    [class.btn-success]="etiqueta.estado === 'inactivo'"
+                                    [title]="etiqueta.estado === 'activo' ? 'Desactivar etiqueta' : 'Activar etiqueta'"
+                                    (click)="confirmarToggleEstado(etiqueta)"
                                 >
-                                    <i class="fas fa-ban"></i>
-                                </button>
-
-                                <!-- Activar -->
-                                <button 
-                                    *ngIf="etiqueta.estado === 'inactivo'"
-                                    class="btn btn-success btn-sm" 
-                                    title="Activar etiqueta"
-                                    (click)="confirmarActivar(etiqueta)"
-                                >
-                                    <i class="fas fa-check"></i>
+                                    <i [class]="etiqueta.estado === 'activo' ? 'fas fa-ban' : 'fas fa-check'"></i>
                                 </button>
                             </div>
                         </td>
@@ -267,13 +257,8 @@
             <!-- Body -->
             <div class="modal-body text-center py-4">
                 <div class="mb-4">
-                    <div *ngIf="accionConfirmacion === 'eliminar'" 
-                        class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
                         <i class="fas fa-exclamation-triangle fs-1 text-warning"></i>
-                    </div>
-                    <div *ngIf="accionConfirmacion === 'activar'" 
-                        class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
-                        <i class="fas fa-question-circle fs-1 text-success"></i>
                     </div>
                 </div>
                 <h6 class="mb-3">{{ mensajeConfirmacion }}</h6>
@@ -290,23 +275,18 @@
                     Cancelar
                 </button>
                 <button type="button" 
-                        class="btn flex-fill"
-                        [class.btn-warning]="accionConfirmacion === 'eliminar'"
-                        [class.btn-success]="accionConfirmacion === 'activar'"
+                        class="btn btn-warning flex-fill"
                         (click)="ejecutarAccion()"
                         [disabled]="procesandoAccion">
                     
                     <span *ngIf="procesandoAccion" class="d-flex align-items-center justify-content-center">
                         <div class="loading-spinner-small me-2"></div>
-                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivando...</span>
-                        <span *ngIf="accionConfirmacion === 'activar'">Activando...</span>
+                        Procesando...
                     </span>
                     
                     <span *ngIf="!procesandoAccion">
-                        <i *ngIf="accionConfirmacion === 'eliminar'" class="fas fa-ban me-1"></i>
-                        <i *ngIf="accionConfirmacion === 'activar'" class="fas fa-check me-1"></i>
-                        <span *ngIf="accionConfirmacion === 'eliminar'">Desactivar</span>
-                        <span *ngIf="accionConfirmacion === 'activar'">Activar</span>
+                        <i class="fas fa-sync me-1"></i>
+                        Cambiar Estado
                     </span>
                 </button>
             </div>

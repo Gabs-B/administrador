@@ -161,9 +161,6 @@
                 <img [src]="banner.imagen_url" [alt]="banner.titulo" class="banner-imagen">
                 <div class="banner-overlay">
                   <span class="orden-badge">{{ banner.orden }}</span>
-                  <span class="badge" [class]="getEstadoClase(banner.estado)">
-                    {{ banner.estado }}
-                  </span>
                 </div>
               </div>
 
@@ -181,11 +178,9 @@
                   <small class="fw-medium">{{ banner.orden }}</small>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <small class="text-muted fw-medium">Estado:</small>
-                  <span class="badge" [class]="getEstadoClase(banner.estado)">
-                    {{ banner.estado }}
-                  </span>
+                  <small class="fw-medium">{{ banner.estado }}</small>
                 </div>
 
                 <!-- Información específica por tipo -->

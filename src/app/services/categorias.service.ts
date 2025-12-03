@@ -210,35 +210,6 @@ export class CategoriasService {
   }
 
   /**
-   * Desactivar categoría
-   */
-  eliminarCategoria(id: number): Observable<{ success: boolean; data?: Categoria; message?: string; }> {
-    return this.http.delete<{ success: boolean; data?: Categoria; message?: string; }>(`${envs.API_URL}/admin/categorias/${id}`).pipe(
-      catchError(error => {
-        console.error('Error al eliminar categoría:', error);
-        return of({
-          success: false,
-          message: error.error?.message || 'Error de conexión'
-        });
-      })
-    );
-  }
-
-  /**
-   * Activar categoría
-   */
-  activarCategoria(id: number): Observable<{ success: boolean; data?: Categoria; message?: string; }> {
-    return this.http.put<{ success: boolean; data?: Categoria; message?: string; }>(`${envs.API_URL}/admin/categorias/${id}/activar`, {}).pipe(
-      catchError(error => {
-        console.error('Error al activar categoría:', error);
-        return of({
-          success: false,
-          message: error.error?.message || 'Error de conexión'
-        });
-      })
-    );
-  }
-  /**
  * Obtener solo subcategorías para productos
  */
   getSubcategoriasProducto(filtros: { buscar?: string } = {}): Observable<CategoriasResponse> {
@@ -276,6 +247,20 @@ getSubcategoriasPorPadre(parentId: number): Observable<CategoriasResponse> {
         success: false,
         message: error.error?.message || 'Error de conexión'
       } as CategoriasResponse);
+    })
+  );
+}
+toggleEstado(id: number): Observable<{ success: boolean; data?: Categoria; message?: string; nuevo_estado?: string; }> {
+  return this.http.put<{ success: boolean; data?: Categoria; message?: string; nuevo_estado?: string; }>(
+    `${envs.API_URL}/admin/categorias/${id}/toggle`, 
+    {}
+  ).pipe(
+    catchError(error => {
+      console.error('Error al cambiar estado de categoría:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Error de conexión'
+      });
     })
   );
 }

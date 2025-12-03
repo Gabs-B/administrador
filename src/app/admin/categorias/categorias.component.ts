@@ -446,50 +446,52 @@ preventCloseOnBackdrop = false;
 
   // =================== MÉTODOS DE SUBCATEGORÍAS ===================
 
-  cambiarEstadoSubcategoria(subcategoria: Categoria, nuevoEstado: 'activo' | 'inactivo'): void {
-    this.subcategoriaModificada[subcategoria.id] = true;
-    
-    this.categoriasService.actualizarCategoria(
-      subcategoria.id,
-      { estado: nuevoEstado,  
-        categoria_slug: subcategoria.categoria_slug
-      }
-    ).subscribe({
-      next: (response) => {
-        if (response.success) {
-          // Actualizar en el array local
-          const index = this.subcategoriasEditables.findIndex(s => s.id === subcategoria.id);
-          if (index !== -1) {
-            this.subcategoriasEditables[index].estado = nuevoEstado;
-          }
-          
-          // Mostrar mensaje temporal
-          const mensajeAnterior = this.mensaje;
-          const tipoAnterior = this.tipoMensaje;
-          
-          this.mensaje = `Subcategoría "${subcategoria.nombre}" ${nuevoEstado === 'activo' ? 'activada' : 'desactivada'} exitosamente`;
-          this.tipoMensaje = 'success';
-          
-          setTimeout(() => {
-            this.mensaje = mensajeAnterior;
-            this.tipoMensaje = tipoAnterior;
-            this.subcategoriaModificada[subcategoria.id] = false;
-          }, 2000);
-          
-          // Recargar la lista principal
-          this.cargarCategorias();
-        } else {
-          alert(response.message || 'Error al cambiar estado');
-          this.subcategoriaModificada[subcategoria.id] = false;
+cambiarEstadoSubcategoria(subcategoria: Categoria, nuevoEstado: 'activo' | 'inactivo'): void {
+  this.subcategoriaModificada[subcategoria.id] = true;
+  
+  // También podemos usar toggleEstado para subcategorías
+  this.categoriasService.toggleEstado(subcategoria.id).subscribe({
+    next: (response) => {
+      if (response.success) {
+        // Actualizar en el array local
+        const index = this.subcategoriasEditables.findIndex(s => s.id === subcategoria.id);
+        if (index !== -1) {
+          // Validar y asignar el nuevo estado
+          const estadoFinal = (response.nuevo_estado === 'activo' || response.nuevo_estado === 'inactivo') 
+            ? response.nuevo_estado 
+            : nuevoEstado;
+          this.subcategoriasEditables[index].estado = estadoFinal;
         }
-      },
-      error: (error) => {
-        console.error('Error al cambiar estado:', error);
-        alert('Error de conexión');
+        
+        // Mostrar mensaje temporal
+        const mensajeAnterior = this.mensaje;
+        const tipoAnterior = this.tipoMensaje;
+        
+        this.mensaje = `Subcategoría "${subcategoria.nombre}" ${response.nuevo_estado === 'activo' ? 'activada' : 'desactivada'} exitosamente`;
+        this.tipoMensaje = 'success';
+        
+        setTimeout(() => {
+          this.mensaje = mensajeAnterior;
+          this.tipoMensaje = tipoAnterior;
+          this.subcategoriaModificada[subcategoria.id] = false;
+        }, 2000);
+        
+        // Recargar la lista principal
+        this.cargarCategorias();
+      } else {
+        alert(response.message || 'Error al cambiar estado');
         this.subcategoriaModificada[subcategoria.id] = false;
       }
-    });
-  }
+    },
+    error: (error) => {
+      console.error('Error al cambiar estado:', error);
+      alert('Error de conexión');
+      this.subcategoriaModificada[subcategoria.id] = false;
+    }
+  });
+}
+
+
   cerrarTodosLosModales(): void {
   if (this.mostrarFormulario) {
     this.cerrarFormulario();
@@ -575,26 +577,23 @@ cerrarConfirmacion(): void {
 ejecutarAccion(): void {
   if (!this.categoriaAccion || this.procesandoAccion) return;
 
-  console.log('Ejecutando acción:', this.accionConfirmacion, 'para categoría:', this.categoriaAccion.nombre);
+  console.log('Ejecutando toggle para categoría:', this.categoriaAccion.nombre);
   this.procesandoAccion = true;
 
-  const operacion = this.accionConfirmacion === 'eliminar'
-    ? this.categoriasService.eliminarCategoria(this.categoriaAccion.id)
-    : this.categoriasService.activarCategoria(this.categoriaAccion.id);
-
-  operacion.subscribe({
+  // Usar el método unificado toggleEstado
+  this.categoriasService.toggleEstado(this.categoriaAccion.id).subscribe({
     next: (response) => {
       console.log('Respuesta recibida:', response);
       
       if (response.success) {
-        const accion = this.accionConfirmacion === 'eliminar' ? 'desactivada' : 'activada';
+        const accion = response.nuevo_estado === 'activo' ? 'activada' : 'desactivada';
         console.log(`✅ Categoría ${accion} exitosamente`);
         
         // Recargar datos
         this.cargarCategorias();
         this.cargarCategoriasPadre();
         
-        // Cerrar modal después de un pequeño delay para que el usuario vea el feedback
+        // Cerrar modal después de un pequeño delay
         setTimeout(() => {
           this.cerrarConfirmacion();
         }, 500);
@@ -602,13 +601,13 @@ ejecutarAccion(): void {
       } else {
         console.error('❌ Error en respuesta:', response.message);
         alert(response.message || 'Error al procesar la acción');
-        this.procesandoAccion = false; // IMPORTANTE: Resetear el estado
+        this.procesandoAccion = false;
       }
     },
     error: (error) => {
       console.error('❌ Error al ejecutar acción:', error);
       alert('Error de conexión al procesar la acción');
-      this.procesandoAccion = false; // IMPORTANTE: Resetear el estado
+      this.procesandoAccion = false;
     }
   });
 }
@@ -682,5 +681,30 @@ ejecutarAccion(): void {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
   }
+}
+confirmarToggleEstado(categoria: Categoria): void {
+  console.log('Abriendo modal de toggle para:', categoria.nombre);
+  
+  // Cerrar inmediatamente otros modales
+  this.cerrarTodosLosModales();
+  
+  // Pequeño delay para asegurar el cierre de otros modales
+  setTimeout(() => {
+    this.categoriaAccion = categoria;
+    
+    // Determinar la acción basándose en el estado actual
+    if (categoria.estado === 'activo') {
+      this.accionConfirmacion = 'eliminar'; // Desactivar
+      this.mensajeConfirmacion = `¿Estás seguro de que deseas desactivar la categoría "${categoria.nombre}"?`;
+    } else {
+      this.accionConfirmacion = 'activar';
+      this.mensajeConfirmacion = `¿Deseas activar la categoría "${categoria.nombre}"?`;
+    }
+    
+    this.mostrarConfirmacion = true;
+    this.setBodyScroll(true);
+    
+    console.log('Modal de confirmación abierto:', this.mostrarConfirmacion);
+  }, 100);
 }
 }

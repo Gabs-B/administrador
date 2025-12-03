@@ -376,9 +376,6 @@ export class CyberwowComponent implements OnInit {
     return 'General';
   }
 
-  getEstadoClase(estado: string): string {
-    return `estado-${estado}`;
-  }
 
   formatearPrecio(precio: number): string {
     return this.cyberwowService.formatearPrecio(precio);

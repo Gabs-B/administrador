@@ -47,7 +47,7 @@ export class TiendasService {
         return of({
           success: false,
           message: error.error?.message || 'Error de conexión'
-        });
+        }); 
       })
     );
   }

@@ -31,6 +31,7 @@ export interface EtiquetaResponse {
   data?: Etiqueta | EtiquetasPaginadas;
   message?: string;
   error?: string;
+  errors?: { [key: string]: string[] }; 
 }
 
 export interface CrearEtiquetaData {
@@ -57,9 +58,6 @@ export class EtiquetaService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Obtener lista paginada de etiquetas
-   */
   listarEtiquetas(params: {
     estado?: string;
     buscar?: string;
@@ -89,15 +87,13 @@ export class EtiquetaService {
         console.error('Error al obtener etiquetas:', error);
         return of({
           success: false,
-          message: error.error?.message || 'Error de conexión'
+          message: error.error?.message || 'Error de conexión',
+          errors: error.error?.errors
         } as EtiquetaResponse);
       })
     );
   }
 
-  /**
-   * Crear nueva etiqueta
-   */
   crearEtiqueta(etiquetaData: CrearEtiquetaData): Observable<EtiquetaResponse> {
     const formData = new FormData();
     formData.append('nombre', etiquetaData.nombre);
@@ -114,30 +110,25 @@ export class EtiquetaService {
         console.error('Error al crear etiqueta:', error);
         return of({
           success: false,
-          message: error.error?.message || 'Error de conexión'
+          message: error.error?.message || 'Error de conexión',
+          errors: error.error?.errors 
         } as EtiquetaResponse);
       })
     );
   }
 
-  /**
-   * Obtener etiqueta por ID
-   */
   obtenerEtiqueta(id: number): Observable<EtiquetaResponse> {
     return this.http.get<EtiquetaResponse>(`${this.apiUrl}/${id}`).pipe(
       catchError(error => {
         console.error('Error al obtener etiqueta:', error);
         return of({
           success: false,
-          message: error.error?.message || 'Error de conexión'
+          message: error.error?.message || 'Error de conexión',
+          errors: error.error?.errors
         } as EtiquetaResponse);
       })
     );
   }
-
-  /**
-   * Actualizar etiqueta existente
-   */
 
   actualizarEtiqueta(id: number, etiquetaData: ActualizarEtiquetaData): Observable<EtiquetaResponse> {
     const formData = new FormData();
@@ -152,7 +143,6 @@ export class EtiquetaService {
       formData.append('estado', etiquetaData.estado);
     }
     
-    // Asegúrate de que la imagen se está agregando correctamente
     if (etiquetaData.imagen) {
       formData.append('imagen', etiquetaData.imagen, etiquetaData.imagen.name);
     }
@@ -161,7 +151,6 @@ export class EtiquetaService {
       formData.append('eliminar_imagen', etiquetaData.eliminar_imagen.toString());
     }
 
-    // Agregar _method para PUT si es necesario (dependiendo de tu configuración)
     formData.append('_method', 'PUT');
 
     return this.http.post<EtiquetaResponse>(`${this.apiUrl}/${id}`, formData).pipe(
@@ -169,19 +158,17 @@ export class EtiquetaService {
         console.error('Error al actualizar etiqueta:', error);
         return of({
           success: false,
-          message: error.error?.message || 'Error de conexión'
+          message: error.error?.message || 'Error de conexión',
+          errors: error.error?.errors 
         } as EtiquetaResponse);
       })
     );
   }
 
-  /**
-   * Eliminar/Desactivar etiqueta
-   */
-  eliminarEtiqueta(id: number): Observable<EtiquetaResponse> {
-    return this.http.delete<EtiquetaResponse>(`${this.apiUrl}/${id}`).pipe(
+  toggleEstado(id: number): Observable<EtiquetaResponse> {
+    return this.http.put<EtiquetaResponse>(`${this.apiUrl}/${id}/toggle`, {}).pipe(
       catchError(error => {
-        console.error('Error al eliminar etiqueta:', error);
+        console.error('Error al cambiar estado del blog:', error);
         return of({
           success: false,
           message: error.error?.message || 'Error de conexión'
@@ -190,25 +177,7 @@ export class EtiquetaService {
     );
   }
 
-  /**
-   * Activar etiqueta
-   */
-  activarEtiqueta(id: number): Observable<EtiquetaResponse> {
-    return this.http.put<EtiquetaResponse>(`${this.apiUrl}/${id}/activar`, {}).pipe(
-      catchError(error => {
-        console.error('Error al activar etiqueta:', error);
-        return of({
-          success: false,
-          message: error.error?.message || 'Error de conexión'
-        } as EtiquetaResponse);
-      })
-    );
-  }
-
-  /**
-   * Obtener etiquetas activas para selects o listas desplegables
-   */
   obtenerEtiquetasActivas(): Observable<EtiquetaResponse> {
     return this.listarEtiquetas({ estado: 'activo', per_page: 100 });
   }
-} 
+}
