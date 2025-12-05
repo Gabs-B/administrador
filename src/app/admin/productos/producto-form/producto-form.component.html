@@ -321,7 +321,7 @@
                       [(ngModel)]="formulario.meta_description" name="meta_description"
                       [class.is-invalid]="errores.meta_description"
                       placeholder="Descripción breve para motores de búsqueda (150-160 caracteres)"
-                      maxlength="160"></textarea>
+                      maxlength="250"></textarea>
             <div *ngIf="errores.meta_description" class="invalid-feedback">
               {{ errores.meta_description }}
             </div>
