@@ -312,6 +312,25 @@
             </div>
           </div>
 
+           <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="fas fa-search text-primary me-1"></i>
+              Meta Description (SEO)
+            </label>
+            <textarea class="form-control" rows="2"
+                      [(ngModel)]="formulario.meta_description" name="meta_description"
+                      [class.is-invalid]="errores.meta_description"
+                      placeholder="Descripción breve para motores de búsqueda (150-160 caracteres)"
+                      maxlength="160"></textarea>
+            <div *ngIf="errores.meta_description" class="invalid-feedback">
+              {{ errores.meta_description }}
+            </div>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle me-1"></i>
+              Descripción optimizada para SEO que aparecerá en resultados de búsqueda de Google
+            </small>
+          </div>
+
           <div class="card border-primary mb-4">
           <div class="card-header bg-primary text-white">
             <h6 class="mb-0">Preguntas Frecuentes (FAQ)</h6>

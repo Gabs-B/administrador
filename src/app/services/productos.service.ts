@@ -37,7 +37,8 @@ export interface Producto {
   faq_por_que_elegir?: string;
   faq_tiempo_uso?: string;
   faq_efectos_secundarios?: string;
-  faq_consumo_alcohol?: string;         
+  faq_consumo_alcohol?: string;
+  meta_description?: string;         
   stock: number;
   es_pack: boolean;
   etiqueta_id?: number;   

@@ -34,6 +34,7 @@ export class ProductoFormComponent implements OnInit {
     faq_tiempo_uso: '',
     faq_efectos_secundarios: '',
     faq_consumo_alcohol: '',
+    meta_description: '',
     stock: 0,
     estado: 'activo' as 'activo' | 'inactivo',
       es_pack: false, 
@@ -235,6 +236,7 @@ cargarEtiquetasActivas(): void {
         faq_tiempo_uso: this.producto.faq_tiempo_uso || '',
         faq_efectos_secundarios: this.producto.faq_efectos_secundarios || '',
         faq_consumo_alcohol: this.producto.faq_consumo_alcohol || '',
+        meta_description: this.producto.meta_description || '',
         stock: this.producto.stock || 0,
         estado: this.producto.estado || 'activo',
         es_pack: this.producto.es_pack || false, 
@@ -270,6 +272,7 @@ cargarEtiquetasActivas(): void {
       faq_tiempo_uso: '',
       faq_efectos_secundarios: '',
       faq_consumo_alcohol: '',
+      meta_description: '',
       categoria_padre_id: null,
       categoria_id: null,
       tienda_id: null,
@@ -512,6 +515,9 @@ private crearProductoNuevo(): void {
   if (this.formulario.faq_consumo_alcohol) {
     formData.append('faq_consumo_alcohol', this.formulario.faq_consumo_alcohol);
   }
+  if (this.formulario.meta_description) {
+    formData.append('meta_description', this.formulario.meta_description);
+  }
 
   // Agregar imágenes nuevas
   this.imagenesSeleccionadas.forEach((archivo, index) => {
@@ -597,6 +603,9 @@ private actualizarProductoExistente(): void {
   }
   if (this.formulario.faq_consumo_alcohol) {
     datosBasicos.faq_consumo_alcohol = this.formulario.faq_consumo_alcohol;
+  }
+  if (this.formulario.meta_description) {
+    datosBasicos.meta_description = this.formulario.meta_description;
   }
 
   // DEBUG: Verificar datos antes de enviar
