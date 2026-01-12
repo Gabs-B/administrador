@@ -466,6 +466,7 @@
 </div>
 
 <!-- Modal de confirmación -->
+<div *ngIf="mostrarConfirmacion" class="modal-backdrop fade show"></div>
 <div *ngIf="mostrarConfirmacion" class="modal d-block" tabindex="-1" (click)="cerrarConfirmacion()">
   <div class="modal-dialog modal-appear" (click)="$event.stopPropagation()">
     <div class="modal-content">
