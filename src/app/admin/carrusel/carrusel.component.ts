@@ -23,6 +23,7 @@ export class CarruselComponent implements OnInit {
   itemEditando: ItemCarrusel | null = null;
   formulario = {
     imagen: null as File | null,
+    imagen_mobile: null as File | null,
     producto_id: null as number | null,
     orden: null as number | null,
     estado: 'activo'
@@ -32,6 +33,7 @@ export class CarruselComponent implements OnInit {
   mensaje = '';
   tipoMensaje: 'success' | 'error' = 'success';
   imagenPreview: string | null = null;
+  imagenMobilePreview: string | null = null;
 
   // Filtros
   filtros: FiltrosCarrusel = {
@@ -118,6 +120,7 @@ export class CarruselComponent implements OnInit {
     this.itemEditando = null;
     this.formulario = {
       imagen: null,
+      imagen_mobile: null,
       producto_id: null,
       orden: null,
       estado: 'activo'
@@ -125,21 +128,41 @@ export class CarruselComponent implements OnInit {
     this.errores = {};
     this.mensaje = '';
     this.imagenPreview = null;
+    this.imagenMobilePreview = null;
     this.mostrarFormulario = true;
   }
 
   mostrarFormularioEditar(item: ItemCarrusel): void {
     this.itemEditando = item;
+    
+    // Obtener producto_id desde el objeto producto anidado
+    let productoId = null;
+    if (item.producto && item.producto.id) {
+      productoId = item.producto.id;
+    } else if (item.producto_id) {
+      // Fallback por si acaso viene directo
+      productoId = typeof item.producto_id === 'string' 
+        ? parseInt(item.producto_id, 10) 
+        : item.producto_id;
+    }
+    
     this.formulario = {
       imagen: null,
-      producto_id: item.producto_id || null,
+      imagen_mobile: null,
+      producto_id: productoId,
       orden: item.orden,
       estado: item.estado
     };
+    
     this.errores = {};
     this.mensaje = '';
     this.imagenPreview = item.imagen_url;
+    this.imagenMobilePreview = item.imagen_mobile_url || null;
     this.mostrarFormulario = true;
+    
+    // Debug para verificar
+    console.log('Item editando:', item);
+    console.log('Producto ID en formulario:', this.formulario.producto_id);
   }
 
   cerrarFormulario(): void {
@@ -147,6 +170,7 @@ export class CarruselComponent implements OnInit {
     this.itemEditando = null;
     this.formulario = {
       imagen: null,
+      imagen_mobile: null,
       producto_id: null,
       orden: null,
       estado: 'activo'
@@ -154,6 +178,7 @@ export class CarruselComponent implements OnInit {
     this.errores = {};
     this.mensaje = '';
     this.imagenPreview = null;
+     this.imagenMobilePreview = null;
   }
 
   onImagenSeleccionada(event: any): void {
@@ -213,13 +238,30 @@ export class CarruselComponent implements OnInit {
     // Crear FormData
     const formData = new FormData();
     
-    // Solo agregar imagen si hay una nueva imagen seleccionada
     if (this.formulario.imagen) {
       formData.append('imagen', this.formulario.imagen);
     }
     
-    if (this.formulario.producto_id) {
-      formData.append('producto_id', this.formulario.producto_id.toString());
+    if (this.formulario.imagen_mobile) {
+      formData.append('imagen_mobile', this.formulario.imagen_mobile);
+    }
+    
+    // ← CORREGIDO: Siempre enviar producto_id en edición
+    if (this.itemEditando) {
+      // Si hay producto, enviar el ID, si no, enviar string vacío
+      const productoId = this.formulario.producto_id;
+      if (productoId && typeof productoId === 'number') {
+        formData.append('producto_id', productoId.toString());
+      } else {
+        // Enviar vacío explícitamente para que el backend lo actualice a null
+        formData.append('producto_id', '');
+      }
+    } else {
+      // En creación, solo enviar si tiene valor
+      const productoId = this.formulario.producto_id;
+      if (productoId && typeof productoId === 'number') {
+        formData.append('producto_id', productoId.toString());
+      }
     }
     
     if (this.formulario.orden !== null) {
@@ -228,10 +270,12 @@ export class CarruselComponent implements OnInit {
     
     formData.append('estado', this.formulario.estado);
 
-    // Si es edición y no hay nueva imagen, pero se eliminó el preview, 
-    // significa que quiere eliminar la imagen actual
     if (this.itemEditando && !this.formulario.imagen && !this.imagenPreview) {
       formData.append('eliminar_imagen', '1');
+    }
+
+    if (this.itemEditando && !this.formulario.imagen_mobile && !this.imagenMobilePreview) {
+      formData.append('eliminar_imagen_mobile', '1');
     }
 
     const operacion = this.itemEditando 
@@ -246,10 +290,8 @@ export class CarruselComponent implements OnInit {
             : 'Imagen agregada exitosamente';
           this.tipoMensaje = 'success';
           
-          // Recargar la lista
           this.cargarCarrusel();
           
-          // Cerrar el formulario después de un breve delay
           setTimeout(() => {
             this.cerrarFormulario();
           }, 1500);
@@ -265,7 +307,14 @@ export class CarruselComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al guardar imagen del carrusel:', error);
-        this.mensaje = 'Error de conexión al guardar la imagen';
+        
+        if (error.error && error.error.errors) {
+          this.errores = error.error.errors;
+          this.mensaje = error.error.message || 'Error de validación';
+        } else {
+          this.mensaje = 'Error de conexión al guardar la imagen';
+        }
+        
         this.tipoMensaje = 'error';
         this.enviando = false;
       }
@@ -422,5 +471,39 @@ export class CarruselComponent implements OnInit {
       style: 'currency',
       currency: 'PEN'
     }).format(precio);
+  }
+  onImagenMobileSeleccionada(event: any): void {
+    const archivo = event.target.files[0];
+    if (archivo) {
+      this.formulario.imagen_mobile = archivo;
+      
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagenMobilePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(archivo);
+    } else {
+      this.formulario.imagen_mobile = null;
+      if (!this.itemEditando) {
+        this.imagenMobilePreview = null;
+      }
+    }
+  }
+
+  eliminarImagenMobilePreview(): void {
+    this.formulario.imagen_mobile = null;
+    
+    if (this.itemEditando) {
+      this.imagenMobilePreview = null;
+    } else {
+      this.imagenMobilePreview = null;
+    }
+    
+    // Reset del input file
+    const fileInput = document.getElementById('imagen_mobile') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 }

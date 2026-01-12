@@ -147,15 +147,21 @@
                   {{ item.estado }}
                 </span>
               </div>
-              <div *ngIf="item.producto_id" class="d-flex justify-content-between align-items-center mb-2">
+              <div *ngIf="item.producto" class="d-flex justify-content-between align-items-center mb-2">
                 <small class="text-muted">Producto:</small>
                 <small class="fw-semibold text-end" style="max-width: 120px; font-size: 0.7rem;">
-                  {{ getProductoNombre(item.producto_id) }}
+                  {{ item.producto.nombre }}
                 </small>
               </div>
-              <div *ngIf="item.producto_precio" class="d-flex justify-content-between align-items-center mb-2">
+
+              <div *ngIf="!item.producto" class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted">Producto:</small>
+                <small class="text-muted fst-italic">Sin producto</small>
+              </div>
+
+              <div *ngIf="item.producto && item.producto.precio" class="d-flex justify-content-between align-items-center mb-2">
                 <small class="text-muted">Precio:</small>
-                <small class="fw-semibold">{{ formatearPrecio(item.producto_precio) }}</small>
+                <small class="fw-semibold">{{ formatearPrecio(item.producto.precio) }}</small>
               </div>
               <div class="d-flex justify-content-between align-items-center">
                 <small class="text-muted">Creado:</small>
@@ -331,17 +337,60 @@
               </button>
             </div>
           </div>
+          <div *ngIf="itemEditando && itemEditando.imagen_mobile_url && !imagenMobilePreview" class="mb-3">
+            <label class="form-label fw-semibold">Imagen móvil actual:</label>
+            <div class="imagen-preview">
+              <img [src]="itemEditando.imagen_mobile_url" alt="Imagen móvil actual" class="preview-img rounded">
+            </div>
+          </div>
+
+          <!-- Selección de imagen móvil -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Imagen para móvil (opcional)
+            </label>
+            <div class="file-input-custom">
+              <input
+                type="file"
+                id="imagen_mobile"
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                (change)="onImagenMobileSeleccionada($event)"
+                [class.is-invalid]="errores.imagen_mobile"
+              />
+              <label for="imagen_mobile" class="form-control text-center">
+                <i class="fas fa-mobile-alt me-2"></i>
+                Seleccionar imagen móvil
+              </label>
+            </div>
+            <div *ngIf="errores.imagen_mobile" class="invalid-feedback d-block">
+              {{ errores.imagen_mobile }}
+            </div>
+            <div class="form-text">
+              Esta imagen se mostrará en dispositivos móviles. Si no se selecciona, se usará la imagen principal.
+            </div>
+          </div>
+
+          <!-- Preview de imagen móvil -->
+          <div *ngIf="imagenMobilePreview" class="mb-3">
+            <label class="form-label fw-semibold">Vista previa móvil:</label>
+            <div class="imagen-preview">
+              <img [src]="imagenMobilePreview" alt="Preview Mobile" class="preview-img rounded">
+              <button type="button" class="btn-remove-preview" (click)="eliminarImagenMobilePreview()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
 
           <!-- Producto asociado -->
           <div class="mb-3">
-            <label class="form-label fw-semibold">Producto asociado</label>
+            <label class="form-label fw-semibold">Producto asociado (opcional)</label>
             <select
               class="form-select"
               [(ngModel)]="formulario.producto_id"
               name="producto_id"
               [disabled]="cargandoProductos"
             >
-              <option value="" disabled selected>-- Selecciona un producto --</option>            
+              <option [ngValue]="null">-- Sin producto asociado --</option>            
               <option *ngFor="let producto of productos" [ngValue]="producto.id">
                 {{ producto.nombre }} - {{ formatearPrecio(producto.precio) }}
               </option>
@@ -353,7 +402,7 @@
               </div>
             </div>
             <div class="form-text" *ngIf="!cargandoProductos">
-              Selecciona un producto para asociar con esta imagen
+              Selecciona un producto para asociar con esta imagen (opcional)
             </div>
           </div>
 

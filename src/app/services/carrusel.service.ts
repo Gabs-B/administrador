@@ -9,6 +9,8 @@ export interface ItemCarrusel {
   id: number;
   imagen: string;
   imagen_url: string;
+  imagen_mobile?: string;  // ← NUEVO
+  imagen_mobile_url?: string; 
   producto_id?: number | null; // Campo agregado para la relación
   producto_nombre?: string; 
   producto_precio?: number; 
@@ -26,7 +28,9 @@ export interface ItemCarrusel {
     estado: string;
     stock: number;
     imagen_url?: string;
-  };
+    producto_slug?: string;
+    descripcion?: string;
+  } | null;
 }
 
 export interface FiltrosCarrusel {
