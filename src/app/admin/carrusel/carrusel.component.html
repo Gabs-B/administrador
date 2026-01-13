@@ -405,6 +405,24 @@
               Selecciona un producto para asociar con esta imagen (opcional)
             </div>
           </div>
+          <div class="mb-3">
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="es_principal"
+              [(ngModel)]="formulario.es_principal"
+              name="es_principal"
+            />
+            <label class="form-check-label fw-semibold" for="es_principal">
+              <i class="fas fa-star text-warning me-2"></i>
+              Marcar como imagen principal
+            </label>
+          </div>
+          <div class="form-text">
+            La imagen principal se mostrará destacada en la parte superior del carrusel. Solo puede haber una imagen principal a la vez.
+          </div>
+        </div>
 
           <div class="row">
             <!-- Orden -->

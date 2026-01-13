@@ -17,6 +17,7 @@ export interface ItemCarrusel {
   producto_estado?: string;
   producto_stock?: number; // Campo adicional para mostrar stock
   orden: number;
+  es_principal?: boolean;
   estado: 'activo' | 'inactivo';
   created_at: string;
   updated_at: String; 

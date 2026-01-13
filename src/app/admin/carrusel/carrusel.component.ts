@@ -26,6 +26,7 @@ export class CarruselComponent implements OnInit {
     imagen_mobile: null as File | null,
     producto_id: null as number | null,
     orden: null as number | null,
+    es_principal: false,
     estado: 'activo'
   };
   errores: any = {};
@@ -123,6 +124,7 @@ export class CarruselComponent implements OnInit {
       imagen_mobile: null,
       producto_id: null,
       orden: null,
+      es_principal: false,
       estado: 'activo'
     };
     this.errores = {};
@@ -151,6 +153,7 @@ export class CarruselComponent implements OnInit {
       imagen_mobile: null,
       producto_id: productoId,
       orden: item.orden,
+      es_principal: item.es_principal || false,
       estado: item.estado
     };
     
@@ -173,6 +176,7 @@ export class CarruselComponent implements OnInit {
       imagen_mobile: null,
       producto_id: null,
       orden: null,
+      es_principal: false,
       estado: 'activo'
     };
     this.errores = {};
@@ -267,7 +271,8 @@ export class CarruselComponent implements OnInit {
     if (this.formulario.orden !== null) {
       formData.append('orden', this.formulario.orden.toString());
     }
-    
+    formData.append('es_principal', this.formulario.es_principal ? '1' : '0');
+
     formData.append('estado', this.formulario.estado);
 
     if (this.itemEditando && !this.formulario.imagen && !this.imagenPreview) {
